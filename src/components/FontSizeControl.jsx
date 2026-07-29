@@ -16,19 +16,25 @@ export const FONT_SCALES = [0.85, 0.925, 1, 1.1, 1.25, 1.4, 1.6];
  * shared across pages.
  */
 export function useFontScale() {
-  const [scale, setScale] = useState(() => {
-    try {
-      const saved = Number(localStorage.getItem(STORAGE_KEY));
-      if (FONT_SCALES.includes(saved)) return saved;
-    } catch { /* ignore */ }
-    return 1;
-  });
+  // Keep the server and hydration frame identical; restore the saved preference
+  // only after mount so React never has to discard the server-rendered tree.
+  const [scale, setScale] = useState(1);
+  const [storageReady, setStorageReady] = useState(false);
 
   useEffect(() => {
     try {
+      const saved = Number(localStorage.getItem(STORAGE_KEY));
+      if (FONT_SCALES.includes(saved)) setScale(saved);
+    } catch { /* ignore */ }
+    setStorageReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!storageReady) return;
+    try {
       localStorage.setItem(STORAGE_KEY, String(scale));
     } catch { /* ignore */ }
-  }, [scale]);
+  }, [scale, storageReady]);
 
   return [scale, setScale];
 }
