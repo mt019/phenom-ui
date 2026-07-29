@@ -21,7 +21,8 @@ function walk(dir) {
   });
 }
 
-const exceptions = readFileSync('scripts/design-token-exceptions.txt', 'utf8')
+const exceptionsPath = 'scripts/design-token-exceptions.txt';
+const exceptions = (existsSync(exceptionsPath) ? readFileSync(exceptionsPath, 'utf8') : '')
   .split('\n')
   .map((line) => line.split('#')[0].trim())
   .filter(Boolean);
