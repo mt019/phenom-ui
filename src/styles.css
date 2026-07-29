@@ -1,5 +1,16 @@
 @import './styles/tokens.css';
 
+/* Desktop: the shared back arrow is quiet until the header row is hovered.
+   Touch screens have no hover, so leave a faint but discoverable control. */
+.phenom-back-link--quiet {
+  opacity: 0;
+}
+@media (hover: none) {
+  .phenom-back-link--quiet {
+    opacity: 0.55;
+  }
+}
+
 /* 站內數值滑桿：避免瀏覽器／作業系統原生 thumb 跳離 Canvas 控制項語彙。 */
 .canvas-range {
   height: 1.25rem;

@@ -22,7 +22,7 @@ import { Link, useNavigate } from 'react-router-dom';
  *
  * `floating` 給沒有抬頭列可掛的滿版工具頁：貼左上角、近乎透明、滑過去才浮出來。
  */
-const QUIET = 'text-token-sm text-ink-muted opacity-0 transition duration-fast '
+const QUIET = 'phenom-back-link--quiet text-token-sm text-ink-muted transition duration-fast '
   + 'group-hover:opacity-100 hover:text-accent hover:opacity-100 focus-visible:opacity-100';
 
 const FLOATING = 'fixed left-3 top-3 z-50 rounded-token-md px-2 py-1 text-token-xs '
