@@ -20,6 +20,8 @@
     "./styles.css": "./src/styles.css",
     "./tokens.css": "./src/styles/tokens.css",
     "./tailwind-preset": "./tailwind-preset.js",
+    "./math": "./src/components/lab/Math.jsx",
+    "./prose": "./src/components/lab/Prose.jsx",
     "./fonts/*": "./fonts/*",
     "./validators/*": "./scripts/*"
   },
