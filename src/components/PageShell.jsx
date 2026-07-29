@@ -34,6 +34,7 @@ export default function PageShell({
   // 返回鍵。不傳＝照全站配置（`src/backNav.js`）決定回哪裡；傳 `null`＝這頁不畫；
   // 傳 `{ href, label }`＝這頁自己說了算。頁面不必再各寫各的。
   back,
+  backIndexHref,
   children,
 }) {
   useEffect(() => {
@@ -50,7 +51,7 @@ export default function PageShell({
     <main className="min-h-screen bg-paper paper-texture text-ink" style={scaleStyle}>
       <div className={`mx-auto py-10 ${PAD_X[width] ?? PAD_X.prose} ${WIDTHS[width] ?? WIDTHS.prose}`}>
         <div className="group mb-4 flex items-center justify-between gap-4">
-          <BackLink back={back} />
+          <BackLink back={back} indexHref={backIndexHref} />
           <span className="flex-1" />
           {controls ? <div className="flex items-center gap-2">{controls}</div> : null}
         </div>

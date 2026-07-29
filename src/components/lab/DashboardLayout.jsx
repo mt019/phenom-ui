@@ -30,6 +30,7 @@ export default function DashboardLayout({
   // 返回鍵。不傳＝照全站配置（`src/backNav.js`）決定回哪裡；傳 `null`＝這頁不畫；
   // 傳 `{ href, label }`＝這頁自己說了算（統計站內頁那種要雙語標籤的才需要）。
   back,
+  backIndexHref,
   headerRight,
   eyebrow,
   title,
@@ -57,7 +58,7 @@ export default function DashboardLayout({
       <header className="border-b border-line-soft">
         <div className={`mx-auto max-w-7xl py-7 ${padX}`}>
           <div className="group mb-4 flex items-center justify-between gap-4">
-            <BackLink back={back} />
+            <BackLink back={back} indexHref={backIndexHref} />
             <span className="flex-1" />
             {headerRight ? <div className="flex items-center gap-2">{headerRight}</div> : null}
           </div>

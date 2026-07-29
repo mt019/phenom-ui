@@ -12,6 +12,7 @@ export { default as PageIdentity } from './components/PageIdentity.jsx';
 export { default as PageShell } from './components/PageShell.jsx';
 export { default as ScrollToTop } from './components/ScrollToTop.jsx';
 export { default as SeoHead } from './components/SeoHead.jsx';
+export { default as SiteHeader } from './components/SiteHeader.jsx';
 export {
   SHELL_PAD_X,
   SHELL_PAD_X_RAIL,
@@ -19,7 +20,7 @@ export {
 } from './components/shellPadding.js';
 
 export { default as Accordion, AccordionItem, useExpandedSet } from './components/lab/Accordion.jsx';
-export { default as ArticleLayout } from './components/lab/ArticleLayout.jsx';
+export { default as ArticleLayout, ArticleNav } from './components/lab/ArticleLayout.jsx';
 export { default as ArticleMeta } from './components/lab/ArticleMeta.jsx';
 export { default as Badge } from './components/lab/Badge.jsx';
 export { default as BookTree } from './components/lab/BookTree.jsx';
@@ -30,6 +31,7 @@ export { default as FilterBar } from './components/lab/FilterBar.jsx';
 export { default as HoverCard } from './components/lab/HoverCard.jsx';
 export { default as HoverCite } from './components/lab/HoverCite.jsx';
 export { default as PdfViewer } from './components/lab/PdfViewer.jsx';
+export { default as Prose } from './components/lab/Prose.jsx';
 export { default as Quiz } from './components/lab/Quiz.jsx';
 export { default as SearchField } from './components/lab/SearchField.jsx';
 export { default as SectionLink } from './components/lab/SectionLink.jsx';

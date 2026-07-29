@@ -69,6 +69,16 @@ export default function BackLink({
    * 螢幕閱讀器需要的名字由 `aria-label` 給，那個不會畫出任何東西。
    */
   const label_ = label ? `回${label}` : '回首頁';
+  const go = (target) => {
+    try {
+      const url = new URL(target, window.location.href);
+      if (url.origin !== window.location.origin) {
+        window.location.assign(url.href);
+        return;
+      }
+    } catch { /* React Router will handle relative paths. */ }
+    navigate(target);
+  };
 
   const onClick = (e) => {
     if (!doubleClickable) return;
@@ -79,11 +89,11 @@ export default function BackLink({
     e.preventDefault();
     if (e.detail >= 2) {
       clearTimeout(timer.current);
-      navigate(indexHref);
+      go(indexHref);
       return;
     }
     clearTimeout(timer.current);
-    timer.current = setTimeout(() => navigate(link.href), DOUBLE_MS);
+    timer.current = setTimeout(() => go(link.href), DOUBLE_MS);
   };
 
   return (
