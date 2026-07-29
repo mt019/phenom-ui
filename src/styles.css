@@ -1,14 +1,12 @@
 @import './styles/tokens.css';
 
-/* Desktop: the shared back arrow is quiet until the header row is hovered.
-   Touch screens have no hover, so leave a faint but discoverable control. */
+/* The shared back arrow is quiet until desktop hover/focus or the first tap on
+   its reserved corner. Touch's first tap reveals; a later tap performs nav. */
 .phenom-back-link--quiet {
   opacity: 0;
 }
-@media (hover: none) {
-  .phenom-back-link--quiet {
-    opacity: 0.55;
-  }
+.phenom-back-link--quiet.phenom-back-link--revealed {
+  opacity: 1;
 }
 
 /* 站內數值滑桿：避免瀏覽器／作業系統原生 thumb 跳離 Canvas 控制項語彙。 */

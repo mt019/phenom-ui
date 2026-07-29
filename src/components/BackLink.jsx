@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 /*
@@ -55,6 +55,7 @@ export default function BackLink({
 }) {
   const navigate = useNavigate();
   const timer = useRef(null);
+  const [touchRevealed, setTouchRevealed] = useState(false);
   useEffect(() => () => clearTimeout(timer.current), []);
 
   const link = back;
@@ -81,11 +82,17 @@ export default function BackLink({
   };
 
   const onClick = (e) => {
-    if (!doubleClickable) return;
     // 修飾鍵與非左鍵一律讓給瀏覽器：開新分頁、複製網址這些不該被攔。
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     // detail 0＝鍵盤觸發的，不等。
     if (e.detail === 0) return;
+    // 觸控沒有 hover：第一次點左上角只叫出箭頭，不偷走這次點擊去導覽。
+    if (window.matchMedia?.('(hover: none)').matches && !touchRevealed) {
+      e.preventDefault();
+      setTouchRevealed(true);
+      return;
+    }
+    if (!doubleClickable) return;
     e.preventDefault();
     if (e.detail >= 2) {
       clearTimeout(timer.current);
@@ -101,7 +108,7 @@ export default function BackLink({
       to={link.href}
       aria-label={link.title || label_}
       onClick={onClick}
-      className={className || (floating ? FLOATING : QUIET)}
+      className={`${className || (floating ? FLOATING : QUIET)} ${touchRevealed ? 'phenom-back-link--revealed' : ''}`.trim()}
     >
       {label ? `← ${label}` : '←'}
     </Link>
