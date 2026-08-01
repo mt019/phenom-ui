@@ -33,6 +33,7 @@ export default function DashboardLayout({
   backIndexHref,
   headerRight,
   eyebrow,
+  eyebrowBack = null,
   title,
   titleClassName = 'font-display',
   summary,
@@ -63,7 +64,7 @@ export default function DashboardLayout({
             {headerRight ? <div className="flex items-center gap-2">{headerRight}</div> : null}
           </div>
           <div className="reader-scale">
-            <PageIdentity eyebrow={eyebrow} title={title} titleClassName={titleClassName} summary={summary} />
+            <PageIdentity eyebrow={eyebrow} eyebrowBack={eyebrowBack} title={title} titleClassName={titleClassName} summary={summary} />
           </div>
         </div>
       </header>

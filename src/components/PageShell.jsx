@@ -27,6 +27,7 @@ const PAD_X = {
 export default function PageShell({
   title,
   eyebrow,
+  eyebrowBack = null,
   width = 'prose',
   controls,
   fontScale,
@@ -57,7 +58,7 @@ export default function PageShell({
         </div>
         <div className={`reader-scale ${width === 'prose' ? 'prose-scaled' : ''}`}>
           <header className="mb-8">
-            <PageIdentity eyebrow={eyebrow} title={title} />
+            <PageIdentity eyebrow={eyebrow} eyebrowBack={eyebrowBack} title={title} />
           </header>
           {children}
         </div>
