@@ -1,4 +1,5 @@
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import { useLayoutEffectOnClient } from './useLayoutEffectOnClient.js';
 
 /*
  * 浮卡的定位。HoverCard（包住一段文字的引用／術語）與 AnnotatedHtml（正文裡的編號註標）
@@ -32,7 +33,7 @@ export function useFloatingCard({ open, getAnchor, width }) {
     setPos({ left, top });
   }, [getAnchor, width]);
 
-  useLayoutEffect(() => {
+  useLayoutEffectOnClient(() => {
     if (!open) { setPos(null); return undefined; }
     place();
     const frame = requestAnimationFrame(place);

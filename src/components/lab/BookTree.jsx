@@ -1,4 +1,5 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import { useLayoutEffectOnClient } from './useLayoutEffectOnClient.js';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import SearchField from './SearchField';
@@ -102,7 +103,7 @@ export default function BookTree({
   // overflow 容器（往上找最近的可捲祖先並設 scrollTop）——不用 scrollIntoView，
   // 後者會連整個視窗一起捲，把讀者從正文拔走。
   const rootRef = useRef(null);
-  useLayoutEffect(() => {
+  useLayoutEffectOnClient(() => {
     const target = rootRef.current?.querySelector('[data-leaf-active]');
     if (!target) return;
     let box = rootRef.current.parentElement;
