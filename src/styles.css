@@ -235,6 +235,27 @@ body {
   vertical-align: -0.2em;
 }
 
+/* 編號註標。建置端把它貼在標點之後，AnnotatedHtml 用事件委派接上浮卡。
+   中文可在任兩字之間斷行，一個數字寬的標記很容易被孤立到下一行，所以整顆設 nowrap，
+   並且不給它自己的左右外距——與前一個字之間看起來要像同一個字串。 */
+.prose-body .fn-ref {
+  white-space: nowrap;
+  cursor: pointer;
+  font-family: var(--font-accent, inherit);
+  font-size: 0.72em;
+  font-variant-numeric: tabular-nums;
+  vertical-align: super;
+  line-height: 0;
+  padding: 0 0.15em;
+  color: var(--color-ink-faint, #8a8378);
+  transition: color var(--duration-fast, 120ms) ease;
+}
+
+.prose-body .fn-ref:hover,
+.prose-body .fn-ref:focus-visible {
+  color: var(--color-accent, #8a5a3b);
+}
+
 /* 圍籬區塊裡的 <code> 會繼承行內那顆藥丸（細框＋左右內距＋accent 字面）。整段程式碼不需要
    第二層框，也需要等寬字面，所以在這裡把它退回素的。外框、內距與捲動由 Prose 的 pre 負責。 */
 .prose-body pre > code {

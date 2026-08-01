@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { CARD_GAP as GAP, useFloatingCard } from './useFloatingCard.js';
 
 /*
  * The floating card behind both kinds of annotation in the prose: a citation on
@@ -21,7 +22,6 @@ import { createPortal } from 'react-dom';
  *   give back what the button element was providing.
  */
 const CARD_W = 320;
-const GAP = 8;
 const OPEN_DELAY = 70;
 const CLOSE_DELAY = 140;
 let closeActiveCard = null;
@@ -29,9 +29,7 @@ let closeActiveCard = null;
 export default function HoverCard({ children, card, className, interactive = true, pinnable = interactive, width = CARD_W, label, focusable = true }) {
   const [open, setOpen] = useState(false);
   const [pinned, setPinned] = useState(false);
-  const [pos, setPos] = useState(null);
   const markerRef = useRef(null);
-  const cardRef = useRef(null);
   const openTimer = useRef(null);
   const closeTimer = useRef(null);
   const id = useId();
@@ -43,36 +41,8 @@ export default function HoverCard({ children, card, className, interactive = tru
     setOpen(false);
   }, []);
 
-  const place = useCallback(() => {
-    const m = markerRef.current?.getBoundingClientRect();
-    if (!m) return;
-    const cardW = cardRef.current?.offsetWidth ?? Math.min(width, window.innerWidth - GAP * 2);
-    const cardH = cardRef.current?.offsetHeight ?? 140;
-    const above = m.top > cardH + GAP + 8;
-    const left = Math.min(
-      Math.max(GAP, m.left + m.width / 2 - cardW / 2),
-      window.innerWidth - cardW - GAP,
-    );
-    const wanted = above ? m.top - cardH - GAP : m.bottom + GAP;
-    const top = Math.min(Math.max(GAP, wanted), window.innerHeight - cardH - GAP);
-    setPos({ left, top });
-  }, [width]);
-
-  useLayoutEffect(() => {
-    if (!open) return undefined;
-    // Twice: the first pass has no card to measure, so it places from an
-    // estimate; the second runs once the card is mounted and uses its real
-    // height. Without it, a marker near the top of the page opens off-screen.
-    place();
-    const frame = requestAnimationFrame(place);
-    window.addEventListener('scroll', place, true);
-    window.addEventListener('resize', place);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener('scroll', place, true);
-      window.removeEventListener('resize', place);
-    };
-  }, [open, place]);
+  const getAnchor = useCallback(() => markerRef.current, []);
+  const { cardRef, pos } = useFloatingCard({ open, getAnchor, width });
 
   useEffect(() => {
     if (!open) return undefined;

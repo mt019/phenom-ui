@@ -27,9 +27,15 @@ export default function SiteHeader({
   onLangChange,
   scale,
   onScaleChange,
+  sticky = false,
 }) {
+  // 這一列平常只裝返回鍵、字級與外觀三顆。內容量撐不起整條磨砂底加分隔線，所以預設就待在
+  // 頁首、跟著捲走。真的需要隨時搆得到的站（長表格、逐段對照）才傳 sticky。
+  const chrome = sticky
+    ? 'sticky top-0 z-40 border-b border-line-soft bg-paper/95 backdrop-blur-sm'
+    : '';
   return (
-    <div className="sticky top-0 z-40 mb-6 border-b border-line-soft bg-paper/95 backdrop-blur-sm">
+    <div className={`mb-6 ${chrome}`}>
       <div className={`group mx-auto flex items-center justify-between gap-4 py-2 ${PAD_X[width] ?? PAD_X.article} ${WIDTHS[width] ?? WIDTHS.article}`}>
         <BackLink back={back} indexHref={backIndexHref} />
         <span className="flex-1" />

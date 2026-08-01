@@ -22,6 +22,7 @@ export {
 export { default as Accordion, AccordionItem, useExpandedSet } from './components/lab/Accordion.jsx';
 export { default as ArticleLayout, ArticleNav } from './components/lab/ArticleLayout.jsx';
 export { default as ArticleMeta } from './components/lab/ArticleMeta.jsx';
+export { default as AnnotatedHtml } from './components/lab/AnnotatedHtml.jsx';
 export { default as Badge } from './components/lab/Badge.jsx';
 export { default as BookTree } from './components/lab/BookTree.jsx';
 export { default as DashboardLayout } from './components/lab/DashboardLayout.jsx';
