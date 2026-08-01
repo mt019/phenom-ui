@@ -22,7 +22,7 @@ import PageIdentity from '../PageIdentity';
  * the mark on wherever the reader currently is.
  */
 export default function ArticleLayout({
-  title, eyebrow, summary, meta, nav, tocLabel, tocKey,
+  title, eyebrow, eyebrowBack = null, summary, meta, nav, tocLabel, tocKey,
   // 右欄目次要列到第幾層。預設 h2＋h3。存檔頁那種「一頁收很多則、每則自己帶小標」的
   // 版面傳 [2]：小標在那裡重複（六則各有一條「補記（Matters 留言區）」），列進去是把
   // 同一個詞印六遍，不是導覽。
@@ -67,7 +67,7 @@ export default function ArticleLayout({
           grid track（minmax(0,44rem)）決定、在 zoom 之外，所以邊界不隨字級移動。 */}
       <article className={scaleContent ? 'reader-scale' : ''}>
         <header className="mb-8">
-          <PageIdentity eyebrow={eyebrow} title={title} summary={summary} />
+          <PageIdentity eyebrow={eyebrow} eyebrowBack={eyebrowBack} title={title} summary={summary} />
           {meta}
         </header>
 
