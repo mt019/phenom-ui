@@ -30,3 +30,15 @@ test('shared source does not export Canvas business components', async () => {
   const index = await readFile(new URL('../src/index.js', import.meta.url), 'utf8');
   assert.doesNotMatch(index, /backNav|src\/data|Jirs|Constitutional|FrontDoor/);
 });
+
+test('every page shell carries eyebrow navigation into PageIdentity', async () => {
+  for (const file of [
+    '../src/components/PageShell.jsx',
+    '../src/components/lab/ArticleLayout.jsx',
+    '../src/components/lab/DashboardLayout.jsx',
+  ]) {
+    const source = await readFile(new URL(file, import.meta.url), 'utf8');
+    assert.match(source, /eyebrowBack\s*=\s*null/);
+    assert.match(source, /<PageIdentity[^>]*eyebrowBack=\{eyebrowBack\}/);
+  }
+});
