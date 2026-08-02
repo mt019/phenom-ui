@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ExternalLink } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowRight, ExternalLink } from 'lucide-react';
 import { CARD_GAP as GAP, useFloatingCard } from './useFloatingCard.js';
 
 /*
@@ -19,15 +20,22 @@ const CARD_W = 320;
 const OPEN_DELAY = 70;
 const CLOSE_DELAY = 140;
 
-export default function AnnotatedHtml({ html, notes = [], className }) {
+export default function AnnotatedHtml({
+  html, notes = [], terms = {}, className,
+}) {
   const containerRef = useRef(null);
-  const [active, setActive] = useState(null); // { element, note }
+  const [active, setActive] = useState(null); // { element, note } 或 { element, term }
   const [pinned, setPinned] = useState(false);
   const openTimer = useRef(null);
   const closeTimer = useRef(null);
 
   const byNumber = useRef(new Map());
   byNumber.current = new Map(notes.map((note) => [String(note.n), note]));
+  const byTerm = useRef({});
+  byTerm.current = terms;
+  // 站內術語連結走 router，免得每點一個術語就整頁重載。與 TermLink 一樣，這個元件
+  // 假定自己掛在 router 底下。
+  const navigate = useNavigate();
 
   const forceClose = useCallback(() => {
     clearTimeout(openTimer.current);
@@ -42,9 +50,11 @@ export default function AnnotatedHtml({ html, notes = [], className }) {
   const show = useCallback((element, immediate) => {
     clearTimeout(closeTimer.current);
     clearTimeout(openTimer.current);
-    const note = byNumber.current.get(element.dataset.note);
-    if (!note) return;
-    const reveal = () => setActive({ element, note });
+    const payload = element.dataset.term
+      ? { term: byTerm.current[element.dataset.term] }
+      : { note: byNumber.current.get(element.dataset.note) };
+    if (!payload.term && !payload.note) return;
+    const reveal = () => setActive({ element, ...payload });
     if (immediate) reveal();
     else openTimer.current = setTimeout(reveal, OPEN_DELAY);
   }, []);
@@ -58,13 +68,28 @@ export default function AnnotatedHtml({ html, notes = [], className }) {
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return undefined;
-    const markerOf = (event) => event.target?.closest?.('[data-note]');
+    const markerOf = (event) => event.target?.closest?.('[data-note],[data-term]');
     const onOver = (event) => { const m = markerOf(event); if (m) show(m, false); };
     const onOut = (event) => { if (markerOf(event)) hide(); };
     const onFocusIn = (event) => { const m = markerOf(event); if (m) show(m, true); };
     const onFocusOut = (event) => { if (markerOf(event)) hide(); };
+    // 註標是 <sup>，點擊在原地釘住卡片；術語是 <a>，點擊走到詞條頁。
+    // 手機沒有 hover，術語的那條路就是點下去進頁面，這是對的行為。
+    // 站內連結交給 router 走，免得每點一個術語就整頁重載；瀏覽器自己的開新分頁、
+    // 另存這些操作（按著修飾鍵、中鍵）照原樣讓給瀏覽器。
     const onClick = (event) => {
       const m = markerOf(event);
+      if (m?.dataset.term) {
+        const href = m.getAttribute('href');
+        const plainClick = event.button === 0
+          && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
+        if (href?.startsWith('/') && plainClick && navigate) {
+          event.preventDefault();
+          forceClose();
+          navigate(href);
+        }
+        return;
+      }
       if (!m) return;
       event.preventDefault();
       show(m, true);
@@ -72,7 +97,7 @@ export default function AnnotatedHtml({ html, notes = [], className }) {
     };
     const onKeyDown = (event) => {
       const m = markerOf(event);
-      if (!m || (event.key !== 'Enter' && event.key !== ' ')) return;
+      if (!m || m.dataset.term || (event.key !== 'Enter' && event.key !== ' ')) return;
       event.preventDefault();
       show(m, true);
       setPinned((p) => !p);
@@ -91,7 +116,7 @@ export default function AnnotatedHtml({ html, notes = [], className }) {
       container.removeEventListener('click', onClick);
       container.removeEventListener('keydown', onKeyDown);
     };
-  }, [hide, show]);
+  }, [forceClose, hide, navigate, show]);
 
   useEffect(() => {
     if (!active) return undefined;
@@ -115,6 +140,7 @@ export default function AnnotatedHtml({ html, notes = [], className }) {
   }, []);
 
   const note = active?.note;
+  const term = active?.term;
 
   return (
     <>
@@ -124,7 +150,7 @@ export default function AnnotatedHtml({ html, notes = [], className }) {
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: html }}
       />
-      {note && pos
+      {(note || term) && pos
         ? createPortal(
           <div
             ref={cardRef}
@@ -142,11 +168,38 @@ export default function AnnotatedHtml({ html, notes = [], className }) {
             }}
             className="z-30 rounded-token-md border border-line bg-surface-raised px-3.5 py-3 text-left text-token-xs leading-relaxed shadow-token-md"
           >
-            <NoteCard note={note} />
+            {note ? <NoteCard note={note} /> : <TermCard term={term} />}
           </div>,
           document.body,
         )
         : null}
+    </>
+  );
+}
+
+/*
+ * 術語卡。與註釋卡共用同一顆浮卡引擎，答的問題不同——註釋交出一份出處，術語交出一個解釋。
+ * 卡片只放一行定義，其餘留給詞條頁：讀者要的是不離開句子就知道這個詞指誰。
+ */
+function TermCard({ term }) {
+  if (!term) return null;
+  return (
+    <>
+      <span className="block font-medium text-ink">{term.term}</span>
+      {term.kind ? (
+        <span className="mt-0.5 block font-accent text-token-xs uppercase tracking-[0.1em] text-ink-faint">
+          {term.kind}
+        </span>
+      ) : null}
+      <span className="mt-1.5 block text-ink-muted">{term.oneLine}</span>
+      {term.route ? (
+        <a
+          href={term.route}
+          className="mt-2 inline-flex items-center gap-1 text-accent hover:underline"
+        >
+          完整說明 <ArrowRight size={11} />
+        </a>
+      ) : null}
     </>
   );
 }
