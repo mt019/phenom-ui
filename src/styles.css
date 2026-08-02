@@ -1,5 +1,39 @@
 @import './styles/tokens.css';
 
+/* 捲軸。作業系統原生那條在每個平台長得都不一樣，而且是這一整套版面上唯一沒有經過設計的
+   東西——兩側 rail、寬表格、下拉選單、程式碼區塊都會露出它。這裡一次換掉，套在全域，
+   免得每加一個 overflow 容器就要記得補一次（記不得就是漏一處，而漏的那處特別顯眼）。
+
+   軌道不畫，只留一條墨線當滑塊，滑過去才變深；粗細 6px，比原生細，貼著內容也不搶。
+   兩套語法都寫：scrollbar-width／scrollbar-color 走 Firefox 與新版 Chrome，
+   ::-webkit-scrollbar 走 WebKit。**別只寫其中一套**，Safari 不吃前者。
+
+   例外只有一個：作業系統自己畫的（原生 select 的下拉清單、date picker）碰不到，
+   所以那些原生控制項本來就不用（見 DESIGN.md 的「不用原生 UI 元件」）。 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--c-ink) 22%, transparent) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--c-ink) 22%, transparent);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in oklab, var(--c-ink) 40%, transparent);
+}
+
 /* The shared back arrow is quiet until desktop hover/focus or the first tap on
    its reserved corner. Touch's first tap reveals; a later tap performs nav. */
 .phenom-back-link--quiet {
@@ -236,24 +270,44 @@ body {
 }
 
 /* 編號註標。建置端把它貼在標點之後，AnnotatedHtml 用事件委派接上浮卡。
-   中文可在任兩字之間斷行，一個數字寬的標記很容易被孤立到下一行，所以整顆設 nowrap，
-   並且不給它自己的左右外距——與前一個字之間看起來要像同一個字串。 */
+   中文可在任兩字之間斷行，一個數字寬的標記很容易被孤立到下一行，所以整顆設 nowrap。
+
+   形狀跟憲法法庭那邊的意見書一致（my-canvas-lab 的 _constitutional-court/OpinionText.jsx）：
+   0.68em、粗體、accent 字色、底線，上標靠 position 上移而不靠 vertical-align——瀏覽器
+   對 <sup> 的 super 會連帶壓行高，自己算位移才控制得住。註標本身是內容不是鷹架，所以
+   不用 ink-faint。
+
+   編號用 accent 那支打字機字體（Erikas Farbband），站主 2026-08-02 指定。子集裡十個數字
+   與兩位數都在，量過沒有掉回明體。憲法法庭那邊的意見書目前是繼承正文字體，形狀要跟這裡
+   對齊（my-canvas-lab 的 _constitutional-court/OpinionText.jsx）。
+
+   顏色 token 一律用 --c-*，不要寫成 --color-*。2026-08-02 以前這段寫的是 var(--color-accent,
+   #8a5a3b)，那個變數不存在，整段其實一直在吃逗號後面的 fallback，顏色沒跟著主題走。
+   字體那個 --font-accent 是真的，別一起改掉。 */
 .prose-body .fn-ref {
   white-space: nowrap;
-  cursor: pointer;
+  cursor: help;
+  display: inline-block;
+  position: relative;
+  top: -0.38em;
   font-family: var(--font-accent, inherit);
-  font-size: 0.72em;
+  font-size: 0.68em;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
-  vertical-align: super;
-  line-height: 0;
-  padding: 0 0.15em;
-  color: var(--color-ink-faint, #8a8378);
-  transition: color var(--duration-fast, 120ms) ease;
+  vertical-align: baseline;
+  line-height: 1;
+  margin: 0 0.08em;
+  padding: 0;
+  color: var(--c-accent);
+  text-decoration: underline;
+  text-decoration-color: var(--c-line);
+  text-underline-offset: 2px;
+  transition: text-decoration-color var(--dur-fast) ease;
 }
 
 .prose-body .fn-ref:hover,
 .prose-body .fn-ref:focus-visible {
-  color: var(--color-accent, #8a5a3b);
+  text-decoration-color: var(--c-accent);
 }
 
 /* 圍籬區塊裡的 <code> 會繼承行內那顆藥丸（細框＋左右內距＋accent 字面）。整段程式碼不需要

@@ -40,6 +40,7 @@ export { default as SourceFilter } from './components/lab/SourceFilter.jsx';
 export { default as StickyHeading, useStickyTop } from './components/lab/StickyHeading.jsx';
 export { default as SubOutline } from './components/lab/SubOutline.jsx';
 export { default as TableOfContents } from './components/lab/TableOfContents.jsx';
+export { default as useHeadings } from './components/lab/useHeadings.js';
 export { default as Tabs, useTabParam, useTabParams } from './components/lab/Tabs.jsx';
 export { default as TermLink } from './components/lab/TermLink.jsx';
 
