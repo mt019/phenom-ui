@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import useHeadings from './useHeadings';
 
 /*
@@ -13,19 +14,35 @@ import useHeadings from './useHeadings';
  */
 export default function TableOfContents({
   containerRef, label = '本頁目次', refreshKey, levels = [2, 3], items, active,
+  metaIds = ['notes', 'sources'],
 }) {
   // hook 不能寫在條件裡：外面已經量好時就不給它容器，它會回一份空的。
   const own = useHeadings(items ? null : containerRef, { levels, refreshKey });
   const list = items ?? own.items;
   const current = items ? active : own.active;
 
+  // 側欄容器有高度上限（見 ArticleLayout 的 max-h + overflow-y-auto），標題一多，目次
+  // 內容比容器高。sticky 定位本身沒問題（容器釘在 top:64px 沒有跟丟），但容器內部的捲動
+  // 要靠自己追——目前這一節如果落在容器可視範圍外，讀者只看得到側欄不動，感覺像整條側欄
+  // 壞掉，其實是內部沒有跟讀者一起往下捲。current 換了就把那一項捲進容器的可視範圍；
+  // nearest 只動側欄容器，不動視窗本身（容器已經在視窗內，等於不做多餘捲動）。
+  const activeRef = useRef(null);
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }, [current]);
+
   if (list.length === 0) return null;
+
+  // 章末的註釋、出處是兩個 h2，跟正文標題一起被 useHeadings 掃進來，不分隔的話目次
+  // 讀起來像是文章結構的延伸，其實是另一種東西（引用清單，不是內容）。找第一個落在
+  // metaIds 裡的項目，前面插一條線，metaIds 之後不再插——只分一次，不是每條註都分。
+  const firstMetaIdx = list.findIndex((it) => metaIds.includes(it.id));
 
   return (
     <nav aria-label={label} className="text-token-xs leading-relaxed">
       <p className="mb-2 font-accent uppercase tracking-[0.12em] text-ink-faint">{label}</p>
       <ul className="space-y-1.5 border-l border-line-soft">
-        {list.map((it) => {
+        {list.map((it, idx) => {
           const on = it.id === current;
           return (
             /*
@@ -34,7 +51,12 @@ export default function TableOfContents({
              * 結構時，側欄就長得跟正文一樣有兩層。文章本身只有一級標題的話，這裡自然也是
              * 一級，那是母本的事，不是這一欄的事。
              */
-            <li key={it.id} style={{ paddingLeft: it.level >= 3 ? 24 : 12 }}>
+            <li
+              key={it.id}
+              style={{
+                paddingLeft: it.level >= 3 ? 24 : 12,
+                ...(idx === firstMetaIdx ? { marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--c-line-soft)' } : null),
+              }}>
               {/*
                 * 側欄只有 13rem 寬，長標題在這裡最多折兩行，第三行起截斷（滑過去看完整標題）。
                 * line-break: strict 讓中日文的斷行避開「（」「）」「、」這些位置——沒有它，
@@ -42,6 +64,7 @@ export default function TableOfContents({
                 * text-wrap: pretty 讓最後一行不會只剩一兩個字。
                 */}
               <a
+                ref={on ? activeRef : null}
                 href={`#${it.id}`}
                 title={it.full}
                 className={`-ml-px block border-l-2 py-0.5 pl-2 transition-colors duration-fast [line-break:strict] [text-wrap:pretty] line-clamp-2${
