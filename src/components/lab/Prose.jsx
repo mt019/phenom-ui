@@ -52,7 +52,9 @@ const BASE = {
   ol: (props) => <ol className="my-4 list-decimal space-y-1.5 pl-5 text-scaled-base leading-[1.8]" {...props} />,
   li: (props) => <li className="pl-1 text-ink" {...props} />,
   hr: () => <hr className="my-10 border-line-soft" />,
-  strong: (props) => <strong className="font-normal text-ink [text-emphasis:filled_dot] [text-emphasis-position:under]" {...props} />,
+  // 作者強調的記號在 styles/marks.css（.phenom-emphasis），與專名號、書名號、著重號同一處
+  // 決定長相——那幾個記號各站的母本都要用，樣式散在各站就會各長各的。
+  strong: (props) => <strong className="phenom-emphasis text-ink" {...props} />,
   em: (props) => <em className="not-italic text-ink-muted" {...props} />,
   // No fill in the reading column: the body sits on paper and nothing else.
   // Inline code is marked by its face and a hairline, not by a grey box.

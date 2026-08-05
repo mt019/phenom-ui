@@ -1,0 +1,67 @@
+/*
+ * 正文標記——舊書的圈點。
+ *
+ * 專名、書名、有定性的專門用語，在正文裡跟一般敘述長得一模一樣，讀者分不出來，逐句審查
+ * 的時候也分不出來。舊書的作法是給它們各一個記號：專名畫底線、書名畫波浪線、要注意的字
+ * 加著重號。這一份決定那些記號的長相，是全站群唯一的一處。
+ *
+ * 母本寫的是類別不是樣式（wealth 的母本寫 `[[_龐鼎元]]`、`[[~個人所得稅法]]`、`[[.裝入]]`，
+ * 建置時轉成 `<span class="text-mark" data-mark="proper">`）。所以同一份標記出得了兩種版：
+ * 網頁走這裡，紙本走 xeCJK 的 \CJKunderline／\CJKunderwave／\CJKunderdot，一對一。
+ * 完整規格與判準在 phenom-wealth-data/engineering/text-marks.md。
+ *
+ * 位置一律 `under right`：中文的著重號在字的右下，`under left` 是先前三個站各寫各的
+ * 留下來的，不是誰的偏好。
+ *
+ * `text-decoration-skip-ink: none` 是必要的，不是裝飾：預設值會在有下伸筆畫的地方把線
+ * 斷開，Safari 尤其明顯，一條波浪線被切成幾截就認不出是書名號了。
+ *
+ * 記號用的是字型裡的 • 與 ○（U+2022、U+25CB）。正文的匯文明體子集收了這兩個字，
+ * 換字型或重做子集時要一起確認，缺了會變成豆腐——Erikas 子集缺空格那次就是這樣。
+ */
+
+/* 著重號：有定性、但還沒有詞條頁的專門用語。已經有詞條頁的走 .term-ref 的虛線底線。 */
+.text-mark[data-mark='term'] {
+  text-emphasis: filled dot;
+  text-emphasis-position: under right;
+}
+
+/* 專名號：人名、機關、法院、國名、地名。 */
+.text-mark[data-mark='proper'] {
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-thickness: from-font;
+  text-decoration-color: color-mix(in oklab, currentColor 40%, transparent);
+  text-decoration-skip-ink: none;
+  text-underline-offset: 0.18em;
+}
+
+/* 書名號：法規、書刊、判決的名稱，限母本裸寫的；已經加《》的不再標。 */
+.text-mark[data-mark='title'] {
+  text-decoration-line: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: color-mix(in oklab, currentColor 40%, transparent);
+  text-decoration-skip-ink: none;
+  text-underline-offset: 0.2em;
+}
+
+/*
+ * 作者強調。給空心圈，不給實心點——實心點留給專門用語，那才是讀者在這幾個站上最需要
+ * 辨識的東西，而真正的作者強調稀疏到不構成辨識負擔。
+ * 上游的 markdown 是 `**⋯**`，各站把這個類別掛在 <strong> 上。
+ */
+.phenom-emphasis {
+  font-weight: 400;
+  text-emphasis: open circle;
+  text-emphasis-position: under right;
+}
+
+/*
+ * 前端關掉記號：在任一祖先加 data-marks="off"。記號消失，HTML 照樣帶 span——
+ * 伺服器端渲染的產物不變，搜尋引擎讀到的也不變。
+ */
+[data-marks='off'] .text-mark,
+[data-marks='off'] .phenom-emphasis {
+  text-emphasis: none;
+  text-decoration-line: none;
+}
