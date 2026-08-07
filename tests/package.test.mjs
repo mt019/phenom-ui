@@ -8,6 +8,7 @@ test('package exposes source, styles, fonts, preset, and validators', async () =
   assert.equal(pkg.name, '@phenomcanvas/ui');
   assert.equal(pkg.exports['.'], './src/index.js');
   assert.equal(pkg.exports['./styles.css'], './src/styles.css');
+  assert.equal(pkg.exports['./eyebrow'], './src/components/Eyebrow.jsx');
   assert.equal(pkg.exports['./tailwind-preset'], './tailwind-preset.js');
   assert.equal(pkg.exports['./fonts/*'], './fonts/*');
   assert.equal(pkg.exports['./validators/*'], './scripts/*');
