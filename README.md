@@ -42,3 +42,13 @@ import '@phenomcanvas/ui/styles.css';
 
 字型檔隨 package 發布，`styles.css` 以相對 URL 引用，由 consumer bundler
 轉成自己的不可變資產。
+
+## 不可退讓的排版與導航契約
+
+- 顯示／裝飾字體必須原生覆蓋頁面可見語言的字形。德文至少包含
+  `ÄÖÜäöüß`；不接受瀏覽器只用 fallback 補變音符號。`npm test` 會直接檢查
+  Erikas regular 與 bold 的 WOFF2 字形表，subset 漏字即失敗。
+- 文章與其他內頁的 eyebrow 是返回上層索引的導航，必須傳入
+  `eyebrowBack={{ href, label }}`。只有索引頁／首頁可使用沒有目的地的純標籤。
+- 共用 `Eyebrow` 統一處理真實連結、詞距、油墨字重與 `font-synthesis`；各站不要另寫一套
+  看似相同但不能返回的眉題。

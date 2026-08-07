@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
+import { openSync } from 'fontkit';
 
 test('package exposes source, styles, fonts, preset, and validators', async () => {
   const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url)));
@@ -26,6 +27,25 @@ test('font rights and package-relative delivery are recorded', async () => {
   ]) assert.match(styles, new RegExp(`\\.\\./fonts/${font.replace('.', '\\.')}`));
 });
 
+// 顯示字體若漏掉變音字，瀏覽器會只用 fallback 畫兩個點：字面、油墨紋理與字重立刻分裂。
+// 這不是可以接受的 graceful fallback。重做 subset 時必須保住服務語言的完整字形。
+test('Erikas regular and bold natively cover German diacritics', () => {
+  const required = [...'ÄÖÜäöüß'];
+  for (const file of [
+    '../fonts/ErikasFarbband-subset.woff2',
+    '../fonts/ErikasFarbband-Bold-subset.woff2',
+  ]) {
+    const font = openSync(new URL(file, import.meta.url));
+    for (const glyph of required) {
+      assert.equal(
+        font.hasGlyphForCodePoint(glyph.codePointAt(0)),
+        true,
+        `${file} is missing native ${glyph}`,
+      );
+    }
+  }
+});
+
 test('shared source does not export Canvas business components', async () => {
   const index = await readFile(new URL('../src/index.js', import.meta.url), 'utf8');
   assert.doesNotMatch(index, /backNav|src\/data|Jirs|Constitutional|FrontDoor/);
@@ -41,6 +61,13 @@ test('every page shell carries eyebrow navigation into PageIdentity', async () =
     assert.match(source, /eyebrowBack\s*=\s*null/);
     assert.match(source, /<PageIdentity[^>]*eyebrowBack=\{eyebrowBack\}/);
   }
+});
+
+test('an eyebrow with a back destination renders a real navigation link', async () => {
+  const source = await readFile(new URL('../src/components/Eyebrow.jsx', import.meta.url), 'utf8');
+  assert.match(source, /if \(back\)/);
+  assert.match(source, /<Link[\s\S]*to=\{back\.href\}/);
+  assert.doesNotMatch(source, /onClick=/);
 });
 
 // 2026-08-02 使用者明令「全局底層模板禁止原生醜 UI 滑動軌道 bar」。樣式套在全域選擇器上
