@@ -53,9 +53,10 @@ export default function HoverCite({ source, lang = 'zh', children }) {
       card={card}
       // 底線走 text-decoration，不用 border-bottom：行內公式的盒子比一行中文高，border
       // 畫在盒子的底緣，分數的分母因此被那條虛線穿過去（2026-08-13 站主截圖）。
-      // text-decoration 畫在基線下方的固定位置，配上 katex.css 讓 .katex 成為 atomic
-      // inline，線就不會延進公式裡。
-      className="cursor-help underline decoration-dotted decoration-ink-faint underline-offset-[0.3em] [text-decoration-skip-ink:auto] transition-colors duration-fast hover:decoration-accent hover:text-accent"
+      // skip-ink 是 none：漢字的墨沉到基線之下，auto 會在每個字底下讓開，整條線碎掉
+      // （2026-08-13 站主截圖）。只有 KaTeX 那段在 katex.css 把繼承值改回 auto，
+      // 讓位只發生在分數這種真的戳進線裡的字符。
+      className="cursor-help underline decoration-dotted decoration-ink-faint underline-offset-[0.3em] [text-decoration-skip-ink:none] transition-colors duration-fast hover:decoration-accent hover:text-accent"
     >
       {children}
     </HoverCard>
