@@ -43,6 +43,11 @@ export { default as TableOfContents } from './components/lab/TableOfContents.jsx
 export { default as useHeadings } from './components/lab/useHeadings.js';
 export { default as Tabs, useTabParam, useTabParams } from './components/lab/Tabs.jsx';
 export { default as TermLink } from './components/lab/TermLink.jsx';
+export { default as MathText } from './components/lab/MathText.jsx';
+export { default as ChartFrame, useFrame } from './components/lab/chart/ChartFrame.jsx';
+export { Grid, AxisX, AxisY } from './components/lab/chart/Axis.jsx';
+export { Bars, Line, AreaWash, Dots, RuleLine } from './components/lab/chart/marks.jsx';
+export { linearScale, bandScale, niceTicks } from './components/lab/chart/scale.js';
 
 export {
   PALETTES,

@@ -1,5 +1,6 @@
 import { ExternalLink } from 'lucide-react';
 import HoverCard from './HoverCard';
+import MathText from './MathText';
 
 /*
  * A source marker on a claim. Hover the cited words to see who said it and
@@ -30,7 +31,7 @@ export default function HoverCite({ source, lang = 'zh', children }) {
       {quote ? (
         <span className="mt-1.5 block border-l-2 border-line pl-2 text-ink-muted">{quote}</span>
       ) : null}
-      {locator ? <span className="mt-1.5 block text-ink-faint">{locator}</span> : null}
+      {locator ? <span className="mt-1.5 block text-ink-faint"><MathText>{locator}</MathText></span> : null}
       {url ? (
         <a
           href={url}
@@ -50,7 +51,11 @@ export default function HoverCite({ source, lang = 'zh', children }) {
   return (
     <HoverCard
       card={card}
-      className="cursor-help border-b border-dotted border-ink-faint transition-colors duration-fast hover:border-accent hover:text-accent"
+      // 底線走 text-decoration，不用 border-bottom：行內公式的盒子比一行中文高，border
+      // 畫在盒子的底緣，分數的分母因此被那條虛線穿過去（2026-08-13 站主截圖）。
+      // text-decoration 畫在基線下方的固定位置，配上 katex.css 讓 .katex 成為 atomic
+      // inline，線就不會延進公式裡。
+      className="cursor-help underline decoration-dotted decoration-ink-faint underline-offset-[0.3em] [text-decoration-skip-ink:auto] transition-colors duration-fast hover:decoration-accent hover:text-accent"
     >
       {children}
     </HoverCard>

@@ -10,6 +10,14 @@
   font-size: 1.02em; /* KaTeX_Main runs small next to an 18px Ming face */
 }
 
+/* 行內公式不在中間被折行。裝飾線交給 text-decoration-skip-ink 處理：底線遇到分數這種
+   會被穿過的字符自己讓開，遇到 $m$ 這種不低於基線的字符照樣連著畫過去。先前用
+   display:inline-block 把公式變成 atomic inline，底線在每個公式前後都斷一次，小公式
+   也跟著斷（2026-08-13 站主截圖）。 */
+.katex:not(.katex-display .katex) {
+  white-space: nowrap;
+}
+
 .katex-display {
   margin: var(--space-5) 0;
   overflow-x: auto;  /* a long formula scrolls in its own box; the page never does */
