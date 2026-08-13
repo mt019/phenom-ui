@@ -56,7 +56,7 @@ export default function HoverCite({ source, lang = 'zh', children }) {
       // skip-ink 是 none：漢字的墨沉到基線之下，auto 會在每個字底下讓開，整條線碎掉
       // （2026-08-13 站主截圖）。只有 KaTeX 那段在 katex.css 把繼承值改回 auto，
       // 讓位只發生在分數這種真的戳進線裡的字符。
-      className="cursor-help underline decoration-dotted decoration-ink-faint underline-offset-[0.3em] [text-decoration-skip-ink:none] transition-colors duration-fast hover:decoration-accent hover:text-accent"
+      className="cursor-help cite-mark transition-colors duration-fast hover:text-accent"
     >
       {children}
     </HoverCard>
