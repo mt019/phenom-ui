@@ -1,31 +1,26 @@
-# Web font source and rights notes
+# 網頁字型的來源與權利
 
-The user confirmed on 2026-07-30 that all five existing Phenom web-font
-binaries may be redistributed and embedded on the web. These files were
-promoted unchanged from the tracked Canvas Lab font pack:
+站主 2026-07-30 確認，本套件現有的五個網頁字型二進位檔都可以再散布、可以嵌在網頁上。
+五個檔案原樣取自 Canvas Lab 已入版控的字型包：
 
-- `HuiwenMincho-subset.woff2` — body Traditional Chinese face.
-- `ChironSungHK-fallback-subset.woff2` — Traditional Chinese fallback.
-- `ErikasFarbband-subset.woff2` — accent face, regular.
-- `ErikasFarbband-Bold-subset.woff2` — accent face, bold.
-- `RadioNewsman-subset.woff2` — Latin display face.
+- `HuiwenMincho-subset.woff2` — 內文，繁體中文。
+- `ChironSungHK-fallback-subset.woff2` — 繁體中文補字（依 unicode-range 補 Huiwen 畫不出的碼位）。
+- `ErikasFarbband-subset.woff2` — 拉丁點綴，regular。
+- `ErikasFarbband-Bold-subset.woff2` — 拉丁點綴，bold。
+- `RadioNewsman-subset.woff2` — 拉丁標題。
 
-## Subset coverage (2026-08-13)
+## 子集覆蓋（2026-08-13）
 
-The two Erikas faces used to carry a 130-glyph subset generated from one site's
-text at the time. Any macron vowel fell outside it, so Hepburn romanisation
-(`daimyō`, `taishōgun`, `bushidō`) rendered half the word in the accent face and
-the macron letter in whatever came next in the stack. Both weights are now subset
-to fixed Latin coverage — ASCII, Latin-1 Supplement, Latin Extended-A and B, 340
-codepoints — the same "subset once, never rebuild for new text" strategy the CJK
-body face already used. `scripts/validate-font-subsets.mjs` now fails the package
-build if an accent face cannot draw the common Latin repertoire on its own; a
-consumer's own font-coverage check cannot see this class of fault, because it
-tests the whole stack's union and the missing glyph exists in the body face.
+Erikas 兩個字重原本帶的是 130 字的子集，照當時某一個站的文字產生。長音字母全部落在外面，
+於是平文式羅馬字（`daimyō`、`taishōgun`、`bushidō`）的那個字母掉到字型堆疊的下一個面，
+同一個詞裡半數是打字機體、長音那個是明體。兩個字重現在改成固定拉丁覆蓋——ASCII、Latin-1
+補充、擴充 A 與 B，340 個碼位——與內文面同一套「子集一次、之後不因網站文字重建」的策略。
 
-Three codepoints stay out because the upstream Erikas Farbband file has no glyph
-for them: U+0113 ē, U+014A Ŋ, U+014B ŋ.
+`scripts/validate-font-subsets.mjs` 逐個面驗「這個面自己畫得完常用拉丁字元」，畫不完就讓
+套件的 validate 失敗。消費端自己的缺字檢查看不到這一類故障：它驗的是整個字型堆疊的聯集，
+而缺的那個字母在內文面有字，聯集永遠通過。
 
-Upstream attribution and the previously recorded license summaries remain in
-`LICENSES.md`. Package code uses the MIT license; each font remains governed by
-its own upstream terms.
+三個碼位留在覆蓋之外，因為來源字型 erikas-farbband.ttf 本身就沒有：U+0113 ē、U+014A Ŋ、
+U+014B ŋ。
+
+上游的姓名標示與各字型的授權摘要仍在 `LICENSES.md`。套件程式碼用 MIT，字型各自依上游條款。
