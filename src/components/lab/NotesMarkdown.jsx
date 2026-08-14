@@ -41,7 +41,7 @@ export default function NotesMarkdown({ raw }) {
   return (
     <div className="max-w-3xl">
       {blocks.map((b, i) => {
-        if (b.kind === 'h3') return <h3 key={i} id={`nh-${i}`} className="mt-10 font-serif text-token-lg font-bold leading-snug">{b.lines[0]}</h3>;
+        if (b.kind === 'h3') return <h3 key={i} id={`nh-${i}`} className="mt-10 font-display text-token-lg leading-snug">{b.lines[0]}</h3>;
         if (b.kind === 'h4') return <h4 key={i} id={`nh-${i}`} className="mt-8 font-serif text-token-body font-bold leading-snug">{b.lines[0]}</h4>;
         if (b.kind === 'ul') return (
           <ul key={i} className="mt-4 list-disc space-y-2 pl-5">
