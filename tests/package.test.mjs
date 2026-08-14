@@ -14,10 +14,11 @@ test('package exposes source, styles, fonts, preset, and validators', async () =
   assert.equal(pkg.exports['./validators/*'], './scripts/*');
 });
 
-test('font rights and package-relative delivery are recorded', async () => {
+// 授權紀錄改中文之後這條跟著改（2026-08-13 站主明令工程文件一律中文）。
+test('字型的權利與套件相對路徑有記錄在案', async () => {
   const notes = await readFile(new URL('../fonts/SOURCE-NOTES.md', import.meta.url), 'utf8');
   const styles = await readFile(new URL('../src/styles.css', import.meta.url), 'utf8');
-  assert.match(notes, /redistributed and embedded on the web/);
+  assert.match(notes, /都可以再散布、可以嵌在網頁上/);
   assert.doesNotMatch(styles, /url\(['"]?\/fonts\//);
   for (const font of [
     'HuiwenMincho-subset.woff2',

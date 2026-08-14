@@ -285,7 +285,9 @@ body {
    顏色 token 一律用 --c-*，不要寫成 --color-*。2026-08-02 以前這段寫的是 var(--color-accent,
    #8a5a3b)，那個變數不存在，整段其實一直在吃逗號後面的 fallback，顏色沒跟著主題走。
    字體那個 --font-accent 是真的，別一起改掉。 */
-.prose-body .fn-ref {
+/* 選擇器不綁 .prose-body（2026-08-13）：資料層是 JSON 字串的頁面（德川頁的術語表、年表）
+   不走 markdown 管線、外層沒有 .prose-body，註標一樣要長這個樣子。 */
+.fn-ref {
   white-space: nowrap;
   cursor: help;
   display: inline-block;
@@ -306,8 +308,8 @@ body {
   transition: text-decoration-color var(--dur-fast) ease;
 }
 
-.prose-body .fn-ref:hover,
-.prose-body .fn-ref:focus-visible {
+.fn-ref:hover,
+.fn-ref:focus-visible {
   text-decoration-color: var(--c-accent);
 }
 
