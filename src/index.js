@@ -33,6 +33,7 @@ export { default as FilterBar } from './components/lab/FilterBar.jsx';
 export { default as HoverCard } from './components/lab/HoverCard.jsx';
 export { default as HoverCite } from './components/lab/HoverCite.jsx';
 export { default as NotesList } from './components/lab/NotesList.jsx';
+export { default as NotesMarkdown, mdInline } from './components/lab/NotesMarkdown.jsx';
 export { default as PdfViewer } from './components/lab/PdfViewer.jsx';
 export { default as Prose } from './components/lab/Prose.jsx';
 export { buildNotes, noteHtml, stripNotes } from './components/lab/textNotes.js';
