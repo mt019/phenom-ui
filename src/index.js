@@ -7,7 +7,7 @@ export {
   FONT_SCALES,
   useFontScale,
 } from './components/FontSizeControl.jsx';
-export { default as LangSwitch } from './components/LangSwitch.jsx';
+export { default as LangSwitch, useLang } from './components/LangSwitch.jsx';
 export { default as PageIdentity } from './components/PageIdentity.jsx';
 export { default as PageShell } from './components/PageShell.jsx';
 export { default as ScrollToTop } from './components/ScrollToTop.jsx';
@@ -42,6 +42,7 @@ export { default as SearchField } from './components/lab/SearchField.jsx';
 export { default as SearchResults } from './components/lab/SearchResults.jsx';
 export { default as SectionLink } from './components/lab/SectionLink.jsx';
 export { default as SourceFilter } from './components/lab/SourceFilter.jsx';
+export { default as SourcesList } from './components/lab/SourcesList.jsx';
 export { default as StickyHeading, useStickyTop } from './components/lab/StickyHeading.jsx';
 export { default as SubOutline } from './components/lab/SubOutline.jsx';
 export { default as TableOfContents } from './components/lab/TableOfContents.jsx';
