@@ -30,7 +30,7 @@ export const GOLD_FOIL_INK = '#3a2d10'; // 金箔上的深褐字色
 export const MARK_TONES = { // token-exempt
   rose:  '#e8a4ac',
   blue:  '#a4b4e8',
-  green: '#a4c8a4',
+  teal:  '#8cc4b4',
   sand:  '#d0b8a4',
 };
 
