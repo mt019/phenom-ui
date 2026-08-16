@@ -77,8 +77,21 @@ for (const n of names) {
   if (!bg.find((t) => t.name === n)) errs.push(`--tone-${n} has no -bg`);
 }
 
+// Layer 1c data-mark palette (--viz-N): same lightness band, chroma one step up.
+// Dots and chart marks have no attached label, so these may not be muted down
+// into the badge band (reads gray) nor pushed past the vivid ceiling.
+const VIZ_L = [0.45, 0.58];
+const VIZ_C = [0.10, 0.16];
+const viz = [...css.matchAll(/--viz-(\d+):\s*(#[0-9a-fA-F]{6})/g)]
+  .map(([, n, hex]) => ({ name: `viz-${n}`, ...oklch(hex), hex }));
+if (!viz.length) errs.push('no --viz-* data-mark tokens found in tokens.css');
+for (const t of viz) {
+  if (t.L < VIZ_L[0] || t.L > VIZ_L[1]) errs.push(`--${t.name} ${t.hex}: L ${t.L} outside mark band ${VIZ_L[0]}–${VIZ_L[1]}`);
+  if (t.C < VIZ_C[0] || t.C > VIZ_C[1]) errs.push(`--${t.name} ${t.hex}: C ${t.C} outside mark chroma band ${VIZ_C[0]}–${VIZ_C[1]} (too gray / too vivid)`);
+}
+
 if (errs.length) {
   console.error(`color-system invalid (${errs.length}):\n  ${errs.join('\n  ')}`);
   process.exit(1);
 }
-console.log(`color system ok: ${names.length} tone pairs, text L-spread ${txSpread} (≤${TX_SPREAD_MAX}), bg L-spread ${bgSpread} (≤${BG_SPREAD_MAX}).`);
+console.log(`color system ok: ${names.length} tone pairs, ${viz.length} viz marks, text L-spread ${txSpread} (≤${TX_SPREAD_MAX}), bg L-spread ${bgSpread} (≤${BG_SPREAD_MAX}).`);

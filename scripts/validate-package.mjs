@@ -31,8 +31,10 @@ if (/url\(['"]?\/fonts\//.test(css)) throw new Error('font URL must be package-r
 
 let leaks = '';
 try {
-  leaks = execFileSync('rg', [
-    '-l',
+  // grep 不用 rg：這台機器沒有真的 ripgrep 執行檔（shell 裡的 rg 是別名，
+  // spawnSync 找不到），grep -rlE 語意相同、無匹配同樣 exit 1。
+  leaks = execFileSync('grep', [
+    '-rlE',
     String.raw`\.\./backNav|src/data|/Users/|Documents/NTU`,
     'src',
   ], { cwd: root, encoding: 'utf8' }).trim();

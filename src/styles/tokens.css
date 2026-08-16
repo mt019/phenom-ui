@@ -78,6 +78,19 @@
   --cat-7-tx: var(--tone-rose-tx);   --cat-7-bg: var(--tone-rose-bg);
   --cat-8-tx: var(--tone-slate-tx);  --cat-8-bg: var(--tone-slate-bg);
 
+  /* Layer 1c — data-mark palette（點陣、圖表 mark、sparkline 專用）。
+     上面的 badge 灰調是刻意的：徽章永遠帶文字，顏色只載和諧、標籤載身分。
+     但一顆 10px 的點沒有標籤可靠，灰調點陣讀起來就是一片灰（2026-08-16 站主
+     當場退回）。所以 mark 用色另開一層：明度同帶（L 0.45–0.58）、彩度上調一檔
+     （C 0.10–0.16），固定順序 1→4 指派、篩選不重排；相鄰對的 CVD 分離度與
+     對 --c-paper 的 3:1 對比都跑過六項檢查（dataviz validate_palette）。
+     超過四個分類先重想圖，不加槽。全站規則：底色與徽章用 --cat，資料 mark
+     用 --viz，兩層都不准在頁面裡寫死 hex。validate-color-system.mjs 管帶寬。 */
+  --viz-1: #b04a30;
+  --viz-2: #2a6fae;
+  --viz-3: #567d2a;
+  --viz-4: #9a55b0;
+
   /* Type scale (rem). Body is 18px: Huiwen Mincho strokes are thin and
      CJK Ming faces need one step up from Latin defaults. */
   --text-xs: 0.75rem;
