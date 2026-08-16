@@ -77,22 +77,14 @@ for (const n of names) {
   if (!bg.find((t) => t.name === n)) errs.push(`--tone-${n} has no -bg`);
 }
 
-// Layer 1c data-mark palette (--viz-N): per the color philosophy (DESIGN.md),
-// chart/mark colors are never formula-generated — every value must be copied
-// verbatim from an already-approved palette entry in palettes.js.
-const paletteSource = readFileSync(new URL('../src/styles/palettes.js', import.meta.url), 'utf8');
-const approved = new Set([...paletteSource.matchAll(/#[0-9a-fA-F]{6}/g)].map(([hex]) => hex.toLowerCase()));
-const viz = [...css.matchAll(/--viz-(\d+):\s*(#[0-9a-fA-F]{6})/g)]
-  .map(([, n, hex]) => ({ name: `viz-${n}`, hex }));
-if (!viz.length) errs.push('no --viz-* data-mark tokens found in tokens.css');
-for (const t of viz) {
-  if (!approved.has(t.hex.toLowerCase())) {
-    errs.push(`--${t.name} ${t.hex}: not an approved palette value — chart colors are copied from palettes.js, never generated`);
-  }
+// 分類 mark 不另設色層（2026-08-16 站主裁定：點用 --cat-N-tx 配圖例）。
+// 這條擋 --viz 槽死灰復燃——曾短暫存在、四輪被退，全局底層禁止。
+if (/--viz-\d+\s*:/.test(css)) {
+  errs.push('tokens.css 出現 --viz-* 槽：分類 mark 一律用 --cat-N-tx＋圖例，不另開色層（2026-08-16 裁定）');
 }
 
 if (errs.length) {
   console.error(`color-system invalid (${errs.length}):\n  ${errs.join('\n  ')}`);
   process.exit(1);
 }
-console.log(`color system ok: ${names.length} tone pairs, ${viz.length} viz marks, text L-spread ${txSpread} (≤${TX_SPREAD_MAX}), bg L-spread ${bgSpread} (≤${BG_SPREAD_MAX}).`);
+console.log(`color system ok: ${names.length} tone pairs, text L-spread ${txSpread} (≤${TX_SPREAD_MAX}), bg L-spread ${bgSpread} (≤${BG_SPREAD_MAX}).`);

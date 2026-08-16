@@ -78,20 +78,12 @@
   --cat-7-tx: var(--tone-rose-tx);   --cat-7-bg: var(--tone-rose-bg);
   --cat-8-tx: var(--tone-slate-tx);  --cat-8-bg: var(--tone-slate-bg);
 
-  /* Layer 1c — data-mark palette（點陣、圖表 mark、sparkline 專用）。
-     badge 的 --cat 灰調不給點陣用：徽章永遠帶文字、顏色只載和諧，
-     但一顆 10px 的點沒有標籤可靠（2026-08-16 站主退回灰調點陣）。
-     mark 用色照色彩哲學（DESIGN.md）：**一律抄站內 PALETTES 已審過的真實
-     色碼，禁止公式或驗證器生成新色**（2026-08-16 站主二度退回生成色，其中
-     橄欖綠正踩 H50–140 土綠危險帶）。現值出處：陶土（全站 accent，其使用
-     邊界明列「圖例點」）、霧藍（陶土粉票 accent2）、深玫瑰（藕粉玫瑰票
-     accent）、苔綠（藕粉玫瑰票 pop）。固定順序 1→4 指派、篩選不重排；
-     超過四個分類先重想圖，不加槽。validate-color-system.mjs 驗每個值
-     都存在於 palettes.js 的已審色碼中。 */
-  --viz-1: #b08060;
-  --viz-2: #4a6880;
-  --viz-3: #8f6071;
-  --viz-4: #6b7d5a;
+  /* 分類 mark（點陣、圖表點）用色的定案（2026-08-16 站主四輪裁定）：
+     就用上面 --cat-N 的 -tx 深墨值畫點、配圖例；mark 上不標字；-bg 淡底
+     單獨當 mark 太淺，禁。曾試過的三條路全被否決並全局底層禁止——
+     驗證器／公式生成新 hex、拿 palettes.js 的框架色（accent／accent2／pop）
+     當 mark、搬 GitHub Primer 或 Notion 的外部色票。單類資料（只講密度
+     節奏）用單色不用分類色。曾短暫存在的 --viz-1〜4 槽因此移除。 */
 
   /* Type scale (rem). Body is 18px: Huiwen Mincho strokes are thin and
      CJK Ming faces need one step up from Latin defaults. */
