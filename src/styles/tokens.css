@@ -78,12 +78,14 @@
   --cat-7-tx: var(--tone-rose-tx);   --cat-7-bg: var(--tone-rose-bg);
   --cat-8-tx: var(--tone-slate-tx);  --cat-8-bg: var(--tone-slate-bg);
 
-  /* 分類 mark（點陣、圖表點）用色的定案（2026-08-16 站主四輪裁定）：
-     就用上面 --cat-N 的 -tx 深墨值畫點、配圖例；mark 上不標字；-bg 淡底
-     單獨當 mark 太淺，禁。曾試過的三條路全被否決並全局底層禁止——
-     驗證器／公式生成新 hex、拿 palettes.js 的框架色（accent／accent2／pop）
-     當 mark、搬 GitHub Primer 或 Notion 的外部色票。單類資料（只講密度
-     節奏）用單色不用分類色。曾短暫存在的 --viz-1〜4 槽因此移除。 */
+  /* Layer 1c — 分類 mark 槽（點陣、圖表點；2026-08-16 站主四輪比選定案）。
+     值＝palettes.js 的 MARK_TONES 中明度票（三＋檔），validator 驗兩邊一致。
+     mark 上不標字；深墨 -tx 禁大色塊；淡底 -bg 禁單獨當 mark；禁生成色、
+     禁框架色當 mark、禁外部名牌色票。完整紀律：docs/DESIGN.md（唯一正本）。 */
+  --mark-1: #e8a4ac;
+  --mark-2: #a4b4e8;
+  --mark-3: #a4c8a4;
+  --mark-4: #d0b8a4;
 
   /* Type scale (rem). Body is 18px: Huiwen Mincho strokes are thin and
      CJK Ming faces need one step up from Latin defaults. */

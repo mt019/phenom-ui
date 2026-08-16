@@ -21,6 +21,20 @@ export const GOLD_FOIL =
 export const GOLD_FOIL_INK = '#3a2d10'; // 金箔上的深褐字色
 
 /*
+ * 資料標記票（分類 mark 專用；2026-08-16 站主四輪比選後點名「三＋」檔）。
+ * 中明度實色（OKLCH L 0.74–0.79），比淡底深、比深墨鮮；通道值取自
+ * tone-candidates 記載的量化梯延伸（0x8c–0xe8 步 4）。深墨禁大色塊、
+ * 淡底禁單獨當 mark、mark 上不標字——完整紀律見 docs/DESIGN.md。
+ * tokens.css 的 --mark-N 引用這裡；validator 驗兩邊一致。
+ */
+export const MARK_TONES = { // token-exempt
+  rose:  '#e8a4ac',
+  blue:  '#a4b4e8',
+  green: '#a4c8a4',
+  sand:  '#d0b8a4',
+};
+
+/*
  * vars 角色說明：
  * paper＝閱讀紙面（強制近白）；surface＝框架鉻件；accent/accent2＝主副強調；
  * pop（可選）＝撞色——一個畫面最多出現一處（badge、標記點），給版面一個亮點；

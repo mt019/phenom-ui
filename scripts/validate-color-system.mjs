@@ -77,10 +77,20 @@ for (const n of names) {
   if (!bg.find((t) => t.name === n)) errs.push(`--tone-${n} has no -bg`);
 }
 
-// 分類 mark 不另設色層（2026-08-16 站主裁定：點用 --cat-N-tx 配圖例）。
-// 這條擋 --viz 槽死灰復燃——曾短暫存在、四輪被退，全局底層禁止。
+// 分類 mark 槽（--mark-N）：值必須逐一存在於 palettes.js 的 MARK_TONES（已審票），
+// 顏色不得在 tokens 裡自行出現新 hex。--viz 是被否決的舊槽名，擋死灰復燃。
 if (/--viz-\d+\s*:/.test(css)) {
-  errs.push('tokens.css 出現 --viz-* 槽：分類 mark 一律用 --cat-N-tx＋圖例，不另開色層（2026-08-16 裁定）');
+  errs.push('tokens.css 出現 --viz-* 舊槽：分類 mark 走 --mark-N（值抄 MARK_TONES），見 docs/DESIGN.md');
+}
+const paletteSource = readFileSync(new URL('../src/styles/palettes.js', import.meta.url), 'utf8');
+const markBlock = paletteSource.match(/MARK_TONES\s*=\s*\{([\s\S]*?)\}/)?.[1] ?? '';
+const approvedMarks = new Set([...markBlock.matchAll(/#[0-9a-fA-F]{6}/g)].map(([hex]) => hex.toLowerCase()));
+const marks = [...css.matchAll(/--mark-(\d+):\s*(#[0-9a-fA-F]{6})/g)];
+if (!marks.length) errs.push('tokens.css 缺 --mark-* 分類 mark 槽');
+for (const [, n, hex] of marks) {
+  if (!approvedMarks.has(hex.toLowerCase())) {
+    errs.push(`--mark-${n} ${hex}: 不在 palettes.js 的 MARK_TONES 已審票裡——mark 色不得自行新增`);
+  }
 }
 
 if (errs.length) {
