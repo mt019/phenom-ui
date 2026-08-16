@@ -77,17 +77,18 @@ for (const n of names) {
   if (!bg.find((t) => t.name === n)) errs.push(`--tone-${n} has no -bg`);
 }
 
-// Layer 1c data-mark palette (--viz-N): same lightness band, chroma one step up.
-// Dots and chart marks have no attached label, so these may not be muted down
-// into the badge band (reads gray) nor pushed past the vivid ceiling.
-const VIZ_L = [0.45, 0.58];
-const VIZ_C = [0.10, 0.16];
+// Layer 1c data-mark palette (--viz-N): per the color philosophy (DESIGN.md),
+// chart/mark colors are never formula-generated — every value must be copied
+// verbatim from an already-approved palette entry in palettes.js.
+const paletteSource = readFileSync(new URL('../src/styles/palettes.js', import.meta.url), 'utf8');
+const approved = new Set([...paletteSource.matchAll(/#[0-9a-fA-F]{6}/g)].map(([hex]) => hex.toLowerCase()));
 const viz = [...css.matchAll(/--viz-(\d+):\s*(#[0-9a-fA-F]{6})/g)]
-  .map(([, n, hex]) => ({ name: `viz-${n}`, ...oklch(hex), hex }));
+  .map(([, n, hex]) => ({ name: `viz-${n}`, hex }));
 if (!viz.length) errs.push('no --viz-* data-mark tokens found in tokens.css');
 for (const t of viz) {
-  if (t.L < VIZ_L[0] || t.L > VIZ_L[1]) errs.push(`--${t.name} ${t.hex}: L ${t.L} outside mark band ${VIZ_L[0]}–${VIZ_L[1]}`);
-  if (t.C < VIZ_C[0] || t.C > VIZ_C[1]) errs.push(`--${t.name} ${t.hex}: C ${t.C} outside mark chroma band ${VIZ_C[0]}–${VIZ_C[1]} (too gray / too vivid)`);
+  if (!approved.has(t.hex.toLowerCase())) {
+    errs.push(`--${t.name} ${t.hex}: not an approved palette value — chart colors are copied from palettes.js, never generated`);
+  }
 }
 
 if (errs.length) {
