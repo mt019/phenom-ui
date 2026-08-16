@@ -53,10 +53,11 @@ export default function DashboardLayout({
   children,
 }) {
   const bodyRef = useRef(null);
-  // 先量再排版。leftRailTop 那塊（篩選器之類）跟目次共用這條軌道，所以它單獨存在時
-  // 軌道照留——收起來的條件是「這條軌道整條沒東西」，不是「沒有標題」。
+  // leftRailTop 那塊（篩選器之類）跟目次共用這條軌道。
+  // 兩個判斷刻意分開：軌道留不留不看量測（理由見底下格線那一段），內容列不列才看。
   const { items, active } = useHeadings(bodyRef, { refreshKey });
-  const showToc = !hideToc && (items.length > 0 || Boolean(leftRailTop));
+  const reserveToc = !hideToc;
+  const showToc = reserveToc && (items.length > 0 || Boolean(leftRailTop));
 
   return (
     <main className="min-h-screen bg-paper paper-texture text-ink" style={{ '--reader-scale': scale }}>
@@ -106,11 +107,14 @@ export default function DashboardLayout({
         </div>
       ) : null}
 
-      {/* 寬內容欄＋右欄本頁大綱（h2+h3，跟著捲動高亮）。右欄在 lg 以下收起，底下沒有
-          標題可列時也收起——那條軌道留不留由量測決定，不由頁面宣告（見 useHeadings）。 */}
+      {/* 寬內容欄＋右欄本頁大綱（h2+h3，跟著捲動高亮）。右欄在 lg 以下收起。
+          軌道數只看 hideToc，不看量測結果：items 要等 effect 掛載讀完 DOM 才有值
+          （useHeadings），若拿它決定軌道，預先渲染的 HTML 與 hydration 第一幀會少一條
+          右軌，量測跑完才補上，整頁在讀者眼前重排一次。同一個成因在 ArticleLayout
+          量到 CLS 0.133（2026-08-17，見該檔說明）。 */}
       <div
         className={`mx-auto grid max-w-7xl gap-8 py-8 lg:gap-10 ${padX} ${
-          showToc ? 'lg:grid-cols-[minmax(0,1fr)_13rem]' : ''
+          reserveToc ? 'lg:grid-cols-[minmax(0,1fr)_13rem]' : ''
         }`}
       >
         <div ref={bodyRef} className="reader-scale min-w-0">{children}</div>

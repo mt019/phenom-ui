@@ -28,9 +28,10 @@ export default function ArticleLayout({
   // 版面傳 [2]：小標在那裡重複（六則各有一條「補記（Matters 留言區）」），列進去是把
   // 同一個詞印六遍，不是導覽。
   tocLevels = [2, 3],
-  // 右欄目次是預設，而且不由頁面宣告有沒有——底下真的有 h2／h3 就出現，沒有就收起來
-  // （見 useHeadings 的說明）。頁面只有在「右欄會跟左欄列出同一份東西」這種重複的情況
-  // 才傳 hideToc 強制關掉；「這頁大概沒有小標吧」不是理由，那件事殼自己看得到。
+  // 右欄目次是預設。**目次內容**列不列由量測決定（底下真的有 h2／h3 才列，見 useHeadings），
+  // 但**那條軌道留不留**由 hideToc 決定，不看量測結果——理由見底下格線那一段。頁面只有在
+  // 「右欄會跟左欄列出同一份東西」這種重複的情況才傳 hideToc；「這頁大概沒有小標吧」
+  // 不是理由，內容列不列殼自己看得到。
   hideToc = false,
   // 內容欄放寬到 61rem。以條文對照表、寬表格當骨架的頁面才傳；散文不傳，44rem 那條
   // 閱讀欄寬是照行長訂的。**放寬不影響右欄目次**——兩件事以前綁在同一個 prop 上，
@@ -41,22 +42,28 @@ export default function ArticleLayout({
   children,
 }) {
   const bodyRef = useRef(null);
-  // 先量再排版：這一頁有沒有標題可列，決定右欄那條軌道存不存在。
   const { items, active } = useHeadings(bodyRef, { levels: tocLevels, refreshKey: tocKey });
-  const showToc = !hideToc && items.length > 0;
+  // 兩個判斷，刻意分開：軌道留不留不看量測，目次內容列不列才看。
+  const reserveToc = !hideToc;
+  const showToc = reserveToc && items.length > 0;
 
   return (
     // 手機的單欄要寫成 minmax(0,1fr)：grid 的 auto 軌會被寬內容（min-width 的圖表、
     // 一列很多格的牌面）撐到內容寬，整欄超出視口、被 html 的 overflow-x clip 藏掉，
     // 圖表自己的橫向捲動因此永遠不會發生（2026-08-13 統計站手機驗收）。
+    // 軌道數只看 hideToc，不看量測結果。以前它看 items.length，而 items 要等 effect 掛載
+    // 讀完 DOM 才有值（useHeadings），於是預先渲染的 HTML 與 hydration 第一幀一律少一條
+    // 右軌，量測跑完才補上——中欄從 44rem 被壓到 37rem 左右，整頁跟著往下推。
+    // wealth.phenomcanvas.com 的 CLS 0.133 就是這樣來的（2026-08-17 量到：文章欄 246ms 時
+    // 704px→592px、y 205→227.75，擋掉字型仍是 0.132，與換字無關）。
+    // 代價是沒有小標的頁面右邊多留一條空軌道；那條軌道只是留白，而版面在讀者眼前跳動不是。
     <div className={`mx-auto grid grid-cols-[minmax(0,1fr)] gap-10 ${SHELL_PAD_X_RAIL} lg:gap-12 ${
-      // 寬版面加上右欄比容器的 86rem 還寬，所以那個組合另給一個上限；沒有目次可列時
-      // 不留空軌道，中欄吃掉騰出來的寬度只發生在本來就要寬的頁面，散文照舊留白。
-      showToc && wideContent ? 'max-w-[96rem]' : 'max-w-[86rem]'
+      // 寬版面加上右欄比容器的 86rem 還寬，所以那個組合另給一個上限。
+      reserveToc && wideContent ? 'max-w-[96rem]' : 'max-w-[86rem]'
     } ${
-      showToc && wideContent
+      reserveToc && wideContent
         ? 'lg:grid-cols-[15rem_minmax(0,61rem)_14rem]'
-        : showToc
+        : reserveToc
         ? 'lg:grid-cols-[15rem_minmax(0,44rem)_14rem]'
         : wideContent
         ? 'lg:grid-cols-[15rem_minmax(0,61rem)]'

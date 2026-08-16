@@ -85,15 +85,30 @@ test('the shared stylesheet replaces the native scrollbar in both syntaxes', asy
 
 // 右欄目次要出現在每一頁上，而「這頁有沒有標題可列」只有量過 DOM 才知道。以前那件事
 // 由頁面傳 hideToc 宣告，於是有標題的頁面照樣可能沒有目次，而且沒有任何地方會報。
-// 這道檢查釘住兩件事：殼自己呼叫 useHeadings，且右欄的判斷式看得到量測結果。
-test('every page shell decides its table of contents from the headings it measured', async () => {
+// 所以目次**內容**列不列，一律看量測結果。
+//
+// 但**軌道**留不留不能看量測結果：items 要等 effect 掛載讀完 DOM 才有值，預先渲染的
+// HTML 與 hydration 第一幀因此一律少一條右軌，量測跑完才補上，整頁重排一次
+// （2026-08-17 在 wealth.phenomcanvas.com 量到 CLS 0.133）。軌道只看 hideToc。
+//
+// 這道檢查釘住三件事：殼自己呼叫 useHeadings、目次內容的判斷式看得到量測結果、
+// 格線的判斷式看不到量測結果。
+test('page shells reserve the toc track up front and fill it from the headings they measured', async () => {
   for (const file of [
     '../src/components/lab/ArticleLayout.jsx',
     '../src/components/lab/DashboardLayout.jsx',
   ]) {
     const source = await readFile(new URL(file, import.meta.url), 'utf8');
     assert.match(source, /useHeadings\(bodyRef/, `${file}：殼要自己量標題`);
-    assert.match(source, /const showToc = !hideToc && .*items\.length/, `${file}：右欄留不留要看量到幾個標題`);
-    assert.doesNotMatch(source, /\{hideToc \? null :/, `${file}：不要再用 hideToc 單獨決定右欄`);
+    assert.match(source, /const reserveToc = !hideToc/, `${file}：軌道留不留只看 hideToc`);
+    assert.match(source, /const showToc = reserveToc && [\s\S]{0,80}items\.length/, `${file}：目次內容列不列要看量到幾個標題`);
+    assert.doesNotMatch(source, /\{hideToc \? null :/, `${file}：不要再用 hideToc 單獨決定目次內容`);
+
+    // 格線那幾條字串必須由 reserveToc 決定。抓法是看每一個 lg:grid-cols- 之前最近的那個
+    // 判斷變數是哪一個——寫成 showToc 就是把軌道綁回量測結果，正是上面那個位移的成因。
+    for (const [before] of source.matchAll(/[\s\S]{0,160}lg:grid-cols-\[15rem|[\s\S]{0,160}lg:grid-cols-\[minmax\(0,1fr\)_13rem/g)) {
+      assert.doesNotMatch(before.slice(-160), /showToc/, `${file}：格線不准看 showToc，要看 reserveToc`);
+    }
+    assert.match(source, /reserveToc[\s\S]{0,160}lg:grid-cols-/, `${file}：格線要由 reserveToc 決定`);
   }
 });
