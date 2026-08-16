@@ -3,7 +3,8 @@
 站主 2026-07-30 確認，本套件現有的五個網頁字型二進位檔都可以再散布、可以嵌在網頁上。
 五個檔案原樣取自 Canvas Lab 已入版控的字型包：
 
-- `HuiwenMincho-subset.woff2` — 內文，繁體中文。
+- `HuiwenMincho-core-subset.woff2` — 內文，繁體中文，常用面（覆蓋各站文字 99.9% 的字元出現次數，先到）。
+- `HuiwenMincho-ext-subset.woff2` — 內文，繁體中文，其餘面（頁面出現罕用字時才下載；與常用面的聯集等於原本的全覆蓋子集）。
 - `ChironSungHK-fallback-subset.woff2` — 繁體中文補字（依 unicode-range 補 Huiwen 畫不出的碼位）。
 - `ErikasFarbband-subset.woff2` — 拉丁點綴，regular。
 - `ErikasFarbband-Bold-subset.woff2` — 拉丁點綴，bold。

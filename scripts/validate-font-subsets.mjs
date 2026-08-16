@@ -45,8 +45,8 @@ const FACES = [
   { files: ['ErikasFarbband-subset.woff2'], label: '拉丁點綴面 regular', required: LATIN_REQUIRED },
   { files: ['ErikasFarbband-Bold-subset.woff2'], label: '拉丁點綴面 bold', required: LATIN_REQUIRED },
   {
-    files: ['HuiwenMincho-subset.woff2', 'ChironSungHK-fallback-subset.woff2'],
-    label: '內文家族（Huiwen＋Chiron 補字）',
+    files: ['HuiwenMincho-core-subset.woff2', 'HuiwenMincho-ext-subset.woff2', 'ChironSungHK-fallback-subset.woff2'],
+    label: '內文家族（Huiwen 常用面＋其餘面＋Chiron 補字）',
     required: CJK_SMOKE,
   },
 ];

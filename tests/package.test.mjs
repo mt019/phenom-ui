@@ -21,7 +21,8 @@ test('字型的權利與套件相對路徑有記錄在案', async () => {
   assert.match(notes, /都可以再散布、可以嵌在網頁上/);
   assert.doesNotMatch(styles, /url\(['"]?\/fonts\//);
   for (const font of [
-    'HuiwenMincho-subset.woff2',
+    'HuiwenMincho-core-subset.woff2',
+    'HuiwenMincho-ext-subset.woff2',
     'ChironSungHK-fallback-subset.woff2',
     'ErikasFarbband-subset.woff2',
     'ErikasFarbband-Bold-subset.woff2',
