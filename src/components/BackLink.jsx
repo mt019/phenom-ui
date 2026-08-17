@@ -47,10 +47,24 @@ const FLOATING = 'fixed left-3 top-3 z-50 rounded-token-md px-2 py-1 text-token-
  */
 const DOUBLE_MS = 260;
 
+/*
+ * 預設落點是站群首頁，不是 `/`。
+ *
+ * 2026-08-17：統計站拆出去之後每一頁都沒有傳 `back`，於是十二頁全部畫出 `href="/"`——
+ * 站首頁上那個箭頭指向它自己，點了不動。這個套件的消費端都是拆出去的主題站，沒有一個站
+ * 的返回鍵該指向自己的根路徑，所以預設值改成站群首頁；canvas 不消費這個套件（它有自己
+ * 的一份），改這裡動不到它。
+ *
+ * 預設值只擋「連結指向自己」這一種。哪一頁該回到哪裡仍然要各站自己寫，未傳值時下面會印
+ * 一句 warning，跨站的檢查在 phenom-ops/scripts/check-back-link.mjs。
+ */
+const CANVAS_HOME = { href: 'https://phenomcanvas.com/', label: '', title: '回 Phenom Canvas' };
+const CANVAS_INDEX = 'https://phenomcanvas.com/all';
+
 export default function BackLink({
   className = '',
-  back = { href: '/', label: '' },
-  indexHref = null,
+  back,
+  indexHref,
   floating = false,
 }) {
   const navigate = useNavigate();
@@ -58,11 +72,17 @@ export default function BackLink({
   const [touchRevealed, setTouchRevealed] = useState(false);
   useEffect(() => () => clearTimeout(timer.current), []);
 
-  const link = back;
+  // `back={null}` 仍然是「這頁不畫返回鍵」；只有整個沒傳才套預設值。
+  const link = back === undefined ? CANVAS_HOME : back;
+  const index = indexHref === undefined ? (back === undefined ? CANVAS_INDEX : null) : indexHref;
   if (!link) return null;
 
+  if (back === undefined && typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production') {
+    console.warn('[phenom-ui] BackLink 沒有收到 back，暫用站群首頁。落點要各站自己寫，見 phenom-ops/scripts/check-back-link.mjs');
+  }
+
   const label = link.label || '';
-  const doubleClickable = Boolean(indexHref && indexHref !== link.href);
+  const doubleClickable = Boolean(index && index !== link.href);
   /*
    * **不掛 `title`。** 瀏覽器那個原生提示框是系統畫的，跟這個站的字體與顏色沒有任何關係，
    * 停在箭頭上一秒就跳出來一塊灰框（使用者 2026-07-28：「這個 hover 框框也太醜了」）。
@@ -96,7 +116,7 @@ export default function BackLink({
     e.preventDefault();
     if (e.detail >= 2) {
       clearTimeout(timer.current);
-      go(indexHref);
+      go(index);
       return;
     }
     clearTimeout(timer.current);

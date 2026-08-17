@@ -28,8 +28,10 @@ import useHeadings from './useHeadings';
  */
 export default function DashboardLayout({
   scale,
-  // 返回鍵。不傳＝照全站配置（`src/backNav.js`）決定回哪裡；傳 `null`＝這頁不畫；
-  // 傳 `{ href, label }`＝這頁自己說了算（統計站內頁那種要雙語標籤的才需要）。
+  // 返回鍵。**每一頁都要傳**：`{ href, label }` 說這頁回哪裡，`null` 說這頁不畫。
+  // 不傳會退到 BackLink 的預設值（站群首頁）並印一句 warning——canvas 那份可以不傳，
+  // 因為它有 `src/backNav.js` 按路徑查落點；拆出去的站沒有那個檔。
+  // 跨站檢查在 phenom-ops/scripts/check-back-link.mjs。
   back,
   backIndexHref,
   headerRight,
