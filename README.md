@@ -40,8 +40,29 @@ export default {
 import '@phenomcanvas/ui/styles.css';
 ```
 
-字型檔隨 package 發布，`styles.css` 以相對 URL 引用，由 consumer bundler
-轉成自己的不可變資產。
+### 字型的兩種投遞
+
+字型檔隨 package 發布，兩個入口的差別只在 `@font-face` 的 `url()` 怎麼寫。
+
+`styles.css` 是預設，`url()` 是套件相對路徑，由 consumer bundler 轉成自己的不可變資產。
+獨佔一個子域名的站用它。各站一個 origin，本來就共享不了快取。
+
+`styles-external-fonts.css` 給同一個 origin 上有多個站的情形（`studies.phenomcanvas.com`
+底下四個產品站）。`url()` 寫絕對路徑 `/assets/fonts/<檔名>.<內容雜湊>.woff2`，vite 不處理
+絕對路徑，所以字型不進各站的產物，四個站共用同一組網址、同一份瀏覽器快取。改引它的站要掛
+配套的 vite plugin，開發伺服器與 preview 才有人供應那些檔案：
+
+```js
+import externalFonts from '@phenomcanvas/ui/scripts/vite-external-fonts.mjs';
+
+plugins: [react(), externalFonts()]               // 引用端
+plugins: [react(), externalFonts({ emit: true })] // 供應端：另把字型寫進自己的產物
+```
+
+供應端只能有一個（該 origin 的底座），並在 `public/_headers` 給 `/assets/fonts/*` 一年期
+`immutable`。`src/fonts-external.css` 與 `fonts/external-manifest.json` 由
+`scripts/build-external-fonts.mjs` 從 `src/fonts-local.css` 產生，改完字型跑一次；
+`npm run validate` 會比對兩者是否同步。
 
 ## 不可退讓的排版與導航契約
 

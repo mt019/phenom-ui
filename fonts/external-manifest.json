@@ -1,0 +1,35 @@
+{
+  "base": "/assets/fonts",
+  "files": [
+    {
+      "source": "HuiwenMincho-ext-subset.woff2",
+      "hashed": "HuiwenMincho-ext-subset.UzFgWfMD.woff2",
+      "bytes": 5769404
+    },
+    {
+      "source": "HuiwenMincho-core-subset.woff2",
+      "hashed": "HuiwenMincho-core-subset.M_D3DwhH.woff2",
+      "bytes": 2354456
+    },
+    {
+      "source": "ChironSungHK-fallback-subset.woff2",
+      "hashed": "ChironSungHK-fallback-subset.O68eh1zh.woff2",
+      "bytes": 3384260
+    },
+    {
+      "source": "ErikasFarbband-subset.woff2",
+      "hashed": "ErikasFarbband-subset.UZ9McBEk.woff2",
+      "bytes": 463028
+    },
+    {
+      "source": "ErikasFarbband-Bold-subset.woff2",
+      "hashed": "ErikasFarbband-Bold-subset.Hlz2Bng7.woff2",
+      "bytes": 727432
+    },
+    {
+      "source": "RadioNewsman-subset.woff2",
+      "hashed": "RadioNewsman-subset.9B_tdseP.woff2",
+      "bytes": 18188
+    }
+  ]
+}

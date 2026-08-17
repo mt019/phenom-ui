@@ -1,0 +1,6 @@
+/* 同一個 origin 上有多個站時的入口。字型不進本站的產物，改由該 origin 的底座在
+   /assets/fonts/ 供應，四個站因此共用同一組網址、共用同一份瀏覽器快取。
+   fonts-external.css 與 fonts/external-manifest.json 都由
+   scripts/build-external-fonts.mjs 產生，不要手改；供應端與引用端各用其中一份。 */
+@import './fonts-external.css';
+@import './styles-base.css';

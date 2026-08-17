@@ -1,5 +1,9 @@
 # Shared CSS contains @font-face unicode ranges, SVG data URLs, and global
 # browser normalization. Palettes are the token source itself.
 src/styles.css
+src/styles-base.css
+src/styles-external-fonts.css
+src/fonts-local.css
+src/fonts-external.css
 src/styles/palettes.js
 src/styles/katex.css

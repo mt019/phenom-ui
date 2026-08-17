@@ -1,0 +1,358 @@
+@import './styles/tokens.css';
+@import './styles/marks.css';
+
+/* 捲軸。作業系統原生那條在每個平台長得都不一樣，而且是這一整套版面上唯一沒有經過設計的
+   東西——兩側 rail、寬表格、下拉選單、程式碼區塊都會露出它。這裡一次換掉，套在全域，
+   免得每加一個 overflow 容器就要記得補一次（記不得就是漏一處，而漏的那處特別顯眼）。
+
+   軌道不畫，只留一條墨線當滑塊，滑過去才變深；粗細 6px，比原生細，貼著內容也不搶。
+   兩套語法都寫：scrollbar-width／scrollbar-color 走 Firefox 與新版 Chrome，
+   ::-webkit-scrollbar 走 WebKit。**別只寫其中一套**，Safari 不吃前者。
+
+   例外只有一個：作業系統自己畫的（原生 select 的下拉清單、date picker）碰不到，
+   所以那些原生控制項本來就不用（見 DESIGN.md 的「不用原生 UI 元件」）。 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--c-ink) 22%, transparent) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--c-ink) 22%, transparent);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in oklab, var(--c-ink) 40%, transparent);
+}
+
+/* The shared back arrow is quiet until desktop hover/focus or the first tap on
+   its reserved corner. Touch's first tap reveals; a later tap performs nav. */
+.phenom-back-link--quiet {
+  opacity: 0;
+}
+.phenom-back-link--quiet.phenom-back-link--revealed {
+  opacity: 1;
+}
+
+/* 站內數值滑桿：避免瀏覽器／作業系統原生 thumb 跳離 Canvas 控制項語彙。 */
+.canvas-range {
+  height: 1.25rem;
+  cursor: pointer;
+  appearance: none;
+  background: transparent;
+}
+
+.canvas-range::-webkit-slider-runnable-track {
+  height: 0.25rem;
+  border-radius: 999px;
+  background: var(--c-line-soft);
+}
+
+.canvas-range::-webkit-slider-thumb {
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-top: -0.3125rem;
+  appearance: none;
+  border: 2px solid white;
+  border-radius: 999px;
+  background: var(--c-accent);
+  box-shadow: 0 1px 4px rgb(50 35 42 / 18%);
+}
+
+.canvas-range::-moz-range-track {
+  height: 0.25rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--c-line-soft);
+}
+
+.canvas-range::-moz-range-thumb {
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 2px solid white;
+  border-radius: 999px;
+  background: var(--c-accent);
+  box-shadow: 0 1px 4px rgb(50 35 42 / 18%);
+}
+
+.canvas-range:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--c-accent) 35%, transparent);
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+
+.canvas-check {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: 0 0 auto;
+  cursor: pointer;
+  appearance: none;
+  border: 1px solid var(--cc-border, var(--c-line));
+  border-radius: 0.25rem;
+  background-color: white;
+  transition: border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+}
+
+.canvas-check:checked {
+  border-color: var(--cc-accent, var(--c-accent));
+  background-color: var(--cc-accent, var(--c-accent));
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='m2.2 6.1 2.3 2.3 5.3-5.3' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 0.72rem;
+}
+
+.canvas-check:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cc-accent, var(--c-accent)) 22%, transparent);
+}
+
+/*
+ * Focus rings. The browser default is a blue glow (Safari) / ring (Chrome) that
+ * shows on plain :focus — including after a mouse click, which leaves an ugly
+ * stray blue outline sitting on a button (most visible on the music tools when
+ * the page is otherwise idle). Suppress it for pointer/programmatic focus; keep
+ * a tasteful, palette-coloured ring only for genuine keyboard navigation, so
+ * accessibility is preserved. :where() keeps specificity at 0 so component focus
+ * styles (.canvas-range, .canvas-check above) still win.
+ */
+:where(a, button, [role="button"], input, select, textarea, summary, [tabindex]):focus {
+  outline: none;
+}
+:where(a, button, [role="button"], input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--c-accent) 45%, transparent);
+  outline-offset: 2px;
+}
+/* No blue tap flash on iOS/Safari touch. */
+:where(a, button, [role="button"], input, select, textarea, summary, [tabindex]) {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+  --font-body: 'Huiwen Mincho', 'Songti TC', 'Noto Serif CJK TC', serif;
+  --font-display: 'Radio Newsman', 'Huiwen Mincho', 'Songti TC', 'Noto Serif CJK TC', serif;
+  --font-accent: 'Erikas Farbband', 'Huiwen Mincho', 'Songti TC', 'Noto Serif CJK TC', serif;
+  /* 圍籬程式碼專用。行內 `code` 走 font-accent（Erikas 的油墨網點正好），但整段程式碼靠的是
+     縮排與對齊，比例字面對不齊；而且 Erikas 是子集字型，空白字元不在裡面。系統等寬字堆疊
+     不必下載，CJK 註解交給後面的明體接手。 */
+  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Huiwen Mincho', 'Songti TC', monospace;
+}
+
+/* 全站硬性：頁面永不水平捲動（游標拖不動）。用 clip 而非 hidden——不建立捲動容器，
+   sticky 分頁列不受影響；寬內容一律在自己的容器內縮放或捲動。 */
+html {
+  overflow-x: clip;
+}
+
+/* 中文排版的三條全域規則（2026-07-13）。
+   1. line-break: strict — 行首不得出現句號、逗號、右引號、右括號等收尾標點。
+      預設值在多數情況下已經這樣做，但只要標點前面是個 inline-block（例如引註標記
+      這種 <button>），瀏覽器會把它當成不可分割的行內物件、允許在其後斷行，孤零零
+      的「。」就掉到下一行去。標記本身改成純行內元素，這條規則才真的生效。
+   2. text-wrap: pretty — 避免末行只剩一兩個字的孤字。
+   3. overflow-wrap: break-word — 長網址不撐破版面（中文本來就能任意處斷行）。*/
+body {
+  font-family: var(--font-body);
+  font-synthesis: none;
+  font-size: var(--text-body);
+  color: var(--c-ink);
+  background-color: var(--c-paper);
+  line-break: strict;
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+  overflow-x: clip;
+  overscroll-behavior-x: none;
+  max-width: 100%;
+  position: relative;
+}
+
+/* 字體平滑只改長文正文，別處一律維持系統預設（2026-07-28 使用者裁定）。
+
+   起因是「正文字體磅重太重……看得累」。實測正文本來就是字重 400、色用 --c-ink 的暖褐
+   （不是黑）、18px／行高 1.85，都已經是最輕的一檔——變重的是渲染：`-webkit-font-smoothing`
+   的預設值 auto 在 macOS 是次像素平滑，會把明體的細筆畫整圈加厚。
+
+   第一版把它設在 body 上，全站一起變細，使用者當場說別處「會覺得看不清，好奇怪」——
+   清單、儀表板、工具列那些字級小、要一眼掃過，細筆畫反而不利。所以範圍收到
+   `.prose-body`（`Prose` 元件的外層，也就是 .mdx 長文的正文區）：整段連續閱讀的地方
+   吃灰階平滑，其餘照舊。
+
+   `.font-accent` 再設回 auto，因為 Erikas 700 的油墨網點靠的是筆畫邊緣的顆粒，灰階平滑
+   會把它抹乾淨（見 DESIGN.md「accent 字體：紋理在字重」）；正文裡的行內程式碼走的正是
+   這支字體。
+
+   這個差別只在 macOS 上看得到，headless 截圖驗不出來（截圖本來就走灰階）。 */
+.prose-body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.prose-body .font-accent {
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
+/* 手記舊文帶著的動態貼圖（notes-data 的 /notes-assets/emoji/，微博那一套 56×56 GIF）
+   是行內尺寸的圖，原尺寸會把行高撐開。選擇器直接認路徑，不必替 Prose 另開一個
+   notes 專屬的樣式檔——這條規則只認 /notes-assets/emoji/ 開頭的網址，不影響其他
+   長文（陳寅恪、統計學實驗室…）共用的同一個 .prose-body。 */
+.prose-body img[src*="/notes-assets/emoji/"] {
+  display: inline;
+  height: 1.25em;
+  width: 1.25em;
+  vertical-align: -0.2em;
+}
+
+/* 編號註標。建置端把它貼在標點之後，AnnotatedHtml 用事件委派接上浮卡。
+   中文可在任兩字之間斷行，一個數字寬的標記很容易被孤立到下一行，所以整顆設 nowrap。
+
+   2026-08-17 由底線式改成上標式，站主裁定，兩個理由。基線下方那條帶已經有五種記號在畫：
+   專門用語的實心點與作者強調的空心圈走 text-emphasis-position: under right、專名號的實線
+   底線、書名號的波浪底線（見 styles/marks.css），引註 .cite-mark 另有一排點當背景畫在
+   行底。註標若再加一條底線，讀者要在同一條帶上辨識六種記號，與專名號的實線尤其接近。
+   另一個理由在語意：textNotes 產出的是 role="button" tabindex="0" 的可點元素（點了釘住
+   浮卡），舊版給的 cursor: help 與實際行為對不上。
+
+   舊版用 position: relative 配 top 上移，理由是瀏覽器對 <sup> 的 vertical-align: super 會
+   連帶撐高行框。現在改用 super 並以 line-height: 1 壓住；長文段落上線前看一眼行距，
+   出現跳動就退回 position 位移的寫法，其餘屬性照留。
+
+   編號用 accent 那支打字機字體（Erikas Farbband），站主 2026-08-02 指定。子集裡十個數字
+   與兩位數都在，量過沒有掉回明體。註標本身是內容不是鷹架，所以不用 ink-faint。憲法法庭
+   那邊的意見書繼承正文字體，形狀要跟這裡對齊（my-canvas-lab 的
+   _constitutional-court/OpinionText.jsx），本次改上標之後那邊也要跟著看一次。
+
+   顏色 token 一律用 --c-*，不要寫成 --color-*。2026-08-02 以前這段寫的是 var(--color-accent,
+   #8a5a3b)，那個變數不存在，整段其實一直在吃逗號後面的 fallback，顏色沒跟著主題走。
+   字體那個 --font-accent 是真的，別一起改掉。
+
+   選擇器不綁 .prose-body（2026-08-13）：資料層是 JSON 字串的頁面（德川頁的術語表、年表）
+   不走 markdown 管線、外層沒有 .prose-body，註標一樣要長這個樣子。 */
+.fn-ref {
+  white-space: nowrap;
+  margin-left: 0.1em;
+  font-family: var(--font-accent);
+  font-size: 0.7em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  vertical-align: super;
+  color: color-mix(in srgb, var(--c-accent) 72%, var(--c-ink));
+  cursor: pointer;
+}
+
+.fn-ref:hover,
+.fn-ref:focus-visible {
+  color: var(--c-accent);
+}
+
+/* 圍籬區塊裡的 <code> 會繼承行內那顆藥丸（細框＋左右內距＋accent 字面）。整段程式碼不需要
+   第二層框，也需要等寬字面，所以在這裡把它退回素的。外框、內距與捲動由 Prose 的 pre 負責。 */
+.prose-body pre > code {
+  border: 0;
+  padding: 0;
+  border-radius: 0;
+  font-family: inherit;
+  font-size: inherit;
+  white-space: pre;
+}
+
+/* 紙面材質畫在獨立的 ::before 兄弟層（絕對定位、負 z-index），不再當作背景畫在
+   容器本身上。原因：字級放大是用 zoom 縮放內容，而 zoom 的子元素會逼瀏覽器把
+   「祖先的背景」一起重新取樣——紙紋那種 1px 細線一經非整數倍（如 160%）重取樣
+   就出現摩爾紋（使用者 2026-07-18 在 160% 看到布紋、簾紋・雙層變形）。把紋理放進
+   ::before，它與被 zoom 的內容是同層兄弟、不是祖先，就不會被牽連重取樣。負 z-index
+   讓它疊在容器自己的底色之上、內文之下（容器需自成 stacking context）。 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--paper-texture, none);
+  background-size: var(--paper-texture-size, auto);
+}
+
+/* 閱讀面的紙張顆粒：底色永遠是 --c-paper，這裡只加一層極淡的噪點（程式生成，
+   不是圖檔）。長文在純平的白底上讀久了會發亮、發空；一點點紙紋讓它像印在東西上。
+
+   強度是有上限的（2026-07-13 使用者指正）：舊值 0.035 的灰噪鋪滿整個視窗，
+   整頁就讀成一層灰底——紋理一旦看得出是「一片顏色」，它就不再是紙紋，而是底色，
+   而閱讀面不准有底色。現值把顆粒調細（頻率 0.9→1.2）並壓到 0.018，只在近看時
+   讓白面不死平。要調就往更淡調，不要往回加。 */
+.reading-grain,
+.paper-texture {
+  position: relative;
+  z-index: 0;
+}
+.reading-grain::before,
+.paper-texture::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.reading-grain::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)' opacity='0.018'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 140px 140px;
+}
+/* 各頁自己的不透明底色容器（PageShell、首頁）疊在 body 之上，單靠 body 的材質層
+   會被蓋住；這個 ::before 讓材質在任何頁面底色上都顯示。 */
+.paper-texture::before {
+  background-image: var(--paper-texture, none);
+  background-size: var(--paper-texture-size, auto);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+}
+
+/* Long-form reading container: follows the FontSizeControl multiplier.
+   Only prose opts in; dashboards and instrument UIs stay fixed. */
+.prose-scaled {
+  font-size: calc(var(--text-body) * var(--fs, 1));
+}
+
+/* Reader size lever. FontSizeControl sets --reader-scale on the page root;
+   this class carries it as `zoom` on the *content wrapper inside* a shell's
+   fixed-width frame — never on the full-width <main>. That is the whole trick:
+   because the max-width column and the outer gutter live outside the zoom, the
+   margins never move when the type grows. The content (text, spacing, charts)
+   scales proportionally and reflows inside a column whose on-screen width is
+   fixed — the way an in-page reader control behaves on Substack / Kindle / NYT,
+   as opposed to browser zoom (Cmd +/−), which scales the frame too. Navigation
+   rails and the toolbar deliberately do NOT get this class, so chrome stays a
+   stable, comfortable size while you enlarge the reading. */
+.reader-scale {
+  zoom: var(--reader-scale, 1);
+}
+
+/* Metallic foil sheen (e.g. Klimt gold). Sanctioned exception to the
+   opacity/transform-only motion rule: background-position pan, slow and
+   decorative, accent elements only — never backgrounds or body text. */
+@keyframes foil-sheen {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+.foil {
+  background-size: 200% auto;
+  animation: foil-sheen 4.5s linear infinite;
+}
+.foil-text {
+  background-size: 200% auto;
+  animation: foil-sheen 4.5s linear infinite;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

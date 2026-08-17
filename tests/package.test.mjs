@@ -3,11 +3,27 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { openSync } from 'fontkit';
 
+// styles.css 自 v0.1.33 起只有兩行 @import（字型一份、其餘一份），所以斷言要看的是把
+// @import 展開之後的內容，不是那個入口檔本身。展開才驗得到「引這個入口的站實際拿到什麼」。
+async function readStylesheet(specifier) {
+  const url = new URL(specifier, import.meta.url);
+  const source = await readFile(url, 'utf8');
+  let out = '';
+  let cursor = 0;
+  for (const match of source.matchAll(/@import\s+'([^']+)';/g)) {
+    out += source.slice(cursor, match.index) + (await readStylesheet(new URL(match[1], url).href));
+    cursor = match.index + match[0].length;
+  }
+  return out + source.slice(cursor);
+}
+
 test('package exposes source, styles, fonts, preset, and validators', async () => {
   const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url)));
   assert.equal(pkg.name, '@phenomcanvas/ui');
   assert.equal(pkg.exports['.'], './src/index.js');
   assert.equal(pkg.exports['./styles.css'], './src/styles.css');
+  assert.equal(pkg.exports['./styles-external-fonts.css'], './src/styles-external-fonts.css');
+  assert.equal(pkg.exports['./scripts/*'], './scripts/*');
   assert.equal(pkg.exports['./eyebrow'], './src/components/Eyebrow.jsx');
   assert.equal(pkg.exports['./tailwind-preset'], './tailwind-preset.js');
   assert.equal(pkg.exports['./fonts/*'], './fonts/*');
@@ -17,7 +33,7 @@ test('package exposes source, styles, fonts, preset, and validators', async () =
 // 授權紀錄改中文之後這條跟著改（2026-08-13 站主明令工程文件一律中文）。
 test('字型的權利與套件相對路徑有記錄在案', async () => {
   const notes = await readFile(new URL('../fonts/SOURCE-NOTES.md', import.meta.url), 'utf8');
-  const styles = await readFile(new URL('../src/styles.css', import.meta.url), 'utf8');
+  const styles = await readStylesheet('../src/styles.css');
   assert.match(notes, /都可以再散布、可以嵌在網頁上/);
   assert.doesNotMatch(styles, /url\(['"]?\/fonts\//);
   for (const font of [
@@ -28,6 +44,17 @@ test('字型的權利與套件相對路徑有記錄在案', async () => {
     'ErikasFarbband-Bold-subset.woff2',
     'RadioNewsman-subset.woff2',
   ]) assert.match(styles, new RegExp(`\\.\\./fonts/${font.replace('.', '\\.')}`));
+});
+
+// 兩個入口除了字型那一段以外必須完全一樣。差別長出來的長相是某一個站少了一條版面規則，
+// 而那條規則在別的站上是好的，所以看單一個站看不出來。
+test('兩個入口只差在字型的投遞方式', async () => {
+  const local = await readStylesheet('../src/styles.css');
+  const external = await readStylesheet('../src/styles-external-fonts.css');
+  const strip = (css) => css.slice(css.indexOf(':root {'));
+  assert.equal(strip(local), strip(external));
+  assert.match(external, /url\('\/assets\/fonts\/[A-Za-z0-9._-]+\.woff2'\)/);
+  assert.doesNotMatch(external, /url\('\.\.\/fonts\//);
 });
 
 // 顯示字體若漏掉變音字，瀏覽器會只用 fallback 畫兩個點：字面、油墨紋理與字重立刻分裂。
@@ -77,7 +104,7 @@ test('an eyebrow with a back destination renders a real navigation link', async 
 // （不逐個 overflow 容器補，補就會漏一處，而漏的那處特別顯眼）。兩套語法都要有——
 // Safari 不吃 scrollbar-color，只寫一套等於沒改。
 test('the shared stylesheet replaces the native scrollbar in both syntaxes', async () => {
-  const styles = await readFile(new URL('../src/styles.css', import.meta.url), 'utf8');
+  const styles = await readStylesheet('../src/styles.css');
   assert.match(styles, /scrollbar-width:\s*thin/);
   assert.match(styles, /scrollbar-color:/);
   assert.match(styles, /::-webkit-scrollbar-thumb\s*\{/);
