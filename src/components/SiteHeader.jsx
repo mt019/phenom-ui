@@ -15,9 +15,9 @@ const PAD_X = {
 };
 
 /*
- * Topic-site toolbar shared by extracted sites. The parent carries `group`, so
- * BackLink keeps the Canvas contract: invisible at rest, visible on row hover
- * or keyboard focus. `backIndexHref` preserves the hidden double-click route.
+ * 拆出去的主題站共用的抬頭列。返回鍵的隱形與熱區全在 BackLink 自己身上（2026-08-17：
+ * 這一列原本掛 `group`，於是游標掃過整條列的任何位置箭頭都會浮出來），這裡只決定它
+ * 放在哪。`backIndexHref` 保留連點兩下回站群清單的隱藏入口。
  */
 export default function SiteHeader({
   back,
@@ -36,7 +36,7 @@ export default function SiteHeader({
     : '';
   return (
     <div className={`mb-6 ${chrome}`}>
-      <div className={`group mx-auto flex items-center justify-between gap-4 py-2 ${PAD_X[width] ?? PAD_X.article} ${WIDTHS[width] ?? WIDTHS.article}`}>
+      <div className={`mx-auto flex items-center justify-between gap-4 py-2 ${PAD_X[width] ?? PAD_X.article} ${WIDTHS[width] ?? WIDTHS.article}`}>
         <BackLink back={back} indexHref={backIndexHref} />
         <span className="flex-1" />
         <div className="flex items-center gap-2">

@@ -46,3 +46,15 @@
 - 各站一律 import 本包，禁止本地複製 `tokens.css`／`palettes.js`／validator 副本
   （phenom-iias 是正確模式）。釘版落後主版太多時升版要專案自查；歷史欠帳見
   canvas TODO 與 2026-08-16 的盤點（六站曾釘四代、三站曾有本地分叉）。
+
+## 返回鍵（v0.1.30 起）
+
+- **熱區是箭頭本身外擴 4px**，寫在 `BackLink.jsx` 的 `ZONE`：`p-1` 撐開、`-m-1` 抵回版面、
+  `w-fit` 不撐滿整行，`group` 掛在這個 wrapper 上。**三個殼那一列不得掛 `group`**，掛了就
+  變成游標掃過整條抬頭列都會讓箭頭浮出來。`scripts/validate-back-link-zone.mjs` 兩條都查，
+  兩個故意寫壞的案例驗過會失敗。
+- 靜置 opacity 0（`.phenom-back-link--quiet`）；hover、`focus-visible` 與觸控的第一次點各自
+  讓它顯形。hover 色吃 `--backlink-accent`，沒設就用全站 accent。有自己色盤的站把這一行加進
+  頁面級變數表，不要傳 class 進來。
+- `className` 加在箭頭上，不整份替換樣式。落點由各站顯式傳 `back`，登記在
+  `phenom-ops/infra/back-link.json`。

@@ -68,7 +68,8 @@ export default function DashboardLayout({
           max-w-7xl 框在 zoom 之外，所以放大字級不會動到左右邊界。 */}
       <header className="border-b border-line-soft">
         <div className={`mx-auto max-w-7xl py-7 ${padX}`}>
-          <div className="group mb-4 flex items-center justify-between gap-4">
+          {/* 熱區在 BackLink 自己身上，這一列不掛 group（2026-08-17）。 */}
+          <div className="mb-4 flex items-center justify-between gap-4">
             <BackLink back={back} indexHref={backIndexHref} />
             <span className="flex-1" />
             {headerRight ? <div className="flex items-center gap-2">{headerRight}</div> : null}

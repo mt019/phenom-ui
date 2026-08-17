@@ -12,22 +12,36 @@ import { Link, useNavigate } from 'react-router-dom';
  * 左上角（那是廣告不是導覽）。帶字的只有主題站的落點（「朱家驊研究室」），那是在告訴讀者
  * 他正要回到哪個站。
  *
- * **預設隱形，滑到抬頭那一列才浮出來**（2026-07-28 使用者裁定）。它照樣佔著位置（不是
- * display:none），浮出來時不會把旁邊的東西推開；殼在那一列掛了 `group`，所以游標移到
- * 左上角附近它就出現，不必精準壓在那個箭頭上。**鍵盤一定看得見**（`focus-visible`）——
+ * **預設隱形，滑過去才浮出來**（2026-07-28 使用者裁定）。它照樣佔著位置（不是
+ * display:none），浮出來時不會把旁邊的東西推開。**鍵盤一定看得見**（`focus-visible`）——
  * 只靠 hover 的隱形控制項對鍵盤使用者等於不存在，那不是安靜，是壞掉。
  *
- * `className` 拿來接該頁自己的顏色（頁面級 CSS 變數、CSS Module class）。位置由呼叫端
- * 決定——這個元件不假設自己被放在哪裡。
+ * **熱區就在箭頭身上，外圈只多 4px**（負外距補回來，版面不動）。到 v0.1.29 為止，`group`
+ * 掛在三個殼那一整列 flex 上，於是游標掃過標題、右側控制項與整片空白都會讓箭頭浮出來
+ * （2026-07-30 使用者在 canvas 說過一次「hover 顯示箭頭的範圍也太大了吧」，canvas 當時
+ * 就改了，這個套件沒跟上；2026-08-17 站主在拆出去的站上又看到同一件事）。隱形的東西要
+ * 靠近它才顯形，一整列都算靠近就等於沒有隱形。三個殼的 `group` 已經拿掉，熱區只由這個
+ * 元件決定，全站一種行為。
  *
- * `floating` 給沒有抬頭列可掛的滿版工具頁：貼左上角、近乎透明、滑過去才浮出來。
+ * `className` 加在箭頭上（頁面級 CSS 變數、CSS Module class），**不再整份替換樣式**——
+ * 舊版寫 `className || QUIET`，呼叫端一傳樣式就把隱形換掉。位置由呼叫端決定，這個元件
+ * 不假設自己被放在哪裡。
+ *
+ * `floating` 給沒有抬頭列可掛的滿版工具頁：貼左上角，同樣隱形，靠自身那塊內距接住游標。
  */
 const QUIET = 'phenom-back-link--quiet text-token-sm text-ink-muted transition duration-fast '
-  + 'group-hover:opacity-100 hover:text-accent hover:opacity-100 focus-visible:opacity-100';
+  + 'group-hover:opacity-100 hover:opacity-100 focus-visible:opacity-100 '
+  + 'hover:text-[var(--backlink-accent,var(--c-accent))]';
 
-const FLOATING = 'fixed left-3 top-3 z-50 rounded-token-md px-2 py-1 text-token-xs '
-  + 'text-ink-muted opacity-80 transition duration-fast hover:bg-paper hover:opacity-100 hover:text-accent '
-  + 'focus-visible:bg-paper focus-visible:opacity-100';
+// 負外距把內距抵掉，熱區比箭頭大一圈而版面不動。
+const ZONE = 'group -m-1 block w-fit shrink-0 p-1';
+
+const FLOATING = 'rounded-token-md px-1 text-token-xs text-ink-muted '
+  + 'phenom-back-link--quiet transition duration-fast focus-visible:opacity-100 '
+  + 'group-hover:opacity-100 hover:bg-paper hover:opacity-100 '
+  + 'hover:text-[var(--backlink-accent,var(--c-accent))] focus-visible:bg-paper';
+
+const FLOATING_ZONE = 'group fixed left-1 top-1 z-50 block p-2';
 
 /*
  * 連點兩下回專案清單（2026-07-28 使用者裁定）。
@@ -124,13 +138,15 @@ export default function BackLink({
   };
 
   return (
-    <Link
-      to={link.href}
-      aria-label={link.title || label_}
-      onClick={onClick}
-      className={`${className || (floating ? FLOATING : QUIET)} ${touchRevealed ? 'phenom-back-link--revealed' : ''}`.trim()}
-    >
-      {label ? `← ${label}` : '←'}
-    </Link>
+    <span className={floating ? FLOATING_ZONE : ZONE}>
+      <Link
+        to={link.href}
+        aria-label={link.title || label_}
+        onClick={onClick}
+        className={`${floating ? FLOATING : QUIET} ${className} ${touchRevealed ? 'phenom-back-link--revealed' : ''}`.trim()}
+      >
+        {label ? `← ${label}` : '←'}
+      </Link>
+    </span>
   );
 }
