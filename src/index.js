@@ -38,6 +38,7 @@ export { default as PdfViewer } from './components/lab/PdfViewer.jsx';
 export { default as Prose } from './components/lab/Prose.jsx';
 export { buildNotes, noteHtml, stripNotes } from './components/lab/textNotes.js';
 export { default as Quiz } from './components/lab/Quiz.jsx';
+export { default as RailLayout } from './components/lab/RailLayout.jsx';
 export { default as SearchField } from './components/lab/SearchField.jsx';
 export { default as SearchResults } from './components/lab/SearchResults.jsx';
 export { default as SectionLink } from './components/lab/SectionLink.jsx';

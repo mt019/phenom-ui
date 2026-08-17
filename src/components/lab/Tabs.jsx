@@ -103,6 +103,15 @@ const VARIANTS = {
     on: 'bg-accent text-paper',
     off: 'text-ink-muted hover:bg-surface-raised hover:text-ink',
   },
+  // Rail: RailLayout 左欄的檢視切換。窄屏是吸頂那一列（換行、不橫捲），lg 起變成左欄的
+  // 直排格線，所以按鈕靠左對齊而不置中——文字起點要跟底下的左欄內容對齊。選中的用
+  // accent-soft 底而不是實心 accent：這一欄整天都在畫面上，實心色塊在旁邊太吵。
+  rail: {
+    list: 'flex flex-wrap gap-1 lg:grid lg:gap-0.5',
+    item: 'shrink-0 rounded-token-md px-2.5 py-1.5 text-left text-token-sm transition-colors duration-fast',
+    on: 'bg-accent-soft font-semibold text-accent',
+    off: 'text-ink-muted hover:text-ink',
+  },
 };
 
 export default function Tabs({ items, value, onChange, variant = 'underline', className = '', style, label }) {
