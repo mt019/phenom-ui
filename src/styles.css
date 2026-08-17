@@ -288,44 +288,43 @@ body {
 /* 編號註標。建置端把它貼在標點之後，AnnotatedHtml 用事件委派接上浮卡。
    中文可在任兩字之間斷行，一個數字寬的標記很容易被孤立到下一行，所以整顆設 nowrap。
 
-   形狀跟憲法法庭那邊的意見書一致（my-canvas-lab 的 _constitutional-court/OpinionText.jsx）：
-   0.68em、粗體、accent 字色、底線，上標靠 position 上移而不靠 vertical-align——瀏覽器
-   對 <sup> 的 super 會連帶壓行高，自己算位移才控制得住。註標本身是內容不是鷹架，所以
-   不用 ink-faint。
+   2026-08-17 由底線式改成上標式，站主裁定，兩個理由。基線下方那條帶已經有五種記號在畫：
+   專門用語的實心點與作者強調的空心圈走 text-emphasis-position: under right、專名號的實線
+   底線、書名號的波浪底線（見 styles/marks.css），引註 .cite-mark 另有一排點當背景畫在
+   行底。註標若再加一條底線，讀者要在同一條帶上辨識六種記號，與專名號的實線尤其接近。
+   另一個理由在語意：textNotes 產出的是 role="button" tabindex="0" 的可點元素（點了釘住
+   浮卡），舊版給的 cursor: help 與實際行為對不上。
+
+   舊版用 position: relative 配 top 上移，理由是瀏覽器對 <sup> 的 vertical-align: super 會
+   連帶撐高行框。現在改用 super 並以 line-height: 1 壓住；長文段落上線前看一眼行距，
+   出現跳動就退回 position 位移的寫法，其餘屬性照留。
 
    編號用 accent 那支打字機字體（Erikas Farbband），站主 2026-08-02 指定。子集裡十個數字
-   與兩位數都在，量過沒有掉回明體。憲法法庭那邊的意見書目前是繼承正文字體，形狀要跟這裡
-   對齊（my-canvas-lab 的 _constitutional-court/OpinionText.jsx）。
+   與兩位數都在，量過沒有掉回明體。註標本身是內容不是鷹架，所以不用 ink-faint。憲法法庭
+   那邊的意見書繼承正文字體，形狀要跟這裡對齊（my-canvas-lab 的
+   _constitutional-court/OpinionText.jsx），本次改上標之後那邊也要跟著看一次。
 
    顏色 token 一律用 --c-*，不要寫成 --color-*。2026-08-02 以前這段寫的是 var(--color-accent,
    #8a5a3b)，那個變數不存在，整段其實一直在吃逗號後面的 fallback，顏色沒跟著主題走。
-   字體那個 --font-accent 是真的，別一起改掉。 */
-/* 選擇器不綁 .prose-body（2026-08-13）：資料層是 JSON 字串的頁面（德川頁的術語表、年表）
+   字體那個 --font-accent 是真的，別一起改掉。
+
+   選擇器不綁 .prose-body（2026-08-13）：資料層是 JSON 字串的頁面（德川頁的術語表、年表）
    不走 markdown 管線、外層沒有 .prose-body，註標一樣要長這個樣子。 */
 .fn-ref {
   white-space: nowrap;
-  cursor: help;
-  display: inline-block;
-  position: relative;
-  top: -0.38em;
-  font-family: var(--font-accent, inherit);
-  font-size: 0.68em;
-  font-weight: 700;
+  margin-left: 0.1em;
+  font-family: var(--font-accent);
+  font-size: 0.7em;
   font-variant-numeric: tabular-nums;
-  vertical-align: baseline;
   line-height: 1;
-  margin: 0 0.08em;
-  padding: 0;
-  color: var(--c-accent);
-  text-decoration: underline;
-  text-decoration-color: var(--c-line);
-  text-underline-offset: 2px;
-  transition: text-decoration-color var(--dur-fast) ease;
+  vertical-align: super;
+  color: color-mix(in srgb, var(--c-accent) 72%, var(--c-ink));
+  cursor: pointer;
 }
 
 .fn-ref:hover,
 .fn-ref:focus-visible {
-  text-decoration-color: var(--c-accent);
+  color: var(--c-accent);
 }
 
 /* 圍籬區塊裡的 <code> 會繼承行內那顆藥丸（細框＋左右內距＋accent 字面）。整段程式碼不需要
