@@ -45,6 +45,44 @@ export function useStickyTop(ref, { varName = '--lab-sticky-top', target } = {})
   return height;
 }
 
+// 判斷一個 position:sticky 的元素此刻是不是已經停在它的貼齊位置上。
+//
+// 用途是把「停住之後才成立的樣式」交給呼叫端決定，最常見的兩件：
+//   1. 上緣的圓角要收掉——圓角在兩個上角各留一個缺口，捲過去的內容從缺口露出來。
+//   2. 貼齊位置往上壓一個像素——`--lab-sticky-top` 是量到的高度四捨五入到整數的結果，
+//      與實際高度差半個像素時，元素上緣會透出一條底色的線。
+//
+// 用法：
+//   const box = useRef(null);
+//   const stuck = useStuckToTop(box);
+//   <div ref={box} className={`sticky ${stuck ? '' : 'rounded-t-lg'}`}
+//        style={{ top: 'calc(var(--lab-sticky-top, 0px) - 1px)' }}>…</div>
+//
+// 貼齊位置直接讀元素算出來的 `top`，所以 CSS 那邊怎麼寫（變數、calc、常數）都不必再告訴它一次。
+export function useStuckToTop(ref) {
+  const [stuck, setStuck] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    let frame = 0;
+    const check = () => {
+      frame = 0;
+      const top = parseFloat(getComputedStyle(el).top) || 0;
+      setStuck(el.getBoundingClientRect().top <= top + 0.5);
+    };
+    const onScroll = () => { if (!frame) frame = window.requestAnimationFrame(check); };
+    check();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [ref]);
+  return stuck;
+}
+
 export default function StickyHeading({ children, className = '', style }) {
   return (
     <div
