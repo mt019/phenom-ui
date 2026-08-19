@@ -36,7 +36,8 @@ export default function ArticleLayout({
   hideToc = false,
   // 右欄改放頁面自己的東西，取代量測出來的小標目次。連續滾動的長文用它：小標是篇名，
   // 左欄已經列了同一份，右欄要回答的是另一個問題——現在讀到的這一篇是什麼、在原書哪幾頁。
-  // 傳了 aside 就不再量測小標，hideToc 也不必再傳。
+  // 傳了 aside 就不再量測小標，hideToc 也不必再傳。窄螢幕沒有這一欄：aside 講的是
+  // 「現在讀到哪裡」，靠黏在視窗邊才成立，貼在正文上方的一份捲過去就過期了。
   aside = null,
   // 內容欄放寬到 61rem。以條文對照表、寬表格當骨架的頁面才傳；散文不傳，44rem 那條
   // 閱讀欄寬是照行長訂的。**放寬不影響右欄目次**——兩件事以前綁在同一個 prop 上，
@@ -116,9 +117,6 @@ export default function ArticleLayout({
           </details>
         ) : null}
 
-        {/* 窄螢幕沒有右欄。aside 講的是「現在讀到哪裡」，隨捲動變，收進 details 讀者得
-            自己去開；改成貼在正文上方一條，佔一兩行。 */}
-        {aside ? <div className="mb-8 lg:hidden">{aside}</div> : null}
 
         {/* prose-body：長文閱讀區的灰階平滑（styles.css）由版型殼自己帶，頁面不必記得掛
             ——2026-08-14 德川頁漏掛整頁筆畫偏重之後，站主明令修在共用層級。 */}
