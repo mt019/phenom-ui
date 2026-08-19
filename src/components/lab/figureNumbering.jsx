@@ -46,6 +46,9 @@ let warned = false;
  */
 export function useFigure(id) {
   const ctx = useContext(FigureNumberingContext);
+  // 沒有 id 的圖本來就不要號（別的文章的圖都還沒接上編號），這種情形不警告——每一張都喊
+  // 一次，等於訓練人忽略警告。
+  if (!id) return null;
   if (!ctx) {
     if (!warned && typeof console !== 'undefined') {
       warned = true;
