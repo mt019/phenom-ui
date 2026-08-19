@@ -32,6 +32,7 @@ export { default as Dropdown } from './components/lab/Dropdown.jsx';
 export { default as FilterBar } from './components/lab/FilterBar.jsx';
 export { default as HoverCard } from './components/lab/HoverCard.jsx';
 export { default as HoverCite } from './components/lab/HoverCite.jsx';
+export { CiteNumbering, createCiteRegistry, useCiteNumber } from './components/lab/citeNumbering.jsx';
 export { default as NotesList } from './components/lab/NotesList.jsx';
 export { default as NotesMarkdown, mdInline } from './components/lab/NotesMarkdown.jsx';
 export { default as PdfViewer } from './components/lab/PdfViewer.jsx';

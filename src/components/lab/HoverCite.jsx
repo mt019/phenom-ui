@@ -1,21 +1,27 @@
 import { ExternalLink } from 'lucide-react';
 import HoverCard from './HoverCard';
 import MathText from './MathText';
+import { useCiteNumber } from './citeNumbering.jsx';
 
 /*
- * A source marker on a claim. Hover the cited words to see who said it and
- * where; click to pin the card so you can reach the link inside it. The floating
- * behaviour lives in HoverCard, which TermLink shares.
+ * 正文裡的一條引註。被引的文字照常排，句子後面掛一顆上標編號；停在編號上出現卡片，
+ * 寫誰在哪裡講的，點一下把卡片釘住才點得到裡面的連結。浮動的行為在 HoverCard，
+ * 與 TermLink 共用。
  *
- * Deliberately narrow: no numbering, no bibliography, no back-links. The source
- * object comes from the data repo, where a citation with no locator fails
- * validation and an id with no entry fails the build.
+ * 編號來自 citeNumbering 的號碼簿（渲染順序、同一條來源同一個號），與章末 SourcesList
+ * 的編號同一個順序。站主 2026-08-19 裁定編號腳註為預設體例，理由是點線只說「這句有出處」，
+ * 不說是第幾條，讀者要走到章末才對得起來；學術正文本來就是用號碼對。
+ *
+ * 點線（.cite-mark）退成 mark 這個選項。整句畫線在正文裡是一大片點陣，而編號一顆字就夠。
+ *
+ * 來源物件出自資料倉：沒有 locator 的引用在那裡就過不了驗證，id 找不到條目的建置會失敗。
  */
-export default function HoverCite({ source, lang = 'zh', children }) {
+export default function HoverCite({ source, sourceId, lang = 'zh', mark = false, children }) {
+  // hook 要無條件呼叫，所以號碼的取捨交給第二個參數，不用提早 return 來跳過它。
+  const n = useCiteNumber(sourceId, Boolean(source));
   if (!source) return children;
 
-  // The card is reader-facing: author, work, where in it, and a way to read it.
-  // Anything about how the citation was checked stays in the data repo.
+  // 卡片是給讀者看的：誰、哪一本、在哪一頁、去哪裡讀。這條引用是怎麼查證的留在資料倉。
   const en = lang === 'en';
   const { author, title, year, container, url } = source;
   const locator = (en ? source.en?.locator : source.locator) ?? source.locator;
@@ -45,20 +51,24 @@ export default function HoverCite({ source, lang = 'zh', children }) {
     </>
   );
 
-  // No asterisk on the marker. A marker is one more character, and Chinese breaks
-  // between any two characters, so it gets orphaned onto the next line just as the
-  // punctuation did. The dotted underline says the same thing and cannot be.
+  // data-cite 留在外層：章末的 SourcesList 掃它生清單、放錨點，並按 DOM 順序編號——
+  // 與這裡的號碼簿同一個順序。
+  //
+  // 點線不走 text-decoration，由 .cite-mark（styles/marks.css）當背景畫：text-decoration
+  // 逐盒畫，KaTeX 子盒各有字級，點的大小與高度拼不齊，且 .base 是 inline-block、父層的
+  // 線進不去。背景一次畫整條，公式底下照樣連續。
   return (
-    <HoverCard
-      card={card}
-      // 底線走 text-decoration，不用 border-bottom：行內公式的盒子比一行中文高，border
-      // 畫在盒子的底緣，分數的分母因此被那條虛線穿過去（2026-08-13 站主截圖）。
-      // skip-ink 是 none：漢字的墨沉到基線之下，auto 會在每個字底下讓開，整條線碎掉
-      // （2026-08-13 站主截圖）。只有 KaTeX 那段在 katex.css 把繼承值改回 auto，
-      // 讓位只發生在分數這種真的戳進線裡的字符。
-      className="cursor-help cite-mark transition-colors duration-fast hover:text-accent"
-    >
-      {children}
-    </HoverCard>
+    <span data-cite={sourceId} className="scroll-mt-8">
+      <span className={mark ? 'cite-mark' : undefined}>{children}</span>
+      {n ? (
+        <HoverCard
+          card={card}
+          className="fn-ref"
+          label={en ? `Source ${n}` : `資料來源第 ${n} 條`}
+        >
+          {n}
+        </HoverCard>
+      ) : null}
+    </span>
   );
 }

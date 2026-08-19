@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import TableOfContents from './TableOfContents';
 import useHeadings from './useHeadings';
 import PageIdentity from '../PageIdentity';
+import { CiteNumbering } from './citeNumbering.jsx';
 
 /*
  * The shell a long article sits in: a quiet rail of everything else there is to
@@ -39,6 +40,9 @@ export default function ArticleLayout({
   wideContent = false,
   mobileNavLabel,
   scaleContent = true,
+  // 引註編號的號碼簿換新的時機。預設跟著 tocKey（頁面切語言時傳的就是它）——同一篇換一種
+  // 語言，引註的出現順序可能不同，號碼簿要重來。頁面不必為此多傳一個 prop。
+  citeKey,
   children,
 }) {
   const bodyRef = useRef(null);
@@ -110,7 +114,9 @@ export default function ArticleLayout({
 
         {/* prose-body：長文閱讀區的灰階平滑（styles.css）由版型殼自己帶，頁面不必記得掛
             ——2026-08-14 德川頁漏掛整頁筆畫偏重之後，站主明令修在共用層級。 */}
-        <div ref={bodyRef} className="prose-body">{children}</div>
+        <div ref={bodyRef} className="prose-body">
+          <CiteNumbering resetKey={citeKey ?? tocKey}>{children}</CiteNumbering>
+        </div>
       </article>
 
       {showToc ? (
