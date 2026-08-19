@@ -127,8 +127,12 @@ test('page shells reserve the toc track up front and fill it from the headings t
   ]) {
     const source = await readFile(new URL(file, import.meta.url), 'utf8');
     assert.match(source, /useHeadings\(bodyRef/, `${file}：殼要自己量標題`);
-    assert.match(source, /const reserveToc = !hideToc/, `${file}：軌道留不留只看 hideToc`);
-    assert.match(source, /const showToc = reserveToc && [\s\S]{0,80}items\.length/, `${file}：目次內容列不列要看量到幾個標題`);
+    // 軌道由 props 決定就好（hideToc，或頁面自己傳進來的 aside），判斷式裡不准出現
+    // 量測結果——那正是上面那個位移的成因。
+    const reserve = source.match(/const reserveToc = .*/)?.[0] ?? '';
+    assert.ok(/hideToc/.test(reserve), `${file}：軌道留不留要看 hideToc`);
+    assert.doesNotMatch(reserve, /items/, `${file}：軌道留不留不准看量測結果`);
+    assert.match(source, /const showToc = [\s\S]{0,40}reserveToc && [\s\S]{0,80}items\.length/, `${file}：目次內容列不列要看量到幾個標題`);
     assert.doesNotMatch(source, /\{hideToc \? null :/, `${file}：不要再用 hideToc 單獨決定目次內容`);
 
     // 格線那幾條字串必須由 reserveToc 決定。抓法是看每一個 lg:grid-cols- 之前最近的那個

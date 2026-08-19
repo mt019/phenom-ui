@@ -39,7 +39,7 @@ function buildTree(items) {
 
 const LEAF = 'block border-l-2 py-1 pl-3 pr-2 text-token-xs leading-snug transition-colors duration-fast';
 
-function Leaf({ item, active, onSelect }) {
+function Leaf({ item, active, onSelect, onFollow }) {
   const tone = active
     ? 'border-accent bg-accent-soft font-bold text-accent'
     : 'border-transparent text-ink-muted hover:border-line hover:text-accent';
@@ -62,6 +62,7 @@ function Leaf({ item, active, onSelect }) {
       ) : (
         <Link
           to={item.href}
+        onClick={onFollow ? (event) => onFollow(item.id, event) : undefined}
         data-leaf-active={active ? '' : undefined}
         title={item.hint || undefined}
         className={`${LEAF} ${tone}`}
@@ -84,6 +85,11 @@ export default function BookTree({
   searchPlaceholder = '搜尋篇名…',
   header,
   onSelect,
+  // 葉子仍是真的連結（中鍵開新分頁、鍵盤、爬蟲都要它），呼叫端要攔就在這裡
+  // 自己 event.preventDefault()。連續滾動的頁面用它：那一篇已經在正文流裡就只捲動，
+  // 不在流裡才讓連結把人帶去別的部次。與 onSelect 的差別是 onSelect 把葉子換成按鈕，
+  // 沒有網址可貼。
+  onFollow,
 }) {
   const [query, setQuery] = useState('');
   const tree = useMemo(() => buildTree(items), [items]);
@@ -123,7 +129,7 @@ export default function BookTree({
         {hits ? (
           <>
             <p className="px-2 pb-2 text-token-xs tabular-nums text-ink-faint">{hits.length} 篇符合</p>
-            <ul>{hits.map((it) => <Leaf key={it.id} item={it} active={it.id === activeId} onSelect={onSelect} />)}</ul>
+            <ul>{hits.map((it) => <Leaf key={it.id} item={it} active={it.id === activeId} onSelect={onSelect} onFollow={onFollow} />)}</ul>
           </>
         ) : tree.map((group) => {
           const shut = collapsed.has(group.name);
@@ -145,7 +151,7 @@ export default function BookTree({
                     <p className="px-1 pb-0.5 pl-5 pt-1 text-token-xs text-ink-faint">{block.label}</p>
                   ) : null}
                   <ul className="pl-3">
-                    {block.items.map((it) => <Leaf key={it.id} item={it} active={it.id === activeId} onSelect={onSelect} />)}
+                    {block.items.map((it) => <Leaf key={it.id} item={it} active={it.id === activeId} onSelect={onSelect} onFollow={onFollow} />)}
                   </ul>
                 </div>
               ))}

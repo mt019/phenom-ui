@@ -34,6 +34,10 @@ export default function ArticleLayout({
   // 「右欄會跟左欄列出同一份東西」這種重複的情況才傳 hideToc；「這頁大概沒有小標吧」
   // 不是理由，內容列不列殼自己看得到。
   hideToc = false,
+  // 右欄改放頁面自己的東西，取代量測出來的小標目次。連續滾動的長文用它：小標是篇名，
+  // 左欄已經列了同一份，右欄要回答的是另一個問題——現在讀到的這一篇是什麼、在原書哪幾頁。
+  // 傳了 aside 就不再量測小標，hideToc 也不必再傳。
+  aside = null,
   // 內容欄放寬到 61rem。以條文對照表、寬表格當骨架的頁面才傳；散文不傳，44rem 那條
   // 閱讀欄寬是照行長訂的。**放寬不影響右欄目次**——兩件事以前綁在同一個 prop 上，
   // 於是要表格擺得下就得放棄目次，那是假的取捨。
@@ -48,8 +52,8 @@ export default function ArticleLayout({
   const bodyRef = useRef(null);
   const { items, active } = useHeadings(bodyRef, { levels: tocLevels, refreshKey: tocKey });
   // 兩個判斷，刻意分開：軌道留不留不看量測，目次內容列不列才看。
-  const reserveToc = !hideToc;
-  const showToc = reserveToc && items.length > 0;
+  const reserveToc = aside ? true : !hideToc;
+  const showToc = !aside && reserveToc && items.length > 0;
 
   return (
     // 手機的單欄要寫成 minmax(0,1fr)：grid 的 auto 軌會被寬內容（min-width 的圖表、
@@ -112,12 +116,22 @@ export default function ArticleLayout({
           </details>
         ) : null}
 
+        {/* 窄螢幕沒有右欄。aside 講的是「現在讀到哪裡」，隨捲動變，收進 details 讀者得
+            自己去開；改成貼在正文上方一條，佔一兩行。 */}
+        {aside ? <div className="mb-8 lg:hidden">{aside}</div> : null}
+
         {/* prose-body：長文閱讀區的灰階平滑（styles.css）由版型殼自己帶，頁面不必記得掛
             ——2026-08-14 德川頁漏掛整頁筆畫偏重之後，站主明令修在共用層級。 */}
         <div ref={bodyRef} className="prose-body">
           <CiteNumbering resetKey={citeKey ?? tocKey}>{children}</CiteNumbering>
         </div>
       </article>
+
+      {aside ? (
+        <aside className="hidden lg:block">
+          <div className="sticky top-16 max-h-[calc(100vh-6rem)] overflow-y-auto pb-10">{aside}</div>
+        </aside>
+      ) : null}
 
       {showToc ? (
         <aside className="hidden lg:block">

@@ -73,7 +73,14 @@ const DOUBLE_MS = 260;
  * 一句 warning，跨站的檢查在 phenom-ops/scripts/check-back-link.mjs。
  */
 const CANVAS_HOME = { href: 'https://phenomcanvas.com/', label: '', title: '回 Phenom Canvas' };
-const CANVAS_INDEX = 'https://phenomcanvas.com/all';
+/*
+ * 雙擊的落點＝那份分區的研究清單，它在 canvas 的根路徑上。
+ *
+ * 2026-08-17 以前這裡寫的是 `phenomcanvas.com/all`，那是 apex 自己另外寫的一份六格卡片頁；
+ * 站主當天認定它與研究清單重複、卡片版面又是全域禁令，整頁刪掉並在 apex 留 308 送到這裡。
+ * 舊網址因此還通，但落點直接寫本尊，少一次轉址。
+ */
+const CANVAS_INDEX = 'https://canvas.phenomcanvas.com/';
 
 export default function BackLink({
   className = '',

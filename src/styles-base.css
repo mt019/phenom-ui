@@ -195,6 +195,11 @@ body {
 .prose-body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* 中文與拉丁字母、半形數字之間的空隙由排版加，不由資料加。轉錄的正文要與原書逐字相同
+     （朱家驊那本排的是「拉丁文Academia Sinica，」，中間沒有空格），在母本補一個空格就是
+     改了原文，讀者複製走的也會是改過的字。text-autospace 只影響繪製，選取複製拿到的仍是
+     原字。Chromium 137 起支援，其餘瀏覽器忽略這一行，讀到的是原書的緊排。 */
+  text-autospace: normal;
 }
 
 .prose-body .font-accent {
