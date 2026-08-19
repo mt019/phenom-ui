@@ -111,6 +111,10 @@ export function RuleLine({ at, scale, orient = 'vertical', label, tone = 'var(--
   const { inner } = useFrame();
   const p = scale(at);
   const vertical = orient === 'vertical';
+  const labelWidth = typeof label === 'string'
+    ? [...label].reduce((w, ch) => w + (ch.charCodeAt(0) > 0x2e80 ? 10 : 6.2), 0)
+    : 0;
+  const fitsRight = p + 4 + labelWidth <= inner.x1;
   return (
     <g>
       <line
@@ -123,10 +127,12 @@ export function RuleLine({ at, scale, orient = 'vertical', label, tone = 'var(--
         strokeDasharray="4 3"
       />
       {label ? (
+        /* 直立標線的說明預設貼在線的右邊，線靠近右緣時會被畫框切掉（統計站 2026-08-19 的
+           雜訊分布圖就是這樣少了半句）。字寬按每字 6.2px、漢字 10px 估，放不下就翻到左邊。 */
         <text
-          x={vertical ? p + 4 : inner.x1}
+          x={vertical ? (fitsRight ? p + 4 : p - 4) : inner.x1}
           y={vertical ? inner.y1 + 10 : p - 4}
-          textAnchor={vertical ? 'start' : 'end'}
+          textAnchor={vertical ? (fitsRight ? 'start' : 'end') : 'end'}
           fontSize="10"
           fill={tone}
         >

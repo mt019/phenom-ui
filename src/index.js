@@ -30,6 +30,7 @@ export { default as DashboardLayout } from './components/lab/DashboardLayout.jsx
 export { default as Derivation } from './components/lab/Derivation.jsx';
 export { default as Dropdown } from './components/lab/Dropdown.jsx';
 export { default as FilterBar } from './components/lab/FilterBar.jsx';
+export { FigureNumbering, FigureBlock, FigureCaption, FigRef, useFigure, figureAnchorId } from './components/lab/figureNumbering.jsx';
 export { default as HoverCard } from './components/lab/HoverCard.jsx';
 export { default as HoverCite } from './components/lab/HoverCite.jsx';
 export { CiteNumbering, createCiteRegistry, useCiteNumber } from './components/lab/citeNumbering.jsx';

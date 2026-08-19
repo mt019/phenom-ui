@@ -242,12 +242,28 @@ body {
   white-space: nowrap;
   margin-left: 0.1em;
   font-family: var(--font-accent);
+  /* Erikas 的油墨網點在 700 那個字面上，400 是乾淨的（DESIGN.md「accent 字體：紋理在字重」）。
+     站主 2026-08-19 看註標「油墨躁點呢」，就是這兩行漏掉的結果：字體對了、字重與平滑沒對，
+     於是上標印出來是光滑的數字。font-smoothing 要退回 auto——正文區的灰階平滑會把顆粒抹掉，
+     .font-accent 那條規則早就這樣做，而註標不帶那個 class，所以要各自寫一次。 */
+  font-weight: 700;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
   font-size: 0.7em;
   font-variant-numeric: tabular-nums;
   line-height: 1;
   vertical-align: super;
   color: color-mix(in srgb, var(--c-accent) 72%, var(--c-ink));
   cursor: pointer;
+}
+
+/* 圖號的數字與註標同一個處理：accent 字面的油墨網點在 700，灰階平滑會把顆粒抹掉。 */
+.fig-num {
+  font-family: var(--font-accent);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
 }
 
 .fn-ref:hover,

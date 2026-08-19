@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'react';
 import MathText from '../MathText';
+import { FigureCaption, figureAnchorId } from '../figureNumbering.jsx';
 
 /*
  * The outer shell of every chart: viewBox, margins, a caption, and the
@@ -25,6 +26,9 @@ export default function ChartFrame({
   minWidth = 480,
   title,
   caption,
+  // 給了 figureId 就從共用的號碼簿取號，圖說開頭印「圖 N｜題目」。沒給就與先前一樣，
+  // 既有各站的圖不會忽然多出一個號。
+  figureId,
   children,
 }) {
   const inner = {
@@ -37,7 +41,7 @@ export default function ChartFrame({
   };
 
   return (
-    <figure className="my-6">
+    <figure className="my-6" id={figureAnchorId(figureId)}>
       <div className="overflow-x-auto">
         <svg
           viewBox={`0 0 ${width} ${height}`}
@@ -51,9 +55,7 @@ export default function ChartFrame({
           </FrameContext.Provider>
         </svg>
       </div>
-      {caption ? (
-        <figcaption className="mt-2 text-token-xs leading-relaxed text-ink-faint"><MathText>{caption}</MathText></figcaption>
-      ) : null}
+      {figureId || caption ? <FigureCaption id={figureId} caption={caption} /> : null}
     </figure>
   );
 }
