@@ -84,3 +84,16 @@ plugins: [react(), externalFonts({ emit: true })] // 供應端：另把字型寫
   切檢視、搜尋、篩選時用，導覽不隨頁面捲走。窄屏時左欄的內容排進正常流，導覽那一列吸頂。
 
 自己刻版型的頁登記在 `phenom-ops/infra/shared-shell.json`，由 `check:shared-shell` 看守。
+
+## 資料表
+
+`DataTable`（v0.1.46）收篇章清單、案件清單這種一列一筆的表。欄寬寫在 `columns` 的 `width`
+裡，由 colgroup 宣告，版面是 `table-layout: fixed`。
+
+**欄寬不准交給內容決定。** auto 版面拿一欄裡最長的那一列當整欄的寬度，而長度的分布通常
+偏斜：iias 篇章表 795 列的作者中位數 3 個字，其中一列是三位西文作者共 50 字，作者欄那一
+列就把整欄撐開，多出來的寬度從篇名與出處扣，出處每列折成三行。同理 `white-space: nowrap`
+只給數值欄與按鈕欄，內容欄要能折行。
+
+`sticky` 與 `minWidth` 只能擇一：`minWidth` 把表包進橫向捲動容器，表頭的 `position: sticky`
+會改成貼那個容器的頂端。長清單要留表頭選 `sticky`，窄欄位多的表選 `minWidth`。
