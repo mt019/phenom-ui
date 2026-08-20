@@ -1,5 +1,5 @@
 /*
- * 裸 hex 的棘輪——站群唯一一份（2026-08-20 之前五個倉各一份副本）。
+ * 裸 hex 的檢查——站群唯一一份（2026-08-20 之前五個倉各一份副本）。
  *
  * 已收編的檔案不得出現裸 hex：顏色寫進 tokens.css，或寫進一個開頭帶 `token-exempt`
  * 註記的頁面色票物件（豁免到下一個以 `};` 結尾的行為止）。尚未收編的檔案列在各倉的
@@ -78,5 +78,5 @@ export function runDesignTokens(opts) {
         violations.map((v) => `  ${v}`).join('\n'),
     );
   }
-  console.log(`色票棘輪通過：${checked} 個已收編的檔案乾淨，未收編 ${exceptions.length} 個。`);
+  console.log(`色票檢查通過：${checked} 個已收編的檔案乾淨，未收編 ${exceptions.length} 個。`);
 }
