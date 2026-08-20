@@ -95,5 +95,9 @@ plugins: [react(), externalFonts({ emit: true })] // 供應端：另把字型寫
 列就把整欄撐開，多出來的寬度從篇名與出處扣，出處每列折成三行。同理 `white-space: nowrap`
 只給數值欄與按鈕欄，內容欄要能折行。
 
+窄屏用 `useMediaQuery`（v0.1.47）換一組欄，別把五欄硬塞進手機的寬度：iias 在 640px 以下
+收成篇名與取得兩欄，作者、出處、頁碼排進篇名底下那一行。初值是 false，版面要寫成
+「窄屏成立時才換」。
+
 `sticky` 與 `minWidth` 只能擇一：`minWidth` 把表包進橫向捲動容器，表頭的 `position: sticky`
 會改成貼那個容器的頂端。長清單要留表頭選 `sticky`，窄欄位多的表選 `minWidth`。

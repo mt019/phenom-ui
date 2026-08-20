@@ -51,6 +51,7 @@ export { default as SourcesList } from './components/lab/SourcesList.jsx';
 export { default as StickyHeading, useStickyTop, useStuckToTop } from './components/lab/StickyHeading.jsx';
 export { default as SubOutline } from './components/lab/SubOutline.jsx';
 export { default as TableOfContents } from './components/lab/TableOfContents.jsx';
+export { default as useMediaQuery } from './components/lab/useMediaQuery.js';
 export { default as useHeadings } from './components/lab/useHeadings.js';
 export { default as Tabs, useTabParam, useTabParams } from './components/lab/Tabs.jsx';
 export { default as TermLink } from './components/lab/TermLink.jsx';
