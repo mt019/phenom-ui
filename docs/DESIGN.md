@@ -3,7 +3,10 @@
 本檔與 `src/styles/tokens.css`、`src/styles/palettes.js` 同倉同版本，是 phenomcanvas
 站群色彩規則的唯一正本。各站 `docs/DESIGN.md` 的色票節一律指到這裡，不各自維護副本；
 歷史上 canvas 的 `docs/DESIGN.md` 色票庫節（296–348 行）是本檔的前身，內容以本檔為準。
-機器閘在 `scripts/validate-color-system.mjs`，接進 `npm run validate`。
+判定在 `scripts/lib/color-system.mjs`，站群五個倉共用一份（各倉的
+`scripts/validate-color-system.mjs` 只宣告自己的路徑與參數）；帶寬與可辨門檻的數值
+取自 `src/styles/oklch.js`，色票庫與色彩原理頁讀的是同一份。負向測試在
+`tests/color-rules.test.mjs`，改判定就跑 `npm test`。
 
 ## 鐵律
 
@@ -23,6 +26,12 @@
 - 色調對 `-tx`（文字／小 mark）：OKLCH L 0.46–0.58、C 0.045–0.13（莫蘭迪，不純不灰），
   全體明度極差 ≤ 0.10。`-bg`（淡底）：L 0.90–0.97、C ≤ 0.035。
 - H 50–140（土黃到土綠）是危險帶：中等彩度就讀成土色，非有已審值不進。
+- 兩支 `-tx` 的 OKLab 距離 ≥ 0.05。低於它，讀者在沒有標籤的圖上把兩類讀成同一類。
+  現行八支有三組未達（玫瑰／李 0.011、紅／李 0.035、玫瑰／紅 0.043），登記在
+  `color-system.mjs` 的 `KNOWN_CLOSE_PAIRS`，重排落地就刪掉那三行；清單以外的新組合
+  直接失敗。
+- 分類槽最多八支。本站彩度帶內、門檻 0.05 下等距排列，第九支掉到 0.046，`--cat-9`
+  以上一律擋。
 
 ## 面積規則（2026-07-08 立、2026-08-16 再令全局底層）
 

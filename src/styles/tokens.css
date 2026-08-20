@@ -40,7 +40,7 @@
      not by hue). The whole thing is Notion's harmony rule made computable:
      every -tx (text/mark) sits in a tight uniform lightness band (OKLCH
      L≈0.48–0.55, muted C≈0.05–0.10) and every -bg is near-white with the same
-     hue (OKLCH L≈0.92–0.96). `scripts/validate-color-system.mjs` enforces the
+     hue (OKLCH L≈0.92–0.96). `scripts/lib/color-system.mjs` enforces the
      bands at build time, so a categorical/status color can never drift out of
      the harmony envelope by hand. These are STABLE across page palettes (status
      meaning and category identity don't change with theme); a future dark mode
