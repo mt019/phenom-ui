@@ -13,7 +13,12 @@
  * 明度極差、tx 與 bg 成對、分類槽的上限、兩支墨色的感知距離，逐項在這裡查。
  */
 import { readFileSync, existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { hexToOklch, oklabDistance, BANDS, SEPARATION_MIN } from '../../src/styles/oklch.js';
+
+/* 已審票的預設位置：本套件自己的 palettes.js。消費倉的 tokens.css 一旦長出 --mark-*，
+ * 值就要對得上這一份，不必各倉再指一次路徑。 */
+const PACKAGED_MARK_SOURCE = fileURLToPath(new URL('../../src/styles/palettes.js', import.meta.url));
 
 export { BANDS, SEPARATION_MIN };
 
@@ -133,11 +138,12 @@ export function checkColorSystem({ tokensPath, markSourcePath, requireMarks = fa
   // 分類 mark 的值要逐一存在於已審票裡，不得在 tokens 裡自行出現新 hex。
   const marks = [...css.matchAll(/--mark-(\d+):\s*(#[0-9a-fA-F]{6})/g)];
   if (requireMarks && !marks.length) errors.push('tokens.css 缺 --mark-* 分類 mark 槽');
-  if (marks.length && markSourcePath) {
-    if (!existsSync(markSourcePath)) throw new Error(`讀不到已審票 ${markSourcePath}`);
-    const block = readFileSync(markSourcePath, 'utf8').match(/MARK_TONES\s*=\s*\{([\s\S]*?)\}/)?.[1] ?? '';
+  if (marks.length) {
+    const source = markSourcePath ?? PACKAGED_MARK_SOURCE;
+    if (!existsSync(source)) throw new Error(`讀不到已審票 ${source}`);
+    const block = readFileSync(source, 'utf8').match(/MARK_TONES\s*=\s*\{([\s\S]*?)\}/)?.[1] ?? '';
     const approved = new Set([...block.matchAll(/#[0-9a-fA-F]{6}/g)].map(([hex]) => hex.toLowerCase()));
-    if (!approved.size) throw new Error(`${markSourcePath} 取不到 MARK_TONES 已審票`);
+    if (!approved.size) throw new Error(`${source} 取不到 MARK_TONES 已審票`);
     for (const [, n, hex] of marks) {
       if (!approved.has(hex.toLowerCase())) {
         errors.push(`--mark-${n} ${hex}：不在 MARK_TONES 已審票裡，mark 色不得自行新增`);
