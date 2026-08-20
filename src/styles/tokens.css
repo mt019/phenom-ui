@@ -48,14 +48,25 @@
      site's own Badge tones, already user-approved. Full rationale + research
      sources: docs/DESIGN.md 色彩哲學, and scratchpad research-*.md. */
 
-  /* Layer 0 — primitive tone pairs (text/mark + near-white bg, same hue) */
+  /* Layer 0 — primitive tone pairs (text/mark + near-white bg, same hue)
+     2026-08-20 調整兩支墨色，成因是玫瑰 356°、李 358°、紅 5° 擠在同一段色相，
+     兩兩距離 0.011／0.035／0.043，都在可辨門檻 0.05 以下：
+       --tone-plum-tx 358° → 315°（#8a5f9e，取自 PALETTES 的 klimt.pop）
+       --tone-red-tx    5° → 22°（#a44a4a，取自 PALETTES 的 yanzhi.accent）
+     兩支都是已審過的真實墨色，不是公式生成（DESIGN.md：墨色永遠用真實值，
+     只有淡底准算）；兩支的淡底照原色相重算，L 與 C 沿用它們原本那一對的值。
+     先前提過的另一案是八支等距重排（每 45° 一支、灰退出分類），沒有採：紅是
+     status-danger 的來源，移到 41° 會與 amber 的警告義撞在一起；slate 是
+     cat-8，統計站十來張圖拿它當估計值與區間的中性墨（SameNomineeForest、
+     PollErrorBand、Fieller⋯），讓它退出分類會把那些圖整批染色。
+     調完八支兩兩最近 0.050（green／teal，本來就是這個值），明度極差 0.072。 */
   --tone-rose-tx:  #8f6071;  --tone-rose-bg:  #f7edf0;
-  --tone-red-tx:   #984f62;  --tone-red-bg:   #f5dfe3;
+  --tone-red-tx:   #a44a4a;  --tone-red-bg:   #f6dfde;
   --tone-amber-tx: #8a6d3b;  --tone-amber-bg: #f2e8d9;
   --tone-green-tx: #566d50;  --tone-green-bg: #e8efe5;
   --tone-teal-tx:  #4c7971;  --tone-teal-bg:  #e3edeb;
   --tone-blue-tx:  #615982;  --tone-blue-bg:  #e8e5f1;
-  --tone-plum-tx:  #945d70;  --tone-plum-bg:  #f2e3e7;
+  --tone-plum-tx:  #8a5f9e;  --tone-plum-bg:  #ece4f0;
   --tone-slate-tx: #52616a;  --tone-slate-bg: #eef1f2;
 
   /* Layer 1a — semantic status (by meaning; ink + pale bg) */

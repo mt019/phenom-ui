@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { checkColorSystem } from '../scripts/lib/color-system.mjs';
+import { checkColorSystem, KNOWN_CLOSE_PAIRS } from '../scripts/lib/color-system.mjs';
 import { checkDesignTokens } from '../scripts/lib/design-tokens.mjs';
 
 const CLEAN_TONES = `:root {
@@ -64,11 +64,22 @@ test('沒登記過的兩支太近就是錯', () => {
   assert.ok(errors.some((e) => e.includes('低於可辨門檻')), errors.join('\n'));
 });
 
-test('登記過的三組只列為待處理，不擋建置', () => {
+test('登記過的組合只列為待處理，不擋建置', () => {
+  // 現行八支已經全部過門檻，KNOWN_CLOSE_PAIRS 是空的；這裡臨時登記一組，
+  // 驗放行的機制還在，跑完拿掉。玫瑰 #8f6071 與 #945d70 距離 0.011。
   const css = CLEAN_TONES.replace('}', '  --tone-plum-tx:  #945d70;  --tone-plum-bg:  #f2e3e7;\n}');
-  const { errors, notes } = withTokens(css);
-  assert.deepEqual(errors, []);
-  assert.ok(notes.some((n) => n.includes('rose') && n.includes('plum')), notes.join('\n'));
+  assert.deepEqual(KNOWN_CLOSE_PAIRS, [], '清單該是空的，有東西就先去看它為什麼還在');
+  const blocked = withTokens(css);
+  assert.ok(blocked.errors.some((e) => e.includes('低於可辨門檻')), blocked.errors.join('\n'));
+
+  KNOWN_CLOSE_PAIRS.push(['rose', 'plum']);
+  try {
+    const { errors, notes } = withTokens(css);
+    assert.deepEqual(errors, []);
+    assert.ok(notes.some((n) => n.includes('rose') && n.includes('plum')), notes.join('\n'));
+  } finally {
+    KNOWN_CLOSE_PAIRS.length = 0;
+  }
 });
 
 test('分類槽第九支', () => {

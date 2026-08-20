@@ -36,21 +36,17 @@ export const BG_SPREAD_MAX = 0.06;
 export const MAX_CAT_SLOTS = 8;
 
 /*
- * 距離未達門檻而暫時放行的組合。2026-08-19 量到的三組，成因是玫瑰 356°、李 358°、
- * 紅 5° 擠在同一段色相；八支重排的色碼要站主在 PaletteLab 點名之後才動得了
- * （見 CHECKPOINT.palette-convergence.md 第 1 步）。重排落地就把這三行刪掉，
- * 這條規則自動變回硬的。
- *
- * 清單以外的新組合一律直接失敗——已知的三組不會讓第四組跟著混進來。
+ * 距離未達門檻而暫時放行的組合。2026-08-19 登記過三組（玫瑰／李、紅／李、玫瑰／紅），
+ * 2026-08-20 把李移到 315°、紅移到 22° 之後三組都過門檻，清單清空。
+ * 再有未達門檻的組合就是直接失敗——這裡不是常設的緩衝區，登記一組要寫明為什麼、
+ * 以及什麼時候拿掉。
  */
-export const KNOWN_CLOSE_PAIRS = [
-  ['rose', 'plum'],
-  ['red', 'plum'],
-  ['rose', 'red'],
-];
+export const KNOWN_CLOSE_PAIRS = [];
 
 const pairKey = (a, b) => [a, b].sort().join('|');
-const KNOWN_CLOSE = new Set(KNOWN_CLOSE_PAIRS.map(([a, b]) => pairKey(a, b)));
+// 每次查的時候才讀清單，不在載入時凍成一份 Set——凍起來的話，清單改了而判定沒跟著改，
+// 而測試裡臨時登記一組也不會生效（登記機制看起來壞了，其實是讀到了舊的快照）。
+const isKnownClose = (a, b) => KNOWN_CLOSE_PAIRS.some(([x, y]) => pairKey(x, y) === pairKey(a, b));
 
 const round = (n) => +n.toFixed(3);
 
@@ -123,7 +119,7 @@ export function checkColorSystem({ tokensPath = PACKAGED_TOKENS, markSourcePath,
       if (!closest || d < closest.d) closest = { a: tx[i].name, b: tx[j].name, d };
       if (d >= SEPARATION_MIN) continue;
       const line = `--tone-${tx[i].name}-tx 與 --tone-${tx[j].name}-tx 距離 ${d}，低於可辨門檻 ${SEPARATION_MIN}`;
-      if (KNOWN_CLOSE.has(pairKey(tx[i].name, tx[j].name))) notes.push(`${line}（八支重排未動，待站主點名色碼）`);
+      if (isKnownClose(tx[i].name, tx[j].name)) notes.push(`${line}（登記為待處理）`);
       else errors.push(line);
     }
   }
