@@ -5,9 +5,9 @@
  * 註記的頁面色票物件（豁免到下一個以 `};` 結尾的行為止）。尚未收編的檔案列在各倉的
  * scripts/design-token-exceptions.txt，那份清單只准變短。
  *
- * 已知的窟窿：`token-exempt` 是一行註記，沒有登記、沒有期限、沒有清單，
- * 目前八個頁面前綴共 241 條 inline 色票靠它豁免（見 CHECKPOINT.palette-convergence.md
- * 第 5 步：改成登記制，登記表進 phenom-ops/infra/）。
+ * `token-exempt` 的登記在 phenom-ops 的 infra/token-exempt.json，由該倉的
+ * check-token-exempt.mjs 逐檔比對；那支檢查用的就是本檔的 exemptRegions()，
+ * 豁免範圍的判定只有這一份。
  */
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -19,6 +19,34 @@ function walk(dir) {
     const path = join(dir, entry.name);
     return entry.isDirectory() ? walk(path) : [path];
   });
+}
+
+/**
+ * 一份原始碼裡的 token-exempt 區段。豁免自帶標記那一行開始，到下一個以 `};` 或 `}`
+ * 結尾的行為止。回傳被豁免的行號（1 起算）、標記的個數，以及豁免區裡的 hex 條數
+ * ——後兩個數字是 phenom-ops 的登記表在比對的東西：登記過的檔案裡再長出新的裸 hex，
+ * 各倉的閘看不到（它整段跳過），只有數字對不上才顯得出來。
+ *
+ * @param {string} source
+ * @returns {{exemptLines: Set<number>, markers: number, hexes: number}}
+ */
+export function exemptRegions(source) {
+  const exemptLines = new Set();
+  let markers = 0;
+  let hexes = 0;
+  let exempt = false;
+  source.split('\n').forEach((line, i) => {
+    if (line.includes('token-exempt')) {
+      exempt = true;
+      markers += 1;
+    }
+    const wasExempt = exempt;
+    if (exempt && /};?\s*$/.test(line.trim()) && !line.includes('token-exempt')) exempt = false;
+    if (!wasExempt) return;
+    exemptLines.add(i + 1);
+    hexes += (line.match(HEX) ?? []).length;
+  });
+  return { exemptLines, markers, hexes };
 }
 
 /**
@@ -52,13 +80,11 @@ export function checkDesignTokens({
 
   const violations = [];
   for (const file of files) {
-    const lines = readFileSync(file, 'utf8').split('\n');
-    let exempt = false;
+    const source = readFileSync(file, 'utf8');
+    const lines = source.split('\n');
+    const { exemptLines } = exemptRegions(source);
     lines.forEach((line, i) => {
-      if (line.includes('token-exempt')) exempt = true;
-      const wasExempt = exempt;
-      if (exempt && /};?\s*$/.test(line.trim()) && !line.includes('token-exempt')) exempt = false;
-      if (wasExempt) return;
+      if (exemptLines.has(i + 1)) return;
       const hits = line.match(HEX);
       if (hits) violations.push(`${file}:${i + 1} ${hits.join(' ')}`);
     });
