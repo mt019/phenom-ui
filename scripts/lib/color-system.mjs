@@ -20,6 +20,10 @@ import { hexToOklch, oklabDistance, BANDS, SEPARATION_MIN } from '../../src/styl
  * 值就要對得上這一份，不必各倉再指一次路徑。 */
 const PACKAGED_MARK_SOURCE = fileURLToPath(new URL('../../src/styles/palettes.js', import.meta.url));
 
+/* 色票母本的預設位置：本套件自己的 tokens.css。消費倉自 2026-08-20 起不再各存一份
+ * fork，值就是這一份，所以 tokensPath 省略時查的也是它。 */
+const PACKAGED_TOKENS = fileURLToPath(new URL('../../src/styles/tokens.css', import.meta.url));
+
 export { BANDS, SEPARATION_MIN };
 
 /** 中性色讀起來要是灰的，不套彩度下限。 */
@@ -54,13 +58,13 @@ const round = (n) => +n.toFixed(3);
  * 查一份 tokens.css。
  *
  * @param {object} opts
- * @param {string} opts.tokensPath          tokens.css 的路徑
+ * @param {string} [opts.tokensPath]        tokens.css 的路徑；省略時查本套件的母本
  * @param {string} [opts.markSourcePath]    分類 mark 已審票的來源（palettes.js）；
  *                                          給了才查 --mark-*
  * @param {boolean} [opts.requireMarks]     該倉的 tokens.css 是否必須有 --mark-*
  * @returns {{errors: string[], notes: string[], summary: string}}
  */
-export function checkColorSystem({ tokensPath, markSourcePath, requireMarks = false }) {
+export function checkColorSystem({ tokensPath = PACKAGED_TOKENS, markSourcePath, requireMarks = false }) {
   if (!existsSync(tokensPath)) {
     // 讀不到就要出聲。回一份空的判定結果，在呼叫端與「沒有問題」一模一樣。
     throw new Error(`讀不到 ${tokensPath}`);
@@ -157,7 +161,7 @@ export function checkColorSystem({ tokensPath, markSourcePath, requireMarks = fa
 }
 
 /** 各倉的閘照這支跑：印出結果，不通過就 exit 1。 */
-export function runColorSystem(opts) {
+export function runColorSystem(opts = {}) {
   const { errors, notes, summary } = checkColorSystem(opts);
   for (const n of notes) console.log(`  已登記待處理：${n}`);
   if (errors.length) {
