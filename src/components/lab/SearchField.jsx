@@ -24,7 +24,9 @@ export default function SearchField({
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
         aria-label={ariaLabel ?? placeholder}
-        className="w-full rounded-token-md border border-line bg-surface-raised py-2 pl-9 pr-9 text-token-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none"
+        /* WebKit 給 type=search 自帶一顆清除鈕，與右側自畫的 X 疊成兩顆（朱家驊站
+           2026-08-24 站主截圖）；原生那顆收掉，清除只留自畫的一顆。 */
+        className="w-full rounded-token-md border border-line bg-surface-raised py-2 pl-9 pr-9 text-token-sm text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-cancel-button]:[-webkit-appearance:none]"
       />
       {value ? (
         <button

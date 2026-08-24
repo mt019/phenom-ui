@@ -12,9 +12,11 @@ import SearchField from './SearchField';
  * 帶原書頁碼。朱家驊言論集（198 篇／14 部次）先用，柳如是別傳那類重排本是同一個形狀。
  *
  * 契約：呼叫端把自己的資料攤平成下面這個形狀，元件不認識任何一本書的欄位名。
- *   items: [{ id, title, href, group, subgroup?, lead?, badge?, hint? }]
+ *   items: [{ id, title, href, group, subgroup?, lead?, badge?, hint?, mark? }]
  *   group 是最上層分組（部次），連續同名的併成一段；subgroup 同理（分節）。
  *   lead 是每一列左側的定值（原書頁碼），badge 是少數狀態的標記（如「全文」）。
+ *   mark 是列尾一枚墨色小方塊的不透明度（0–1），標這一列對應材料的多少——年表的
+ *   年目用它標該年收入的言論篇數，深淺即多少。
  * items 必須已經照書的順序排好——分組靠相鄰同名，不重排。
  */
 
@@ -57,6 +59,7 @@ function Leaf({ item, active, onSelect, onFollow }) {
             {item.lead != null ? <span className="w-7 shrink-0 tabular-nums text-ink-faint">{item.lead}</span> : null}
             <span className="min-w-0 flex-1">{item.title}</span>
             {item.badge ? <span className="shrink-0 text-accent">{item.badge}</span> : null}
+            {item.mark ? <span aria-hidden="true" className="h-2 w-2 shrink-0 self-center rounded-[2px] bg-ink" style={{ opacity: item.mark }} /> : null}
           </span>
         </button>
       ) : (
@@ -71,6 +74,7 @@ function Leaf({ item, active, onSelect, onFollow }) {
           {item.lead != null ? <span className="w-7 shrink-0 tabular-nums text-ink-faint">{item.lead}</span> : null}
           <span className="min-w-0 flex-1">{item.title}</span>
           {item.badge ? <span className="shrink-0 text-accent">{item.badge}</span> : null}
+            {item.mark ? <span aria-hidden="true" className="h-2 w-2 shrink-0 self-center rounded-[2px] bg-ink" style={{ opacity: item.mark }} /> : null}
         </span>
         </Link>
       )}
