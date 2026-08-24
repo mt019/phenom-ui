@@ -12,19 +12,19 @@ export default function RailBrand({ icon = null, title, subtitle = null, to }) {
   return (
     <Link
       to={to}
-      className="group mb-3 flex w-full items-center gap-2.5 border-b border-line-soft pb-3"
+      className="group mb-3.5 flex w-full items-center gap-3 border-b border-line-soft pb-3.5"
     >
       {icon ? (
-        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-ink text-paper">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-ink text-paper">
           {icon}
         </span>
       ) : null}
       <span className="min-w-0">
-        <strong className="block font-display text-token-sm font-medium leading-tight text-ink group-hover:underline">
+        <strong className="block font-display text-token-body font-medium leading-tight text-ink group-hover:underline">
           {title}
         </strong>
         {subtitle ? (
-          <span className="mt-0.5 block text-token-xs text-ink-muted">{subtitle}</span>
+          <span className="mt-0.5 block text-token-sm text-ink-muted">{subtitle}</span>
         ) : null}
       </span>
     </Link>
