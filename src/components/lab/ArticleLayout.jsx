@@ -39,6 +39,9 @@ export default function ArticleLayout({
   // 傳了 aside 就不再量測小標，hideToc 也不必再傳。窄螢幕沒有這一欄：aside 講的是
   // 「現在讀到哪裡」，靠黏在視窗邊才成立，貼在正文上方的一份捲過去就過期了。
   aside = null,
+  // 左欄頂端的站名塊（通常放 RailBrand）。釘在左欄的捲動容器之外：目次長到要在
+  // 欄內捲動時，站名不跟著捲走。不傳就與現狀相同。
+  navBrand = null,
   // 內容欄放寬到 61rem。以條文對照表、寬表格當骨架的頁面才傳；散文不傳，44rem 那條
   // 閱讀欄寬是照行長訂的。**放寬不影響右欄目次**——兩件事以前綁在同一個 prop 上，
   // 於是要表格擺得下就得放棄目次，那是假的取捨。
@@ -81,8 +84,10 @@ export default function ArticleLayout({
       <aside className="hidden lg:block">
         {/* Clears the sticky site bar above it (see SiteHeader) — a rail that
             slides under the toolbar loses its first item. */}
-        <div className="sticky top-16 max-h-[calc(100vh-6rem)] overflow-y-auto border-r border-line-soft pr-5">
-          {nav}
+        <div className="sticky top-16 flex max-h-[calc(100vh-6rem)] flex-col border-r border-line-soft pr-5">
+          {navBrand ? <div className="shrink-0">{navBrand}</div> : null}
+          {/* overflow 從 sticky 容器移到內側的目次容器，站名塊才不隨目次一起捲。 */}
+          <div className="min-h-0 flex-1 overflow-y-auto">{nav}</div>
         </div>
       </aside>
 

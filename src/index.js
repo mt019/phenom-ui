@@ -27,6 +27,7 @@ export { default as AnnotatedHtml } from './components/lab/AnnotatedHtml.jsx';
 export { default as AnnotatedText } from './components/lab/AnnotatedText.jsx';
 export { default as Badge } from './components/lab/Badge.jsx';
 export { default as BookTree } from './components/lab/BookTree.jsx';
+export { default as RailBrand } from './components/lab/RailBrand.jsx';
 export { default as DashboardLayout } from './components/lab/DashboardLayout.jsx';
 export { default as DataTable } from './components/lab/DataTable.jsx';
 export { default as Derivation } from './components/lab/Derivation.jsx';
