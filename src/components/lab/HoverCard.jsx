@@ -26,7 +26,7 @@ const OPEN_DELAY = 70;
 const CLOSE_DELAY = 140;
 let closeActiveCard = null;
 
-export default function HoverCard({ children, card, className, interactive = true, pinnable = interactive, width = CARD_W, label, focusable = true }) {
+export default function HoverCard({ children, card, className, interactive = true, pinnable = interactive, width = CARD_W, label, focusable = true, placement = 'auto', cardClassName = 'px-3.5 py-3' }) {
   const [open, setOpen] = useState(false);
   const [pinned, setPinned] = useState(false);
   const markerRef = useRef(null);
@@ -42,7 +42,7 @@ export default function HoverCard({ children, card, className, interactive = tru
   }, []);
 
   const getAnchor = useCallback(() => markerRef.current, []);
-  const { cardRef, pos } = useFloatingCard({ open, getAnchor, width });
+  const { cardRef, pos } = useFloatingCard({ open, getAnchor, width, placement });
 
   useEffect(() => {
     if (!open) return undefined;
@@ -122,7 +122,7 @@ export default function HoverCard({ children, card, className, interactive = tru
             onMouseEnter={interactive ? () => show(true) : undefined}
             onMouseLeave={interactive ? hide : undefined}
             style={{ position: 'fixed', left: pos.left, top: pos.top, width, maxWidth: `calc(100vw - ${GAP * 2}px)`, maxHeight: '45vh', overflowY: 'auto' }}
-            className={`z-30 rounded-token-md border border-line bg-surface-raised px-3.5 py-3 text-left text-token-xs leading-relaxed shadow-token-md ${interactive ? '' : 'pointer-events-none'}`}
+            className={`z-30 rounded-token-md border border-line bg-surface-raised text-left text-token-xs leading-relaxed shadow-token-md ${cardClassName} ${interactive ? '' : 'pointer-events-none'}`}
           >
             {card}
           </div>,

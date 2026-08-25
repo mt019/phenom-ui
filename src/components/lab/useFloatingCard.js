@@ -14,7 +14,9 @@ import { useLayoutEffectOnClient } from './useLayoutEffectOnClient.js';
 export const CARD_GAP = 8;
 const ESTIMATED_H = 140;
 
-export function useFloatingCard({ open, getAnchor, width }) {
+// placement：'auto' 有空間就開在上方（正文註標的預設，卡片不遮住讀者正在讀的那一行），
+// 'below' 一律開在下方（掛在頁尾出處列那種 anchor 用）。
+export function useFloatingCard({ open, getAnchor, width, placement = 'auto' }) {
   const cardRef = useRef(null);
   const [pos, setPos] = useState(null);
 
@@ -23,7 +25,9 @@ export function useFloatingCard({ open, getAnchor, width }) {
     if (!anchor) return;
     const cardW = cardRef.current?.offsetWidth ?? Math.min(width, window.innerWidth - CARD_GAP * 2);
     const cardH = cardRef.current?.offsetHeight ?? ESTIMATED_H;
-    const above = anchor.top > cardH + CARD_GAP + 8;
+    const above = placement === 'below'
+      ? false
+      : placement === 'above' || anchor.top > cardH + CARD_GAP + 8;
     const left = Math.min(
       Math.max(CARD_GAP, anchor.left + anchor.width / 2 - cardW / 2),
       window.innerWidth - cardW - CARD_GAP,
@@ -31,7 +35,7 @@ export function useFloatingCard({ open, getAnchor, width }) {
     const wanted = above ? anchor.top - cardH - CARD_GAP : anchor.bottom + CARD_GAP;
     const top = Math.min(Math.max(CARD_GAP, wanted), window.innerHeight - cardH - CARD_GAP);
     setPos({ left, top });
-  }, [getAnchor, width]);
+  }, [getAnchor, placement, width]);
 
   useLayoutEffectOnClient(() => {
     if (!open) { setPos(null); return undefined; }
