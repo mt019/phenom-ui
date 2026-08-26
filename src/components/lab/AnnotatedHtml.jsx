@@ -212,10 +212,15 @@ function NoteCard({ note }) {
         <span className="font-accent tabular-nums text-ink-faint">{note.n}</span>
         {note.label ? <span className="ml-2">{note.label}</span> : null}
       </span>
+      {/* 內容註（kind: note）的主體是 text，條文或原文照錄只是它的依據，所以 text 排在
+          quote 之前；引用註反過來，讀者先看到被引的那句話。 */}
+      {note.kind === 'note' && note.text
+        ? <span className="mt-1.5 block text-ink-muted">{note.text}</span> : null}
       {note.quote ? (
         <span className="mt-1.5 block border-l-2 border-line pl-2 text-ink-muted">{note.quote}</span>
       ) : null}
-      {note.text ? <span className="mt-1.5 block text-ink-muted">{note.text}</span> : null}
+      {note.kind !== 'note' && note.text
+        ? <span className="mt-1.5 block text-ink-muted">{note.text}</span> : null}
       {note.locator ? <span className="mt-1.5 block text-ink-faint"><MathText>{note.locator}</MathText></span> : null}
       {note.href ? (
         <a
