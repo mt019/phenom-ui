@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { scrollToY } from '../anchorScroll.js';
 import { ArrowUp } from 'lucide-react';
 
 const SHOW_AFTER = 560;
@@ -30,8 +31,9 @@ export default function BackToTop() {
 
   const returnToTop = () => {
     setVisible(false);
-    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    // 這顆鈕出現的時機就是讀者離頁首最遠的時候，原生的 smooth 在這裡走得最久
+    // （站主 2026-08-26 點名的就是同一種慢）。改用共用的計時捲動，時間有上限。
+    scrollToY(0);
   };
 
   return (

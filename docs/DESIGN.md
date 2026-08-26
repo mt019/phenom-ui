@@ -72,3 +72,18 @@
   頁面級變數表，不要傳 class 進來。
 - `className` 加在箭頭上，不整份替換樣式。落點由各站顯式傳 `back`，登記在
   `phenom-ops/infra/back-link.json`。
+
+## 頁內捲動（v0.1.54 起）
+
+- **各站的 CSS 一律不寫 `html { scroll-behavior: smooth }`，也不掛 Tailwind 的 `scroll-smooth`。**
+  原生平滑捲動大致是定速，位移越長跑越久：wealth 那篇四百行的章節，從章末目次跳回第一節
+  要走好幾秒，換章時 `ScrollToTop` 的 `scrollTo(0, 0)` 也被同一條規則接管（2026-08-26 站主
+  點名「兩個側邊欄的點擊滾動都太慢」）。CSS 沒有辦法替它設上限。
+- 時長寫在 `src/anchorScroll.js`：夾在 180 到 420 毫秒，距離只決定落在區間內的哪個值；
+  讀者滾滑鼠、觸控或按鍵就當場停手；`prefers-reduced-motion` 直接跳過動畫。落點扣掉目標
+  元素自己的 `scroll-margin-top`，網址列用 `pushState` 換。
+- `ArticleLayout` 與 `DashboardLayout` 呼叫 `useAnchorScroll()`，用事件代理接整份文件的
+  `a[href^="#"]`，所以側欄目次、註標、回指都走同一條路，頁面與元件不必各自改連結。
+  只用 `PageShell` 手刻的頁面自己呼叫那支 hook。`BackToTop` 走 `scrollToY(0)`。
+- `phenom-ops` 的 `npm run check:scroll-motion` 查各站有沒有把那行 CSS 寫回來，例外登記在
+  `infra/scroll-motion.json`。
