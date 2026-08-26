@@ -1,11 +1,12 @@
 # 網頁字型的來源與權利
 
-站主 2026-07-30 確認，本套件現有的五個網頁字型二進位檔都可以再散布、可以嵌在網頁上。
-五個檔案原樣取自 Canvas Lab 已入版控的字型包：
+站主 2026-07-30 確認，本套件現有的網頁字型二進位檔都可以再散布、可以嵌在網頁上。
+以下各檔取自 Canvas Lab 已入版控的字型包：
 
 - `HuiwenMincho-core-subset.woff2` — 內文，繁體中文，常用面（覆蓋各站文字 99.9% 的字元出現次數，先到）。
 - `HuiwenMincho-ext-subset.woff2` — 內文，繁體中文，其餘面（頁面出現罕用字時才下載；與常用面的聯集等於原本的全覆蓋子集）。
 - `ChironSungHK-fallback-subset.woff2` — 繁體中文補字（依 unicode-range 補 Huiwen 畫不出的碼位）。
+- `HuiwenMincho-anglebrackets.woff2` — 篇名號 U+3008、U+3009 的全形版本，由 `scripts/build-angle-bracket-face.mjs` 從同一支汇文母檔產生。汇文把這兩個碼位畫成半形（advance 512，em 1024），而它自己的《》「」（）都是全形，半形的角括號排在漢字之間會貼著相鄰的筆畫。輪廓一個點都不動，改的是 advance 與位移；`validate-font-subsets.mjs` 驗 CSS 會選中的那一面 advance 等於 em。
 - `ErikasFarbband-subset.woff2` — 拉丁點綴，regular。
 - `ErikasFarbband-Bold-subset.woff2` — 拉丁點綴，bold。
 - `RadioNewsman-subset.woff2` — 拉丁標題。

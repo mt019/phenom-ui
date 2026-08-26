@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as fontkit from 'fontkit';
@@ -65,13 +66,88 @@ for (const face of FACES) {
   }
 }
 
+/*
+ * 全形標點得是全形。
+ *
+ * 2026-08-27 補上。汇文明朝体把篇名號 U+3008、U+3009 畫成半形（advance 512，em 1024），
+ * 而《》「」（）都是全形，於是〈魔鬼夜訪錢鍾書先生〉的兩個角括號貼著相鄰的漢字筆畫。
+ * 上面那組煙霧測試看的是「畫不畫得出來」，半形照樣通過，所以缺的是這一道。
+ *
+ * 量的是「CSS 會選中哪一面」，不是「隨便哪一面有字就算」：三個內文面同屬 Huiwen Mincho
+ * 家族，unicode-range 涵蓋該碼位者之中後宣告的勝出。新的全形面若漏掉沒出貨，舊的半形面
+ * 照樣有字，只驗聯集的檢查會通過而讀者看到的仍是半形。
+ */
+const FONTS_CSS = path.join(root, 'src/fonts-local.css');
+const FULLWIDTH_REQUIRED = [...'〈〉《》「」『』（）、。'];
+
+/** 讀 fonts-local.css，回傳 Huiwen Mincho 家族各面的檔名與 unicode-range，順序即宣告順序。 */
+export function huiwenFaces(css) {
+  const faces = [];
+  for (const [, body] of css.matchAll(/@font-face\s*\{([^}]*)\}/g)) {
+    if (!/font-family:\s*'Huiwen Mincho'/.test(body)) continue;
+    const file = /url\('\.\.\/fonts\/([A-Za-z0-9._-]+\.woff2)'\)/.exec(body)?.[1];
+    if (!file) continue;
+    const rangeText = /unicode-range:\s*([^;]+);/.exec(body)?.[1];
+    const ranges = rangeText
+      ? rangeText.split(',').map((part) => {
+        const [lo, hi] = part.trim().replace(/^U\+/i, '').split('-');
+        return [parseInt(lo, 16), parseInt(hi ?? lo, 16)];
+      })
+      : null;
+    faces.push({ file, ranges });
+  }
+  return faces;
+}
+
+/** CSS 會選中的那一面：unicode-range 涵蓋該碼位者之中，最後宣告且真的有字的那一個。 */
+export function winningFace(faces, codepoint, open = font) {
+  const candidates = faces.filter(
+    ({ ranges }) => ranges === null || ranges.some(([lo, hi]) => codepoint >= lo && codepoint <= hi),
+  );
+  for (const candidate of candidates.reverse()) {
+    const loaded = open(candidate.file);
+    if (loaded.hasGlyphForCodePoint(codepoint)) return { ...candidate, loaded };
+  }
+  return null;
+}
+
+const cssText = readFileSync(FONTS_CSS, 'utf8');
+const faces = huiwenFaces(cssText);
+if (faces.length === 0) problems.push(`${FONTS_CSS} 裡找不到任何 Huiwen Mincho 的 @font-face`);
+for (const character of FULLWIDTH_REQUIRED) {
+  const codepoint = character.codePointAt(0);
+  const label = `${character}（U+${codepoint.toString(16).toUpperCase().padStart(4, '0')}）`;
+  const winner = winningFace(faces, codepoint);
+  if (!winner) {
+    problems.push(`全形標點 ${label} 在內文家族的任何一面都沒有字`);
+    continue;
+  }
+  const { advanceWidth } = winner.loaded.glyphForCodePoint(codepoint);
+  if (advanceWidth !== winner.loaded.unitsPerEm) {
+    problems.push(
+      `全形標點 ${label} 由 ${winner.file} 供應，advance ${advanceWidth}，em ${winner.loaded.unitsPerEm}`,
+    );
+  }
+}
+
+/* 負向測試：未改過的常用面單獨拿來量，U+3008 要報半形。報不出來就表示上面那段的量法
+   壞了（或是換了一支來源字型），而它壞掉的樣子與「一切正常」一模一樣。 */
+{
+  const core = font('HuiwenMincho-core-subset.woff2');
+  const { advanceWidth } = core.glyphForCodePoint(0x3008);
+  if (advanceWidth >= core.unitsPerEm) {
+    problems.push('全形檢查的負向測試不過：常用面的 U+3008 應該是半形，實際不是');
+  }
+}
+
 if (problems.length > 0) {
   console.error('字型子集覆蓋不足：');
   for (const p of problems) console.error(`  ${p}`);
   console.error('\n這些字元在別的字型有，所以消費端的缺字檢查不會報——壞的是字面一致性：');
   console.error('缺的那個字母會掉到堆疊下一個字型，半個詞不是這個面的字。');
-  console.error('→ 在有來源字型的機器上重建子集（my-canvas-lab 的 npm run fonts:rebuild），把產物複製過來。');
+  console.error('→ 缺字：在有來源字型的機器上重建子集（my-canvas-lab 的 npm run fonts:rebuild），把產物複製過來。');
+  console.error('→ 全形標點的 advance 不對：跑 node scripts/build-angle-bracket-face.mjs，再跑 node scripts/build-external-fonts.mjs。');
   process.exit(1);
 }
 
-console.log(`字型子集覆蓋通過：${FACES.length} 個面，拉丁面各 ${LATIN_REQUIRED.length} 字、內文面煙霧測試 ${CJK_SMOKE.length} 字。`);
+console.log(`字型子集覆蓋通過：${FACES.length} 個面，拉丁面各 ${LATIN_REQUIRED.length} 字、內文面煙霧測試 ${CJK_SMOKE.length} 字、全形標點 ${FULLWIDTH_REQUIRED.length} 字。`);
