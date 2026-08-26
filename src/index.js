@@ -11,6 +11,7 @@ export { default as LangSwitch, useLang } from './components/LangSwitch.jsx';
 export { default as PageIdentity } from './components/PageIdentity.jsx';
 export { default as PageShell } from './components/PageShell.jsx';
 export { default as ScrollToTop } from './components/ScrollToTop.jsx';
+export { scrollToY, scrollToAnchor, useAnchorScroll } from './anchorScroll.js';
 export { mountApp, hasPrerenderedMarkup } from './mountApp.js';
 export { default as SeoHead } from './components/SeoHead.jsx';
 export { default as SiteHeader } from './components/SiteHeader.jsx';

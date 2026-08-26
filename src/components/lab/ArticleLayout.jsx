@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useAnchorScroll } from '../../anchorScroll.js';
 import { SHELL_PAD_X_RAIL } from '../shellPadding';
 import { Link } from 'react-router-dom';
 import TableOfContents from './TableOfContents';
@@ -53,6 +54,8 @@ export default function ArticleLayout({
   citeKey,
   children,
 }) {
+  // 頁內的 hash 連結（右欄目次、註標、回指）走固定時長的捲動，見 anchorScroll。
+  useAnchorScroll();
   const bodyRef = useRef(null);
   const { items, active } = useHeadings(bodyRef, { levels: tocLevels, refreshKey: tocKey });
   // 兩個判斷，刻意分開：軌道留不留不看量測，目次內容列不列才看。

@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useAnchorScroll } from '../../anchorScroll.js';
 import PageIdentity from '../PageIdentity';
 import BackLink from '../BackLink';
 import { SHELL_PAD_X } from '../shellPadding';
@@ -54,6 +55,8 @@ export default function DashboardLayout({
   refreshKey,
   children,
 }) {
+  // 頁內的 hash 連結走固定時長的捲動，見 anchorScroll。
+  useAnchorScroll();
   const bodyRef = useRef(null);
   // leftRailTop 那塊（篩選器之類）跟目次共用這條軌道。
   // 兩個判斷刻意分開：軌道留不留不看量測（理由見底下格線那一段），內容列不列才看。
