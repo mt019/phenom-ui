@@ -47,7 +47,7 @@ export { default as RailLayout } from './components/lab/RailLayout.jsx';
 export { default as SearchField } from './components/lab/SearchField.jsx';
 export { default as SearchResults } from './components/lab/SearchResults.jsx';
 export { default as SectionLink } from './components/lab/SectionLink.jsx';
-export { default as SourceFilter } from './components/lab/SourceFilter.jsx';
+export { default as SourceFilter, usePersistedFlag } from './components/lab/SourceFilter.jsx';
 export { default as SourcesList } from './components/lab/SourcesList.jsx';
 export { default as StickyHeading, useStickyTop, useStuckToTop } from './components/lab/StickyHeading.jsx';
 export { default as SubOutline } from './components/lab/SubOutline.jsx';
