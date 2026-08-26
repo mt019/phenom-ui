@@ -64,6 +64,10 @@ plugins: [react(), externalFonts({ emit: true })] // 供應端：另把字型寫
 `scripts/build-external-fonts.mjs` 從 `src/fonts-local.css` 產生，改完字型跑一次；
 `npm run validate` 會比對兩者是否同步。
 
+第三種：站自己切了字型子集，一個套件的面都不要下載。這種站引 `@phenomcanvas/ui/styles-base.css`
+（版型與色票，沒有 `@font-face`），字型由站自己的 CSS 宣告，並在自己的 `:root` 覆寫
+`--font-body`／`--font-display`／`--font-accent` 指到站有的家族。phenom-mandarin 走這一種。
+
 ## 不可退讓的排版與導航契約
 
 - 顯示／裝飾字體必須原生覆蓋頁面可見語言的字形。德文至少包含
