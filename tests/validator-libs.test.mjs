@@ -187,6 +187,45 @@ test('浮層：產生者被搬走要報出來，不是安靜跳過', () => {
   }
 });
 
+test('浮層：產生者在 node_modules 那份時，掃描根與產生者各走各的前綴', () => {
+  const producers = {
+    'node_modules/@phenomcanvas/ui/src/components/lab/HoverCard.jsx': [
+      "createPortal(node, document.body); document.addEventListener('pointerdown', close);",
+      "if (e.key === 'Escape') close(); closeActiveCard = forceClose; useFloatingCard({ open });",
+    ].join('\n'),
+    'node_modules/@phenomcanvas/ui/src/components/lab/AnnotatedHtml.jsx': [
+      "createPortal(node, document.body); document.addEventListener('pointerdown', close);",
+      "if (event.key === 'Escape') close(); useFloatingCard({});",
+      'const [active, setActive] = useState(null);',
+    ].join('\n'),
+    'node_modules/@phenomcanvas/ui/src/components/lab/useFloatingCard.js':
+      'const left = window.innerWidth - cardW - CARD_GAP;',
+  };
+  const opts = {
+    roots: ['src/pages/_constitutional-court'],
+    producerPrefix: 'node_modules/@phenomcanvas/ui',
+  };
+
+  const ok = sandbox({ ...producers, 'src/pages/_constitutional-court/Case.jsx': '<div>x</div>' });
+  try {
+    const { failures, checked } = inDir(ok, () => checkFloatingSurfaces(opts));
+    assert.equal(checked, 1);
+    assert.deepEqual(failures, []);
+  } finally {
+    rmSync(ok, { recursive: true, force: true });
+  }
+
+  // 站自己的頁面寫回 group-hover 要報，而產生者不在掃描根裡也不能因此漏驗。
+  const bad = sandbox({ 'src/pages/_constitutional-court/Case.jsx': '<div class="group-hover:block">x</div>' });
+  try {
+    const { failures } = inDir(bad, () => checkFloatingSurfaces(opts));
+    assert.ok(failures.some((f) => /group-hover:block/.test(f)), failures.join('\n'));
+    assert.ok(failures.some((f) => /讀不到.*HoverCard\.jsx/.test(f)), failures.join('\n'));
+  } finally {
+    rmSync(bad, { recursive: true, force: true });
+  }
+});
+
 test('Cloudflare 排版：路由攤平成 <route>.html，空目錄清掉', () => {
   const dir = sandbox({
     'dist/index.html': '<html>root</html>',

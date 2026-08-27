@@ -47,15 +47,18 @@ const PRODUCERS = [
 
 /**
  * @param {object} [opts]
- * @param {string[]} [opts.roots]     掃描根，預設 src/pages 與 src/components
- * @param {string}   [opts.prefix]    產生者路徑的前綴（套件自己驗時要指到自己的 src）
+ * @param {string[]} [opts.roots]           掃描根，預設 src/pages 與 src/components
+ * @param {string}   [opts.prefix]          掃描根的前綴（套件自己驗時要指到自己的 src）
+ * @param {string}   [opts.producerPrefix]  產生者路徑的前綴，不給就同 prefix。倉自己沒有
+ *                                          HoverCard、以 node_modules 那份為準時要指過去
+ *                                          （phenom-court 的內容型浮層全部來自共用包）。
  */
-export function checkFloatingSurfaces({ roots = DEFAULT_ROOTS, prefix = '' } = {}) {
+export function checkFloatingSurfaces({ roots = DEFAULT_ROOTS, prefix = '', producerPrefix = prefix } = {}) {
   const present = roots.filter((root) => existsSync(join(prefix, root)));
   const files = present.flatMap((root) => walk(join(prefix, root))).filter((path) => /\.(jsx|tsx)$/.test(path));
   const failures = [];
 
-  const producerPaths = new Set(PRODUCERS.map(([file]) => join(prefix, file)));
+  const producerPaths = new Set(PRODUCERS.map(([file]) => join(producerPrefix, file)));
   for (const path of files) {
     const source = readFileSync(path, 'utf8');
     const rel = relative('.', path);
@@ -69,7 +72,7 @@ export function checkFloatingSurfaces({ roots = DEFAULT_ROOTS, prefix = '' } = {
   }
 
   for (const [file, needles] of PRODUCERS) {
-    const path = join(prefix, file);
+    const path = join(producerPrefix, file);
     let source;
     try {
       source = readFileSync(path, 'utf8');
