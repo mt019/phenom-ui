@@ -66,23 +66,3 @@
   text-decoration-line: none;
 }
 
-/*
- * 引註的點線標記。不用 text-decoration：逐盒畫的線在 KaTeX 子盒（各有字級與基線）
- * 拼不齊，且 .base 是 inline-block、父層的線進不去。標記自己把一排點當背景畫在
- * 行底：一次畫、全程同一種點；背景在墨後面，分數的分母壓過去自然蓋住點；跨行靠
- * box-decoration-break: clone。與 my-canvas-lab 的 src/index.css 是同一份，改一邊要改兩邊。
- */
-.cite-mark {
-  --cite-dot: var(--c-ink-faint);
-  padding-bottom: 0.1em;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
-  background-image: radial-gradient(circle closest-side, var(--cite-dot) 92%, transparent);
-  background-size: 0.32em 0.09em;
-  background-repeat: repeat-x;
-  background-position: left bottom;
-}
-
-.cite-mark:hover {
-  --cite-dot: var(--c-accent);
-}

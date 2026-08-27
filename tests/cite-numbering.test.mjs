@@ -36,7 +36,7 @@ async function loadComponents() {
   return import(pathToFileURL(outfile).href);
 }
 
-const { CiteNumbering, HoverCite } = await loadComponents();
+const { CiteNumbering, HoverCite, NoteCard } = await loadComponents();
 
 
 const source = (id) => ({ author: `作者${id}`, title: `書${id}`, year: 2026, locator: '頁 1' });
@@ -60,11 +60,12 @@ test('每個引註留下 data-cite，章末清單靠它生號與錨點', () => {
   assert.match(html, /data-cite="a"/);
 });
 
-test('點線不是預設，要傳 mark 才畫', () => {
-  const plain = article(createElement(HoverCite, { source: source('a'), sourceId: 'a' }, '一句話'));
-  assert.ok(!plain.includes('cite-mark'));
-  const marked = article(createElement(HoverCite, { source: source('a'), sourceId: 'a', mark: true }, '一句話'));
-  assert.match(marked, /cite-mark/);
+test('引註不畫底線，傳什麼參數都一樣', () => {
+  for (const extra of [{}, { mark: true }, { lang: 'en' }]) {
+    const html = article(createElement(HoverCite, { source: source('a'), sourceId: 'a', ...extra }, '一句話'));
+    assert.ok(!html.includes('cite-mark'), JSON.stringify(extra));
+    assert.ok(!/text-decoration|border-bottom/.test(html), JSON.stringify(extra));
+  }
 });
 
 test('沒有來源條目就照原樣輸出，不佔號碼', () => {
@@ -75,4 +76,13 @@ test('沒有來源條目就照原樣輸出，不佔號碼', () => {
   assert.match(html, /沒有出處的字/);
   const numbers = [...html.matchAll(/class="fn-ref"[^>]*>(\d+)</g)].map((m) => m[1]);
   assert.deepEqual(numbers, ['1']);
+});
+
+test('外文來源的浮卡在原文底下印中譯', () => {
+  const html = renderToStaticMarkup(createElement(NoteCard, {
+    note: { n: 3, label: 'Sitkoff', quote: 'the rule against perpetuities', quoteZh: '永久拘束原則' },
+  }));
+  assert.match(html, /the rule against perpetuities/);
+  assert.match(html, /中譯/);
+  assert.ok(html.indexOf('the rule against perpetuities') < html.indexOf('永久拘束原則'));
 });

@@ -12,11 +12,12 @@ import { useCiteNumber } from './citeNumbering.jsx';
  * 的編號同一個順序。站主 2026-08-19 裁定編號腳註為預設體例，理由是點線只說「這句有出處」，
  * 不說是第幾條，讀者要走到章末才對得起來；學術正文本來就是用號碼對。
  *
- * 點線（.cite-mark）退成 mark 這個選項。整句畫線在正文裡是一大片點陣，而編號一顆字就夠。
+ * 被引的文字不畫底線。基線下方那條帶的記號已經分配完了：專名號的實線、書名號的波浪、
+ * 詞條頁的虛線、著重號的實心點，引註再占一種，讀者在同一條帶上要辨識的記號多一種。
  *
  * 來源物件出自資料倉：沒有 locator 的引用在那裡就過不了驗證，id 找不到條目的建置會失敗。
  */
-export default function HoverCite({ source, sourceId, lang = 'zh', mark = false, children }) {
+export default function HoverCite({ source, sourceId, lang = 'zh', children }) {
   // hook 要無條件呼叫，所以號碼的取捨交給第二個參數，不用提早 return 來跳過它。
   const n = useCiteNumber(sourceId, Boolean(source));
   if (!source) return children;
@@ -53,13 +54,9 @@ export default function HoverCite({ source, sourceId, lang = 'zh', mark = false,
 
   // data-cite 留在外層：章末的 SourcesList 掃它生清單、放錨點，並按 DOM 順序編號——
   // 與這裡的號碼簿同一個順序。
-  //
-  // 點線不走 text-decoration，由 .cite-mark（styles/marks.css）當背景畫：text-decoration
-  // 逐盒畫，KaTeX 子盒各有字級，點的大小與高度拼不齊，且 .base 是 inline-block、父層的
-  // 線進不去。背景一次畫整條，公式底下照樣連續。
   return (
     <span data-cite={sourceId} className="scroll-mt-8">
-      <span className={mark ? 'cite-mark' : undefined}>{children}</span>
+      {children}
       {n ? (
         <HoverCard
           card={card}

@@ -13,9 +13,8 @@ import MathText from './MathText';
  * 註標編號按章內出現順序，payload 由 notes 陣列以編號對照。註標之外還有一份章末清單，
  * 那份是給列印與不用滑鼠的人看的，兩邊指的是同一組資料。
  *
- * HoverCite 用點狀底線而不用星號，理由是中文可在任兩字之間斷行、單一字元的標記會被孤立到
- * 下一行。編號註標躲不掉這件事，所以建置端把註標貼在標點之後，並用 CSS 的 nowrap 把它與
- * 前一個字綁在一起（見 styles.css 的 .fn-ref）。
+ * 中文可在任兩字之間斷行，一個數字寬的註標會被孤立到下一行，所以建置端把註標貼在標點
+ * 之後，並用 CSS 的 nowrap 把它與前一個字綁在一起（見 styles.css 的 .fn-ref）。
  */
 const CARD_W = 320;
 const OPEN_DELAY = 70;
@@ -205,7 +204,7 @@ function TermCard({ term }) {
   );
 }
 
-function NoteCard({ note }) {
+export function NoteCard({ note }) {
   return (
     <>
       <span className="block text-ink">
@@ -218,6 +217,14 @@ function NoteCard({ note }) {
         ? <span className="mt-1.5 block text-ink-muted">{note.text}</span> : null}
       {note.quote ? (
         <span className="mt-1.5 block border-l-2 border-line pl-2 text-ink-muted">{note.quote}</span>
+      ) : null}
+      {/* 外文來源：原文在上，正文採用的中譯接在下面，讀者對得起來譯得準不準。順序與章末
+          清單一致（phenom-wealth 的 src/pages/shared.jsx）。 */}
+      {note.quoteZh ? (
+        <span className="mt-1.5 block border-l-2 border-line pl-2 text-ink-muted">
+          <span className="mr-1 font-accent text-token-xs uppercase tracking-[0.12em] text-ink-faint">中譯</span>
+          {note.quoteZh}
+        </span>
       ) : null}
       {note.kind !== 'note' && note.text
         ? <span className="mt-1.5 block text-ink-muted">{note.text}</span> : null}
