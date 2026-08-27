@@ -43,7 +43,11 @@ export default function SiteHeader({
         <BackLink back={back} indexHref={backIndexHref} />
         {/* 檢索框吃掉中間的空間，但留一個上限：這一列在寬螢幕上有 86rem，整條都給輸入框
             會讓游標跑到離兩端都很遠的地方。沒有檢索的站照舊由空白撐開。 */}
-        {search ? <div className="min-w-0 flex-1 px-4 sm:px-8">{search}</div> : <span className="flex-1" />}
+        {search ? (
+          <div className="min-w-0 flex-1 px-4 sm:px-8">
+            <div className="max-w-xl">{search}</div>
+          </div>
+        ) : <span className="flex-1" />}
         <div className="flex items-center gap-2">
           {onLangChange ? <LangSwitch lang={lang} onChange={onLangChange} /> : null}
           {onScaleChange ? <FontSizeControl scale={scale} onChange={onScaleChange} /> : null}
