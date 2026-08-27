@@ -27,6 +27,9 @@ export default function SiteHeader({
   onLangChange,
   scale,
   onScaleChange,
+  // 常駐檢索：接了全站檢索的站（稅法課程筆記先用）把自己的檢索框放進來，讀者在任何
+  // 一頁都打得了字。不傳就與現狀相同，這一列還是只有返回鍵與那三顆。
+  search = null,
   sticky = false,
 }) {
   // 這一列平常只裝返回鍵、字級與外觀三顆。內容量撐不起整條磨砂底加分隔線，所以預設就待在
@@ -38,7 +41,9 @@ export default function SiteHeader({
     <div className={`mb-6 ${chrome}`}>
       <div className={`mx-auto flex items-center justify-between gap-4 py-2 ${PAD_X[width] ?? PAD_X.article} ${WIDTHS[width] ?? WIDTHS.article}`}>
         <BackLink back={back} indexHref={backIndexHref} />
-        <span className="flex-1" />
+        {/* 檢索框吃掉中間的空間，但留一個上限：這一列在寬螢幕上有 86rem，整條都給輸入框
+            會讓游標跑到離兩端都很遠的地方。沒有檢索的站照舊由空白撐開。 */}
+        {search ? <div className="min-w-0 flex-1 px-4 sm:px-8">{search}</div> : <span className="flex-1" />}
         <div className="flex items-center gap-2">
           {onLangChange ? <LangSwitch lang={lang} onChange={onLangChange} /> : null}
           {onScaleChange ? <FontSizeControl scale={scale} onChange={onScaleChange} /> : null}
