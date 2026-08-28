@@ -133,9 +133,31 @@ const build = (name, codepoints) => {
   return kb;
 };
 
-build('HuiwenMincho-core-subset.woff2', [...coreSet]);
-build('HuiwenMincho-ext-subset.woff2', extSet);
+// 只要重算兩面的 unicode-range、不要重裁 woff2 時加 --ranges-only：重裁會換掉檔案的內容
+// 雜湊，九個消費站的產物跟著全部換一輪，改 CSS 的範圍並不需要那個。
+const rangesOnly = process.argv.includes('--ranges-only');
+if (!rangesOnly) {
+  build('HuiwenMincho-core-subset.woff2', [...coreSet]);
+  build('HuiwenMincho-ext-subset.woff2', extSet);
+}
 
 const ranges = mergeRanges([...coreSet]);
 writeFileSync(join(root, 'scripts/font-core-unicode-range.txt'), `${ranges}\n`);
-console.log(`\n常用面的 unicode-range 已寫進 scripts/font-core-unicode-range.txt（${ranges.split(',').length} 段），貼進 src/styles.css 的常用面宣告。`);
+console.log(`\n常用面的 unicode-range 已寫進 scripts/font-core-unicode-range.txt（${ranges.split(',').length} 段），貼進 src/fonts-local.css 的常用面宣告。`);
+
+// 其餘面的實際範圍。CSS 那邊宣告的是三個漢字區塊（見 fonts-local.css 的註解：逐字列出要
+// 4,535 段、40 KB，而其餘面實測只含漢字），這裡把實際範圍寫成檔案，並當場檢查那三塊還
+// 涵蓋得住——換一支來源字型或改了 COVERAGE_RANGES，其餘面就可能長出漢字區塊以外的碼位，
+// 而那種漏法在畫面上是「同一句話兩種字面」，不會報錯。
+const extRanges = mergeRanges(extSet);
+writeFileSync(join(root, 'scripts/font-ext-unicode-range.txt'), `${extRanges}\n`);
+const DECLARED_EXT_BLOCKS = [[0x3400, 0x4dbf], [0x4e00, 0x9fff], [0xf900, 0xfaff]];
+const outsideBlocks = extSet.filter((cp) => !DECLARED_EXT_BLOCKS.some(([lo, hi]) => cp >= lo && cp <= hi));
+console.log(`其餘面的實際範圍已寫進 scripts/font-ext-unicode-range.txt（${extRanges.split(',').length} 段，${extSet.length} 字）。`);
+if (outsideBlocks.length > 0) {
+  console.error(`\n其餘面有 ${outsideBlocks.length} 個碼位落在 fonts-local.css 宣告的三個漢字區塊之外：`
+    + `${outsideBlocks.slice(0, 12).map((cp) => `U+${cp.toString(16).toUpperCase()}`).join(' ')}`);
+  console.error('把 fonts-local.css 那一面的 unicode-range 改成涵蓋得住的範圍，或改用逐字列出的版本。');
+  process.exit(1);
+}
+console.log('其餘面的碼位全部落在 fonts-local.css 宣告的三個漢字區塊內。');

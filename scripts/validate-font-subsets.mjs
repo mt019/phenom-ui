@@ -140,6 +140,39 @@ for (const character of FULLWIDTH_REQUIRED) {
   }
 }
 
+/*
+ * 其餘面宣告的 unicode-range 要涵蓋它實際含有的每一個碼位。
+ *
+ * 2026-08-28 補上。在此之前那一面不帶 unicode-range，等於宣告 U+0-10FFFF，於是頁面上
+ * 任何一個常用面沒有的碼位都會去取 5.6 MB，包括它畫不出來的 emoji（實測：手記 72 頁裡
+ * 65 頁因為側欄一個 U+1F411 而下載它，下載完仍然落回系統 emoji）。改成三個漢字區塊之後，
+ * 反過來的風險是宣告漏掉了它真的有的字——那種漏法不會報錯，只會讓那個字安靜地掉到堆疊
+ * 下一個字型，同一句話兩種字面。所以這裡驗的是涵蓋，不是相等：宣告的範圍可以比實際內容
+ * 寬（區塊裡 Huiwen 畫不出的碼位由 Chiron 那一面接走），不可以比它窄。
+ */
+{
+  const extFile = 'HuiwenMincho-ext-subset.woff2';
+  const extFace = faces.find((face) => face.file === extFile);
+  if (!extFace) {
+    problems.push(`fonts-local.css 裡找不到 ${extFile} 的 @font-face`);
+  } else if (!extFace.ranges) {
+    problems.push(`${extFile} 沒有宣告 unicode-range，等於涵蓋 U+0-10FFFF：任何一個常用面`
+      + '沒有的碼位都會下載這一面，包括它畫不出來的 emoji');
+  } else {
+    const loaded = font(extFile);
+    const declared = (codepoint) => extFace.ranges.some(([lo, hi]) => codepoint >= lo && codepoint <= hi);
+    // characterSet 帶著 cmap format 4 結尾那個對到 .notdef 的哨位段（三個內文面都回報
+    // U+FFFF，而三個面的 hasGlyphForCodePoint(0xFFFF) 都是 false），所以只看真的有字圖的碼位。
+    const outside = [...loaded.characterSet]
+      .filter((codepoint) => loaded.hasGlyphForCodePoint(codepoint) && !declared(codepoint));
+    if (outside.length > 0) {
+      const codes = outside.slice(0, 12).map((cp) => `U+${cp.toString(16).toUpperCase()}`).join(' ');
+      problems.push(`${extFile} 有 ${outside.length} 個碼位落在它宣告的 unicode-range 之外，`
+        + `這些字會掉到堆疊下一個字型：${codes}`);
+    }
+  }
+}
+
 if (problems.length > 0) {
   console.error('字型子集覆蓋不足：');
   for (const p of problems) console.error(`  ${p}`);

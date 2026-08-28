@@ -20,14 +20,24 @@
    才到齊，swap 於是在三秒多之後把整頁重排一次（cc.phenomcanvas.com CLS 0.293，把字型擋掉
    只剩 0.002）。切開之後常用面 2.3 MB 先到，其餘面只在頁面真的出現罕用字時才下載；兩面的
    聯集等於原本那份全覆蓋子集，所以新文章照樣不必重建字型。
-   宣告順序有意義：其餘面在前、不帶 unicode-range，常用面在後、帶顯式範圍——同一家族裡後
-   宣告且範圍涵蓋該字的面優先，所以常用字走常用面，其餘字才落到另一面。
+   宣告順序有意義：其餘面在前，常用面在後、帶顯式範圍。同一家族裡後宣告且範圍涵蓋該字的
+   面優先，所以常用字走常用面，其餘字才落到另一面。
+   其餘面的 unicode-range 是三個漢字區塊（2026-08-28 補）。在此之前它不帶 unicode-range，
+   等於涵蓋 U+0-10FFFF，於是頁面上任何一個常用面沒有的碼位都會去取這 5.6 MB，包括它根本
+   畫不出來的字：手記 72 頁裡有 65 頁的側欄印著一篇文章的標題 3🐑，U+1F411 不在常用面的
+   範圍內，每一頁都下載其餘面，而其餘面裡沒有那隻羊，瀏覽器仍然落回系統 emoji。
+   宣告成三個漢字區塊而不是逐字列出，是因為其餘面實測只含漢字（8,644 個碼位，全部落在這
+   三塊），逐字列出要 4,535 段、40 KB 的 CSS，而三塊只要三段。區塊裡 Huiwen 畫不出的碼位
+   由下面 Chiron 那一面接走（它宣告在後，範圍涵蓋 17,140 個碼位）；兩者都沒有的只剩 143 個
+   相容漢字，那些字會白抓一次其餘面。scripts/validate-font-subsets.mjs 驗這串範圍涵蓋
+   其餘面實際含有的每一個碼位，漏了就報。
    兩個檔與下面那串範圍都由 scripts/build-font-slices.mjs 產生，不要手改。 */
 @font-face {
   font-family: 'Huiwen Mincho';
   src: url('/assets/fonts/HuiwenMincho-ext-subset.UzFgWfMD.woff2') format('woff2');
   font-weight: 400;
   font-display: swap;
+  unicode-range: U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF;
 }
 
 @font-face {
