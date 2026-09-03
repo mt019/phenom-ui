@@ -1,0 +1,31 @@
+name: Actions quota watch
+
+# Actions 額度看守：每 6 小時量一次本月私有倉的 Actions 分鐘，過 1400/1800 門檻就在本倉
+# 開 issue（label actions-quota）。門檻推導與量法見 scripts/actions-quota-watch.mjs。
+# 放在本倉的理由：公開倉分鐘為零，且本倉是站群共用基建、secret 暴露面最小。
+#
+# 本倉 60 天無 push 時 GitHub 會自動停用排程 workflow；phenom-ops 的
+# check:remote-watchers 每次執行都查這件事。
+
+on:
+  schedule:
+    - cron: '43 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: actions-quota-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - run: node scripts/actions-quota-watch.mjs
+        env:
+          ACTIONS_QUOTA_TOKEN: ${{ secrets.ACTIONS_QUOTA_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

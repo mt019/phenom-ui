@@ -1,0 +1,30 @@
+name: Watch site availability
+
+# 站群唯一的週期性健康檢查。2026-09-03 自 phenom-ops 搬來：那邊是私有倉，Actions 分鐘要
+# 計費（8 月疊上手記線把全帳號額度燒盡、停擺 27 小時，排程被迫降到每 6 小時）；本倉公開、
+# 分鐘為零，恢復每小時。站點名冊由腳本執行時拉 phenom-ops 母本 infra/sites.json，
+# 要用 secret ACTIONS_QUOTA_TOKEN（fine-grained PAT，Contents: Read）。
+#
+# 本倉 60 天無 push 時 GitHub 會自動停用排程 workflow；phenom-ops 的
+# check:remote-watchers 每次執行都查這件事。
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: watch-availability
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - run: node scripts/watch-availability.mjs
+        env:
+          ACTIONS_QUOTA_TOKEN: ${{ secrets.ACTIONS_QUOTA_TOKEN }}
