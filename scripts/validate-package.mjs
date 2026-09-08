@@ -34,13 +34,15 @@ for (const relative of required) {
 const localCss = await readFile(path.join(root, 'src/fonts-local.css'), 'utf8');
 const externalCss = await readFile(path.join(root, 'src/fonts-external.css'), 'utf8');
 const manifest = JSON.parse(await readFile(path.join(root, 'fonts/external-manifest.json'), 'utf8'));
-const hashedBySource = new Map(manifest.files.map((entry) => [entry.source, entry.hashed]));
+const urlBySource = new Map(manifest.files.map((entry) => [entry.source, entry.url]));
+if (!/^https:\/\//.test(manifest.origin ?? '')) throw new Error('external-manifest.json missing https origin');
 for (const font of required.filter((item) => item.endsWith('.woff2')).map((item) => path.basename(item))) {
   if (!localCss.includes(`../fonts/${font}`)) throw new Error(`fonts-local.css does not reference ${font}`);
-  const hashed = hashedBySource.get(font);
-  if (!hashed) throw new Error(`external-manifest.json does not list ${font}`);
-  if (!externalCss.includes(`${manifest.base}/${hashed}`)) {
-    throw new Error(`fonts-external.css does not reference ${hashed}`);
+  const url = urlBySource.get(font);
+  if (!url) throw new Error(`external-manifest.json does not list ${font}`);
+  if (!url.startsWith(`${manifest.origin}/v1/`)) throw new Error(`manifest url for ${font} is not content-addressed: ${url}`);
+  if (!externalCss.includes(url)) {
+    throw new Error(`fonts-external.css does not reference ${url}`);
   }
 }
 if (/url\(['"]?\/fonts\//.test(localCss)) throw new Error('font URL must be package-relative');

@@ -1,40 +1,54 @@
 {
-  "base": "/assets/fonts",
+  "origin": "https://assets.phenomcanvas.com",
   "files": [
     {
       "source": "HuiwenMincho-ext-subset.woff2",
-      "hashed": "HuiwenMincho-ext-subset.UzFgWfMD.woff2",
-      "bytes": 5769404
+      "bytes": 5769404,
+      "sha256": "53316059f303939534133e5f417d7c3588eb7e7243088ec14b84f5be6d9b0988",
+      "key": "v1/53316059f303939534133e5f417d7c3588eb7e7243088ec14b84f5be6d9b0988/fonts/HuiwenMincho-ext-subset.woff2",
+      "url": "https://assets.phenomcanvas.com/v1/53316059f303939534133e5f417d7c3588eb7e7243088ec14b84f5be6d9b0988/fonts/HuiwenMincho-ext-subset.woff2"
     },
     {
       "source": "HuiwenMincho-core-subset.woff2",
-      "hashed": "HuiwenMincho-core-subset.M_D3DwhH.woff2",
-      "bytes": 2354456
+      "bytes": 2354456,
+      "sha256": "33f0f70f084740309514955574965090a52aa4158c9e92c914815648df54476b",
+      "key": "v1/33f0f70f084740309514955574965090a52aa4158c9e92c914815648df54476b/fonts/HuiwenMincho-core-subset.woff2",
+      "url": "https://assets.phenomcanvas.com/v1/33f0f70f084740309514955574965090a52aa4158c9e92c914815648df54476b/fonts/HuiwenMincho-core-subset.woff2"
     },
     {
       "source": "ChironSungHK-fallback-subset.woff2",
-      "hashed": "ChironSungHK-fallback-subset.O68eh1zh.woff2",
-      "bytes": 3384260
+      "bytes": 3384260,
+      "sha256": "3baf1e875ce1fac82a60905c8abaa14fd251a8b9de47d74b9cf9ec3fbaef6ea9",
+      "key": "v1/3baf1e875ce1fac82a60905c8abaa14fd251a8b9de47d74b9cf9ec3fbaef6ea9/fonts/ChironSungHK-fallback-subset.woff2",
+      "url": "https://assets.phenomcanvas.com/v1/3baf1e875ce1fac82a60905c8abaa14fd251a8b9de47d74b9cf9ec3fbaef6ea9/fonts/ChironSungHK-fallback-subset.woff2"
     },
     {
       "source": "HuiwenMincho-anglebrackets.woff2",
-      "hashed": "HuiwenMincho-anglebrackets.O1ilbw4b.woff2",
-      "bytes": 1300
+      "bytes": 1300,
+      "sha256": "3b58a56f0e1b9ce92fdb7bf8de6487991d62d7efcdd9d5ae5908c95bd9369046",
+      "key": "v1/3b58a56f0e1b9ce92fdb7bf8de6487991d62d7efcdd9d5ae5908c95bd9369046/fonts/HuiwenMincho-anglebrackets.woff2",
+      "url": "https://assets.phenomcanvas.com/v1/3b58a56f0e1b9ce92fdb7bf8de6487991d62d7efcdd9d5ae5908c95bd9369046/fonts/HuiwenMincho-anglebrackets.woff2"
     },
     {
       "source": "ErikasFarbband-subset.woff2",
-      "hashed": "ErikasFarbband-subset.UZ9McBEk.woff2",
-      "bytes": 463028
+      "bytes": 463028,
+      "sha256": "519f4c7011247422db110e3fd88fc76527b672822e7c6a0295a24471a65c13ff",
+      "key": "v1/519f4c7011247422db110e3fd88fc76527b672822e7c6a0295a24471a65c13ff/fonts/ErikasFarbband-subset.woff2",
+      "url": "https://assets.phenomcanvas.com/v1/519f4c7011247422db110e3fd88fc76527b672822e7c6a0295a24471a65c13ff/fonts/ErikasFarbband-subset.woff2"
     },
     {
       "source": "ErikasFarbband-Bold-subset.woff2",
-      "hashed": "ErikasFarbband-Bold-subset.Hlz2Bng7.woff2",
-      "bytes": 727432
+      "bytes": 727432,
+      "sha256": "1e5cf606783b370a9a3aac0b01394bc76756db11b096089921c4eee8cd0f9513",
+      "key": "v1/1e5cf606783b370a9a3aac0b01394bc76756db11b096089921c4eee8cd0f9513/fonts/ErikasFarbband-Bold-subset.woff2",
+      "url": "https://assets.phenomcanvas.com/v1/1e5cf606783b370a9a3aac0b01394bc76756db11b096089921c4eee8cd0f9513/fonts/ErikasFarbband-Bold-subset.woff2"
     },
     {
       "source": "RadioNewsman-subset.woff2",
-      "hashed": "RadioNewsman-subset.9B_tdseP.woff2",
-      "bytes": 18188
+      "bytes": 18188,
+      "sha256": "f41fed76c78fcd24eaa5f06dd76aeaf1fe45ca30ed473e4a76642451b3846cf9",
+      "key": "v1/f41fed76c78fcd24eaa5f06dd76aeaf1fe45ca30ed473e4a76642451b3846cf9/fonts/RadioNewsman-subset.woff2",
+      "url": "https://assets.phenomcanvas.com/v1/f41fed76c78fcd24eaa5f06dd76aeaf1fe45ca30ed473e4a76642451b3846cf9/fonts/RadioNewsman-subset.woff2"
     }
   ]
 }

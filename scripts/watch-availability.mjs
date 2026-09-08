@@ -12,6 +12,8 @@
 // 退出碼：0＝站群全通，1＝至少一站不通或名冊拉不到。上游來源（憲法法庭官網）只回報
 // 不計入退出碼——它斷線不是我們的故障，若計入，官網斷的每一輪都會發一次通知。
 
+import { readFile } from 'node:fs/promises';
+
 const REGISTRY_URL = 'https://api.github.com/repos/mt019/phenom-ops/contents/infra/sites.json';
 const token = process.env.ACTIONS_QUOTA_TOKEN;
 if (!token) {
@@ -76,19 +78,50 @@ const 站群探測 = registry.sites
     };
   });
 
+// 共用字型 origin（assets.phenomcanvas.com）。court、wealth 的 @font-face 指到這裡，
+// CORS 標頭掉了頁面只會安靜退回系統明體，本機檢查與上線當下的 smoke 都看不到，
+// 只有對線上的週期檢查會發現，所以計入退出碼。清單讀本倉的 fonts/external-manifest.json——URL 是內容定址，
+// 字型換版 manifest 跟著換，這裡自動跟上。HEAD 沒有 body，七支全查也便宜。
+const fontManifest = JSON.parse(
+  await readFile(new URL('../fonts/external-manifest.json', import.meta.url), 'utf8'),
+);
+
+async function probeFont(entry) {
+  const started = Date.now();
+  try {
+    const response = await fetch(entry.url, { method: 'HEAD', signal: AbortSignal.timeout(30000), cache: 'no-store' });
+    const type = response.headers.get('content-type') ?? '';
+    const cache = response.headers.get('cache-control') ?? '';
+    const acao = response.headers.get('access-control-allow-origin') ?? '';
+    const 缺 = [
+      response.status === 200 ? null : `HTTP ${response.status}`,
+      type.includes('font/woff2') ? null : `content-type=${type || '無'}`,
+      acao ? null : '無 access-control-allow-origin',
+      cache.includes('immutable') ? null : `cache-control=${cache || '無'}`,
+    ].filter(Boolean);
+    return { 名稱: `字型 ${entry.source}`, url: entry.url, 狀態碼: response.status, 位元組: entry.bytes, 合格: 缺.length === 0, 錯誤: 缺.join('；') || undefined, 毫秒: Date.now() - started };
+  } catch (error) {
+    return { 名稱: `字型 ${entry.source}`, url: entry.url, 狀態碼: null, 位元組: 0, 合格: false, 錯誤: error.name, 毫秒: Date.now() - started };
+  }
+}
+
 const 站群 = [];
 for (const item of 站群探測) 站群.push(await probe(item));
+const 字型 = [];
+for (const entry of fontManifest.files) 字型.push(await probeFont(entry));
 const 上游 = [];
 for (const item of UPSTREAM) 上游.push(await probe(item));
 
-const line = (r) => `${r.合格 ? '通' : '不通'}｜${r.名稱}｜${r.狀態碼 ?? r.錯誤}｜${r.位元組} bytes｜${r.毫秒} ms｜${r.url}`;
+const line = (r) => `${r.合格 ? '通' : '不通'}｜${r.名稱}｜${r.狀態碼 ?? r.錯誤}｜${r.位元組} bytes｜${r.毫秒} ms｜${r.url}${r.合格 || !r.錯誤 ? '' : `｜${r.錯誤}`}`;
 console.log('站群：');
 for (const r of 站群) console.log(`  ${line(r)}`);
+console.log(`字型 origin（${fontManifest.origin}，HEAD）：`);
+for (const r of 字型) console.log(`  ${line(r)}`);
 console.log('上游一手來源（不計入退出碼）：');
 for (const r of 上游) console.log(`  ${line(r)}`);
 
-const 壞掉 = 站群.filter((r) => !r.合格);
-console.log(`\n${new Date().toISOString()}｜站群 ${站群.length - 壞掉.length}/${站群.length} 通｜上游 ${上游.filter((r) => r.合格).length}/${上游.length} 通`);
+const 壞掉 = [...站群, ...字型].filter((r) => !r.合格);
+console.log(`\n${new Date().toISOString()}｜站群 ${站群.filter((r) => r.合格).length}/${站群.length} 通｜字型 ${字型.filter((r) => r.合格).length}/${字型.length} 通｜上游 ${上游.filter((r) => r.合格).length}/${上游.length} 通`);
 if (壞掉.length) {
   console.error(`不通：${壞掉.map((r) => r.名稱).join('、')}`);
   process.exit(1);

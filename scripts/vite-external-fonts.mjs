@@ -1,15 +1,14 @@
-// 引 styles-external-fonts.css 的站要掛的 vite plugin。
+// 引 styles-external-fonts.css 的站沿用的 vite plugin。
 //
-// 那份 CSS 的 url() 是絕對路徑 /assets/fonts/<檔名>.<雜湊>.woff2，vite 不處理絕對路徑，
-// 所以字型不會進本站的產物——這正是要的效果，但也表示開發伺服器與 preview 上沒有人供應它們，
-// 不補的話本機看到的是系統明體。middleware 那一段就是補這件事。
+// 2026-09-08 起 fonts-external.css 的 url() 是 assets.phenomcanvas.com 上的絕對 URL，
+// 開發伺服器與產物都直接向該 origin 抓，這支不再需要做任何事；保留檔案只為了讓
+// 還掛著它的 vite.config 不必同輪改。manifest 沒有 origin 欄位時（消費端裝的是
+// 2026-09-08 以前的版本，url 還是根相對的 /assets/fonts/）維持舊行為：
+// middleware 在開發伺服器供應字型、emit: true 的底座把字型寫進自己的產物。
 //
-// emit: true 的站另外把字型寫進自己的產物（同一個 origin 上只有底座該開這個開關）。
-//
-// 用法：
+// 用法（兩種版本相同）：
 //   import externalFonts from '@phenomcanvas/ui/scripts/vite-external-fonts.mjs';
-//   plugins: [react(), externalFonts()]              // 引用端
-//   plugins: [react(), externalFonts({ emit: true })] // 供應端（底座）
+//   plugins: [react(), externalFonts()]
 
 import { createReadStream } from 'node:fs';
 import { mkdir, readFile, copyFile } from 'node:fs/promises';
@@ -27,9 +26,11 @@ async function loadManifest() {
 export default function externalFonts({ emit = false } = {}) {
   let manifest;
   let outDir = 'dist';
+  const crossOrigin = () => Boolean(manifest?.origin);
 
   const serve = (server) => {
     server.middlewares.use((req, res, next) => {
+      if (crossOrigin()) return next();
       const requested = (req.url || '').split('?')[0];
       const entry = manifest.files.find((item) => requested.endsWith(`/${item.hashed}`));
       if (!entry || !requested.startsWith(manifest.base)) return next();
@@ -44,11 +45,14 @@ export default function externalFonts({ emit = false } = {}) {
     async configResolved(config) {
       manifest = await loadManifest();
       outDir = config.build.outDir;
+      if (crossOrigin()) {
+        config.logger.info(`[phenom-external-fonts] 字型由 ${manifest.origin} 供應，本地供應與 emit 均跳過。`);
+      }
     },
     configureServer: serve,
     configurePreviewServer: serve,
     async writeBundle() {
-      if (!emit) return;
+      if (!emit || crossOrigin()) return;
       // SSR 那一趟也會呼叫，寫進 .ssr 沒有意義；只在真正的產物目錄寫一次。
       const target = path.resolve(outDir, manifest.base.replace(/^\//, ''));
       if (path.basename(outDir).startsWith('.')) return;

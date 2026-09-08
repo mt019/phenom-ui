@@ -53,7 +53,7 @@ test('兩個入口只差在字型的投遞方式', async () => {
   const external = await readStylesheet('../src/styles-external-fonts.css');
   const strip = (css) => css.slice(css.indexOf(':root {'));
   assert.equal(strip(local), strip(external));
-  assert.match(external, /url\('\/assets\/fonts\/[A-Za-z0-9._-]+\.woff2'\)/);
+  assert.match(external, /url\('https:\/\/assets\.phenomcanvas\.com\/v1\/[0-9a-f]{64}\/fonts\/[A-Za-z0-9._-]+\.woff2'\)/);
   assert.doesNotMatch(external, /url\('\.\.\/fonts\//);
 });
 
