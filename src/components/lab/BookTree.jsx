@@ -12,8 +12,11 @@ import SearchField from './SearchField';
  * 帶原書頁碼。朱家驊言論集（198 篇／14 部次）先用，柳如是別傳那類重排本是同一個形狀。
  *
  * 契約：呼叫端把自己的資料攤平成下面這個形狀，元件不認識任何一本書的欄位名。
- *   items: [{ id, title, href, group, subgroup?, lead?, badge?, hint?, mark? }]
+ *   items: [{ id, title, href, group, subgroup?, lead?, badge?, hint?, mark?, depth? }]
  *   group 是最上層分組（部次），連續同名的併成一段；subgroup 同理（分節）。
+ *   group 可以是一串字，也可以是 { lead?, name }：lead（年份區間）與 name 排成兩行、各自
+ *   不折——併成一串印在窄欄會折成第二行只剩兩個字（站主 2026-09-21 令禁）。
+ *   depth 是葉子在同一段裡再往內縮幾層（一件文獻底下的四層章節）。
  *   lead 是每一列左側的定值（原書頁碼），badge 是少數狀態的標記（如「全文」）。
  *   mark 是列尾一枚墨色小方塊的不透明度（0–1），標這一列對應材料的多少——年表的
  *   年目用它標該年收入的言論篇數，深淺即多少。
@@ -23,9 +26,11 @@ import SearchField from './SearchField';
 function buildTree(items) {
   const groups = [];
   for (const item of items) {
+    const g = typeof item.group === 'string' ? { name: item.group } : (item.group ?? { name: '' });
+    const key = `${g.lead ?? ''}|${g.name}`;
     let group = groups[groups.length - 1];
-    if (!group || group.name !== item.group) {
-      group = { name: item.group, blocks: [], count: 0 };
+    if (!group || group.key !== key) {
+      group = { key, lead: g.lead ?? null, name: g.name, blocks: [], count: 0 };
       groups.push(group);
     }
     group.count += 1;
@@ -39,6 +44,14 @@ function buildTree(items) {
   return groups;
 }
 
+/* 分組名稱要折行時只准折在頓號、逗號、冒號、分號之後：按這些標點切成片段，每段 inline-block，
+   放得下就整段搬到下一行，放不下才在段內折。純靠 text-wrap: balance 會把「中央」拆成兩行。 */
+function nameSegments(name) {
+  const parts = String(name ?? '').split(/(?<=[、，：；])/);
+  if (parts.length < 2) return name;
+  return parts.map((part, i) => <span key={i} className="inline-block">{part}</span>);
+}
+
 const LEAF = 'block border-l-2 py-1 pl-3 pr-2 text-token-xs leading-snug transition-colors duration-fast';
 
 function Leaf({ item, active, onSelect, onFollow }) {
@@ -46,7 +59,7 @@ function Leaf({ item, active, onSelect, onFollow }) {
     ? 'border-accent bg-accent-soft font-bold text-accent'
     : 'border-transparent text-ink-muted hover:border-line hover:text-accent';
   return (
-    <li>
+    <li style={item.depth ? { marginLeft: `${item.depth * 0.75}rem` } : undefined}>
       {onSelect ? (
         <button
           type="button"
@@ -136,17 +149,20 @@ export default function BookTree({
             <ul>{hits.map((it) => <Leaf key={it.id} item={it} active={it.id === activeId} onSelect={onSelect} onFollow={onFollow} />)}</ul>
           </>
         ) : tree.map((group) => {
-          const shut = collapsed.has(group.name);
+          const shut = collapsed.has(group.key);
           return (
-            <section key={group.name} className="mb-1">
+            <section key={group.key} className="mb-1">
               <button
                 type="button"
-                onClick={() => toggle(group.name)}
+                onClick={() => toggle(group.key)}
                 aria-expanded={!shut}
                 className="flex w-full items-center gap-1.5 px-1 py-1.5 text-left text-token-sm font-bold text-ink transition-colors duration-fast hover:text-accent"
               >
                 <ChevronRight size={13} className={`shrink-0 text-ink-faint transition-transform duration-fast ${shut ? '' : 'rotate-90'}`} />
-                <span className="min-w-0 flex-1">{group.name}</span>
+                <span className="min-w-0 flex-1">
+                  {group.lead ? <span className="block whitespace-nowrap text-token-xs font-normal tabular-nums text-ink-faint">{group.lead}</span> : null}
+                  <span className="block">{nameSegments(group.name)}</span>
+                </span>
                 <span className="shrink-0 text-token-xs font-normal tabular-nums text-ink-faint">{group.count}</span>
               </button>
               {shut ? null : group.blocks.map((block, bi) => (
