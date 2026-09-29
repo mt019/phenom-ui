@@ -6,6 +6,7 @@ import { SHELL_PAD_X } from '../shellPadding';
 import Tabs from './Tabs';
 import TableOfContents from './TableOfContents';
 import useHeadings from './useHeadings';
+import MobileRail from './MobileRail.jsx';
 
 /*
  * 儀表板版的兩欄殼——`/brief` 手刻過，抽到這裡讓別的儀表板頁共用（DESIGN.md 元件表）。
@@ -63,6 +64,11 @@ export default function DashboardLayout({
   const { items, active } = useHeadings(bodyRef, { refreshKey });
   const reserveToc = !hideToc;
   const showToc = reserveToc && (items.length > 0 || Boolean(leftRailTop));
+  // 右欄在窄螢幕收進左下角的抽屜（MobileRail）：篩選器（leftRailTop）與本頁大綱照樣搆得到。
+  const mobilePanels = showToc ? [{
+    key: 'toc', side: 'right', label: tocLabel,
+    content: <>{leftRailTop}<TableOfContents label={tocLabel} items={items} active={active} /></>,
+  }] : [];
 
   return (
     <main className="min-h-screen bg-paper paper-texture text-ink" style={{ '--reader-scale': scale }}>
@@ -120,6 +126,8 @@ export default function DashboardLayout({
           量到 CLS 0.133（2026-08-17，見該檔說明）。 */}
       <div
         className={`mx-auto grid max-w-7xl gap-8 py-8 lg:gap-10 ${padX} ${
+          mobilePanels.length ? 'pb-24 lg:pb-8' : ''
+        } ${
           reserveToc ? 'lg:grid-cols-[minmax(0,1fr)_13rem]' : ''
         }`}
       >
@@ -134,6 +142,7 @@ export default function DashboardLayout({
           </aside>
         ) : null}
       </div>
+      <MobileRail panels={mobilePanels} />
     </main>
   );
 }

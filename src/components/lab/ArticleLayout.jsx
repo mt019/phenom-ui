@@ -6,6 +6,7 @@ import TableOfContents from './TableOfContents';
 import useHeadings from './useHeadings';
 import PageIdentity from '../PageIdentity';
 import { CiteNumbering } from './citeNumbering.jsx';
+import MobileRail from './MobileRail.jsx';
 
 /*
  * The shell a long article sits in: a quiet rail of everything else there is to
@@ -14,9 +15,10 @@ import { CiteNumbering } from './citeNumbering.jsx';
  * three things in the same places, and readers of technical prose already know
  * where to look.
  *
- * Both rails are sticky and both disappear below a wide screen, where the reading
- * column takes the whole width and the headings collapse into a summary at the top
- * — a sidebar squeezed onto a phone is worse than no sidebar.
+ * Both rails are sticky and both leave the grid below a wide screen, where the
+ * reading column takes the whole width — a sidebar squeezed onto a phone is worse
+ * than no sidebar. What was in them moves into drawers behind a small toolbar at
+ * the bottom-left corner (MobileRail), always there, never opt-in.
  *
  * Neither the reading column nor the rail is a colored panel. A tinted block of
  * any hue sits against the paper's own warmth and fights it; the only colors that
@@ -47,7 +49,11 @@ export default function ArticleLayout({
   // 閱讀欄寬是照行長訂的。**放寬不影響右欄目次**——兩件事以前綁在同一個 prop 上，
   // 於是要表格擺得下就得放棄目次，那是假的取捨。
   wideContent = false,
+  // 窄螢幕左下角那顆導覽鈕的字。左欄在窄螢幕一律收進抽屜（MobileRail），頁面不必開；
+  // 這個 prop 只改按鈕上的字，不傳就是「目次」。
   mobileNavLabel,
+  // 同上，右欄（aside）那顆的字。
+  asideLabel = '本頁',
   scaleContent = true,
   // 引註編號的號碼簿換新的時機。預設跟著 tocKey（頁面切語言時傳的就是它）——同一篇換一種
   // 語言，引註的出現順序可能不同，號碼簿要重來。頁面不必為此多傳一個 prop。
@@ -61,6 +67,19 @@ export default function ArticleLayout({
   // 兩個判斷，刻意分開：軌道留不留不看量測，目次內容列不列才看。
   const reserveToc = aside ? true : !hideToc;
   const showToc = !aside && reserveToc && items.length > 0;
+  // 窄螢幕：兩條側欄收進左下角的膠囊，點開是抽屜。有什麼收什麼，頁面不必宣告。
+  const mobilePanels = [
+    (nav || navBrand) ? {
+      key: 'nav', side: 'left', label: mobileNavLabel ?? '目次',
+      // 站名塊釘在抽屜頂端、不隨目次捲走，與寬螢幕左欄相同。
+      head: nav ? navBrand : null, content: nav ?? navBrand,
+    } : null,
+    aside ? { key: 'aside', side: 'right', label: asideLabel, content: aside } : null,
+    showToc ? {
+      key: 'toc', side: 'right', label: tocLabel ?? '本頁目次',
+      content: <TableOfContents label={tocLabel} items={items} active={active} />,
+    } : null,
+  ].filter(Boolean);
 
   return (
     // 手機的單欄要寫成 minmax(0,1fr)：grid 的 auto 軌會被寬內容（min-width 的圖表、
@@ -73,6 +92,8 @@ export default function ArticleLayout({
     // 704px→592px、y 205→227.75，擋掉字型仍是 0.132，與換字無關）。
     // 代價是沒有小標的頁面右邊多留一條空軌道；那條軌道只是留白，而版面在讀者眼前跳動不是。
     <div className={`mx-auto grid grid-cols-[minmax(0,1fr)] gap-10 ${SHELL_PAD_X_RAIL} lg:gap-12 ${
+      mobilePanels.length ? 'pb-20 lg:pb-0' : ''
+    } ${
       // 寬版面加上右欄比容器的 86rem 還寬，所以那個組合另給一個上限。
       reserveToc && wideContent ? 'max-w-[96rem]' : 'max-w-[86rem]'
     } ${
@@ -109,23 +130,6 @@ export default function ArticleLayout({
           {meta}
         </header>
 
-        {mobileNavLabel ? (
-          <details className="mb-8 rounded-token-md border border-line-soft px-4 py-3 lg:hidden">
-            <summary className="cursor-pointer text-token-sm text-ink-muted">{mobileNavLabel}</summary>
-            <div className="mt-3">{nav}</div>
-          </details>
-        ) : null}
-
-        {showToc ? (
-          <details className="mb-8 rounded-token-md border border-line-soft px-4 py-3 lg:hidden">
-            <summary className="cursor-pointer text-token-sm text-ink-muted">{tocLabel ?? '本頁目次'}</summary>
-            <div className="mt-3">
-              <TableOfContents label={tocLabel} items={items} active={active} />
-            </div>
-          </details>
-        ) : null}
-
-
         {/* prose-body：長文閱讀區的灰階平滑（styles.css）由版型殼自己帶，頁面不必記得掛
             ——2026-08-14 德川頁漏掛整頁筆畫偏重之後，站主明令修在共用層級。 */}
         <div ref={bodyRef} className="prose-body">
@@ -148,6 +152,7 @@ export default function ArticleLayout({
           </div>
         </aside>
       ) : null}
+      <MobileRail panels={mobilePanels} />
     </div>
   );
 }
