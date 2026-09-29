@@ -132,7 +132,10 @@ export default function BookTree({
     let box = rootRef.current.parentElement;
     while (box && box.scrollHeight <= box.clientHeight) box = box.parentElement;
     if (!box || box === document.body || box === document.documentElement) return;
-    const wanted = Math.max(0, target.offsetTop - box.clientHeight / 2);
+    // 位置用捲動容器自己的座標算。offsetTop 相對的是最近的定位祖先（左欄的 sticky 外框），
+    // 目次上方有站名塊與站內入口時，差距就是那一塊的高度，本篇會被捲到可視區上方（2026-09-29）。
+    const offset = target.getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop;
+    const wanted = Math.max(0, offset - box.clientHeight / 2 + target.offsetHeight / 2);
     if (Math.abs(box.scrollTop - wanted) > 8) box.scrollTop = wanted;
   }, [activeId]);
 
