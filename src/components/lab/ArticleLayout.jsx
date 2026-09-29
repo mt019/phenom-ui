@@ -45,6 +45,11 @@ export default function ArticleLayout({
   // 左欄頂端的站名塊（通常放 RailBrand）。釘在左欄的捲動容器之外：目次長到要在
   // 欄內捲動時，站名不跟著捲走。不傳就與現狀相同。
   navBrand = null,
+  // 站內入口：{ label, items: [{ to, label, active }] }。站名塊底下那一串（全書篇目、年表、
+  // 全文檢索⋯）以前由各站塞進 BookTree 的 header，寬螢幕上隨目次捲走，手機上整串收在抽屜裡。
+  // 2026-09-29 站主在手機上打開朱家驊站，看不到這份索引。傳資料而不是 JSX，殼才排得出兩種
+  // 版式：寬螢幕在左欄站名底下直排、釘住不捲；窄螢幕在標題底下橫排，一打開就看得到。
+  siteNav = null,
   // 內容欄放寬到 61rem。以條文對照表、寬表格當骨架的頁面才傳；散文不傳，44rem 那條
   // 閱讀欄寬是照行長訂的。**放寬不影響右欄目次**——兩件事以前綁在同一個 prop 上，
   // 於是要表格擺得下就得放棄目次，那是假的取捨。
@@ -69,10 +74,11 @@ export default function ArticleLayout({
   const showToc = !aside && reserveToc && items.length > 0;
   // 窄螢幕：兩條側欄收進左下角的膠囊，點開是抽屜。有什麼收什麼，頁面不必宣告。
   const mobilePanels = [
-    (nav || navBrand) ? {
+    (nav || navBrand || siteNav) ? {
       key: 'nav', side: 'left', label: mobileNavLabel ?? '目次',
       // 站名塊釘在抽屜頂端、不隨目次捲走，與寬螢幕左欄相同。
-      head: nav ? navBrand : null, content: nav ?? navBrand,
+      head: nav ? <>{navBrand}{siteNav ? <SiteNav nav={siteNav} /> : null}</> : null,
+      content: nav ?? navBrand,
     } : null,
     aside ? { key: 'aside', side: 'right', label: asideLabel, content: aside } : null,
     showToc ? {
@@ -110,6 +116,7 @@ export default function ArticleLayout({
             slides under the toolbar loses its first item. */}
         <div className="sticky top-16 flex max-h-[calc(100vh-6rem)] flex-col border-r border-line-soft pr-5">
           {navBrand ? <div className="shrink-0">{navBrand}</div> : null}
+          {siteNav ? <div className="shrink-0"><SiteNav nav={siteNav} /></div> : null}
           {/* overflow 從 sticky 容器移到內側的目次容器，站名塊才不隨目次一起捲。 */}
           <div className="min-h-0 flex-1 overflow-y-auto">{nav}</div>
         </div>
@@ -128,6 +135,7 @@ export default function ArticleLayout({
         <header className="mb-8">
           <PageIdentity eyebrow={eyebrow} eyebrowBack={eyebrowBack} title={title} summary={summary} />
           {meta}
+          {siteNav ? <SiteNav nav={siteNav} inline /> : null}
         </header>
 
         {/* prose-body：長文閱讀區的灰階平滑（styles.css）由版型殼自己帶，頁面不必記得掛
@@ -199,6 +207,34 @@ export function ArticleNav({ topics = [], articles = [], currentSlug, homeHref, 
           </div>
         );
       })}
+    </nav>
+  );
+}
+
+/* 站內入口。寬螢幕與抽屜裡直排；窄螢幕的正文頂端（inline）橫排換行，上下各一條細線，
+   目前所在的那一項用 accent 標出來。 */
+function SiteNav({ nav, inline = false }) {
+  const items = nav?.items ?? [];
+  if (items.length === 0) return null;
+  const tone = (on) => `transition-colors duration-fast hover:text-accent ${on ? 'text-accent' : 'text-ink'}`;
+  if (inline) {
+    return (
+      <nav aria-label={nav.label} className="mt-6 border-y border-line-soft py-3 lg:hidden">
+        <ul className="flex flex-wrap gap-x-5 gap-y-2 text-token-sm">
+          {items.map((it) => (
+            <li key={it.to}>
+              <Link to={it.to} aria-current={it.active ? 'page' : undefined} className={`whitespace-nowrap ${tone(it.active)}`}>{it.label}</Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    );
+  }
+  return (
+    <nav aria-label={nav.label} className="mb-4 space-y-1.5 text-token-sm">
+      {items.map((it) => (
+        <Link key={it.to} to={it.to} aria-current={it.active ? 'page' : undefined} className={`block ${tone(it.active)}`}>{it.label}</Link>
+      ))}
     </nav>
   );
 }
