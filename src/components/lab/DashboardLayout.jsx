@@ -38,7 +38,7 @@ export default function DashboardLayout({
   backIndexHref,
   headerRight,
   eyebrow,
-  eyebrowBack = null,
+  eyebrowBack,
   title,
   titleClassName = 'font-display',
   summary,

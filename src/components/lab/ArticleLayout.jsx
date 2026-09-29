@@ -27,7 +27,7 @@ import MobileRail from './MobileRail.jsx';
  * the mark on wherever the reader currently is.
  */
 export default function ArticleLayout({
-  title, eyebrow, eyebrowBack = null, summary, meta, nav, tocLabel, tocKey,
+  title, eyebrow, eyebrowBack, summary, meta, nav, tocLabel, tocKey,
   // 右欄目次要列到第幾層。預設 h2＋h3。存檔頁那種「一頁收很多則、每則自己帶小標」的
   // 版面傳 [2]：小標在那裡重複（六則各有一條「補記（Matters 留言區）」），列進去是把
   // 同一個詞印六遍，不是導覽。

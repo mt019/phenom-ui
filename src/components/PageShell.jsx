@@ -27,7 +27,7 @@ const PAD_X = {
 export default function PageShell({
   title,
   eyebrow,
-  eyebrowBack = null,
+  eyebrowBack,
   width = 'prose',
   controls,
   fontScale,

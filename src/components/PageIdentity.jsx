@@ -11,17 +11,26 @@ import Eyebrow from './Eyebrow';
  *   主頁的按鈕了，太奇怪」），站首頁也不連（「已經在小站首頁了，點大 title 不應該把我丟回
  *   空首頁」）。要離開這個站，用最上面那支箭頭。
  *
- * 落點一律來自 `backNav.js`，這裡只決定哪一行掛哪一個。
+ * 落點由呼叫端傳 `eyebrowBack`：站內頁傳 `{ href, label }`，站首頁明寫 `null`。canvas 那份
+ * 由 `backNav.js` 按路徑查落點；拆出去的站沒有那個檔，不傳就是一行不能按的死眉標
+ * （2026-09-29 站主在朱家驊站點不動「ZHU JIAHUA · COLLECTED SPEECHES」，顧準、小轉鈴、
+ * 德川三站同樣漏傳）。所以有眉標而沒有宣告時印一句 warning，寫法照 BackLink。
  * 三個殼（DashboardLayout／PageShell／ArticleLayout）都畫這一個，不各寫一份。
  */
+let warnedEyebrow = false;
+
 export default function PageIdentity({
   eyebrow,
-  eyebrowBack = null,
+  eyebrowBack,
   title,
   titleClassName = 'font-display',
   summary,
   children,
 }) {
+  if (eyebrow && eyebrowBack === undefined && typeof console !== 'undefined' && !warnedEyebrow) {
+    warnedEyebrow = true;
+    console.warn('[phenom-ui] 眉標沒有收到 eyebrowBack：站內頁傳 { href, label } 連回站首頁，站首頁明寫 null。');
+  }
   const titleEl = title ? (
     <h1 className={`${titleClassName} text-token-2xl leading-tight sm:text-token-3xl`}>{title}</h1>
   ) : null;
