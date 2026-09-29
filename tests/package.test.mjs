@@ -88,9 +88,12 @@ test('every page shell carries eyebrow navigation into PageIdentity', async () =
     '../src/components/lab/DashboardLayout.jsx',
   ]) {
     const source = await readFile(new URL(file, import.meta.url), 'utf8');
-    assert.match(source, /eyebrowBack\s*=\s*null/);
+    // 殼不自帶預設值：預設 null 會讓漏傳與「站首頁刻意不連」長得一樣（2026-09-29 四站漏傳）。
+    assert.doesNotMatch(source, /eyebrowBack\s*=\s*null/);
     assert.match(source, /<PageIdentity[^>]*eyebrowBack=\{eyebrowBack\}/);
   }
+  const identity = await readFile(new URL('../src/components/PageIdentity.jsx', import.meta.url), 'utf8');
+  assert.match(identity, /eyebrowBack === undefined[\s\S]*console\.warn/);
 });
 
 test('an eyebrow with a back destination renders a real navigation link', async () => {
