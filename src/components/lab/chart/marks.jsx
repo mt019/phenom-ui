@@ -18,11 +18,13 @@ const slot = (n) => {
  *
  * A bar is a tint of its own ink, not a near-white box with a hairline around it.
  * The wireframe version — pale fill plus 1px outline — is fine at chip size and
- * reads as an empty placeholder once it is 200px tall, which is why the fill here
- * is the ink color at low opacity: the hue survives, the area still stays light.
- * Corners get a small radius, the way Notion and GitHub draw theirs; hard 90°
- * corners on a thin outline are what make a chart look like a spreadsheet.
+ * reads as an empty placeholder once it is 200px tall. The fill is the ink mixed
+ * into paper in OKLab (35%, 85% when highlighted), opaque, with no outline and no
+ * cap: an opaque tint does not let gridlines show through the bar, and the edge
+ * comes from the contrast with the paper. Corners get a small radius, the way
+ * Notion and GitHub draw theirs.
  */
+const tint = (tx, pct) => `color-mix(in oklab, ${tx} ${pct}%, var(--c-paper))`;
 export function Bars({ data, x, y, y0, cat = 8, highlightCat = 6, highlight = () => false, radius = 3, onHover }) {
   const { inner } = useFrame();
   const base = y0 ?? inner.y0;
@@ -45,11 +47,7 @@ export function Bars({ data, x, y, y0, cat = 8, highlightCat = 6, highlight = ()
             width={w}
             height={h}
             rx={Math.min(radius, w / 2, h)}
-            fill={c.tx}
-            fillOpacity={on ? 0.85 : 0.22}
-            stroke={c.tx}
-            strokeOpacity={on ? 0 : 0.35}
-            strokeWidth="1"
+            fill={tint(c.tx, on ? 85 : 35)}
             onMouseEnter={onHover ? () => onHover(d, i) : undefined}
             onMouseLeave={onHover ? () => onHover(null, -1) : undefined}
           />
