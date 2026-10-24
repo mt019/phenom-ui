@@ -1,0 +1,1 @@
+import assert from 'node:assert/strict';import {renderScale} from '../.ssr-tests/ssr-entry.js';assert.equal(await renderScale(),'<output>1</output>');console.log('SSR scale is deterministic without browser globals');

@@ -1,0 +1,10 @@
+import {readFile,writeFile,cp,mkdir,rm} from 'node:fs/promises';import {fileURLToPath} from 'node:url';import {resolve,join} from 'node:path';import {execFileSync} from 'node:child_process';import {createHash} from 'node:crypto';
+const root=resolve(fileURLToPath(new URL('..',import.meta.url))),out=join(root,'.preview');await rm(out,{recursive:true,force:true});await mkdir(out,{recursive:true});await cp(join(root,'dist'),join(out,'vue-ui'),{recursive:true});
+const pkg=JSON.parse(await readFile(join(root,'node_modules/@phenomcanvas/ui-vue/package.json'),'utf8')),design=JSON.parse(await readFile(join(root,'node_modules/@phenomcanvas/ui-vue/core/source-manifest.json'),'utf8'));
+const sourceCommit=execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim();
+const record={schemaVersion:1,site:'vue-shared-foundation',sourceRepository:'mt019/phenom-ui',sourceCommit,packageVersion:pkg.version,designSourceCommit:design.sourceCommit,packageSha256:createHash('sha256').update(await readFile(join(root,'vendor',`phenomcanvas-ui-vue-${pkg.version}.tgz`))).digest('hex'),node:process.version,framework:'vue',scope:'Shared component acceptance preview; no new frontend site migration or production promotion'};
+await writeFile(join(out,'vue-ui/deployment-manifest.json'),JSON.stringify(record,null,2)+'\n');
+await writeFile(join(out,'_headers'),'/*\n  X-Robots-Tag: noindex, nofollow\n\n/vue-ui/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n\n/vue-ui/deployment-manifest.json\n  Cache-Control: no-store\n');
+await writeFile(join(out,'_redirects'),'/ /vue-ui/ 302\n');
+await writeFile(join(out,'404.html'),'<!doctype html><html lang="zh-Hant"><head><meta charset="UTF-8"><meta name="robots" content="noindex,nofollow"><title>找不到這一頁</title></head><body><h1>找不到這一頁</h1><a href="/vue-ui/">回閱讀預覽</a></body></html>\n');
+console.log(JSON.stringify(record,null,2));

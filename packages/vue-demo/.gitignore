@@ -1,0 +1,4 @@
+dist/
+.ssr-tests/
+.test-evidence/
+.preview/

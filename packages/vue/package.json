@@ -1,0 +1,34 @@
+{
+  "name": "@phenomcanvas/ui-vue",
+  "version": "0.1.1",
+  "type": "module",
+  "description": "Vue components and composables using the existing Phenom design sources",
+  "license": "MIT",
+  "files": [
+    "src",
+    "core",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles.css": "./core/styles-external-fonts.css",
+    "./styles-base.css": "./core/styles-base.css",
+    "./tokens.css": "./core/styles/tokens.css",
+    "./tailwind-preset": "./core/tailwind-preset.js",
+    "./palettes": "./core/styles/palettes.js"
+  },
+  "sideEffects": [
+    "./core/**/*.css"
+  ],
+  "peerDependencies": {
+    "vue": "^3.5.44",
+    "vue-router": "^5.4.0"
+  },
+  "scripts": {
+    "prepack": "node scripts/stage-core.mjs"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}
