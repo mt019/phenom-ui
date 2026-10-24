@@ -1,6 +1,6 @@
 {
   "name": "@phenomcanvas/ui-vue",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "type": "module",
   "description": "Vue components and composables using the existing Phenom design sources",
   "license": "MIT",
@@ -16,14 +16,20 @@
     "./styles-base.css": "./core/styles-base.css",
     "./tokens.css": "./core/styles/tokens.css",
     "./tailwind-preset": "./core/tailwind-preset.js",
-    "./palettes": "./core/styles/palettes.js"
+    "./palettes": "./core/styles/palettes.js",
+    "./fonts/*": "./core/fonts/*",
+    "./scripts/*": "./core/scripts/*",
+    "./validators/*": "./core/scripts/*",
+    "./assets/*": "./core/assets/*"
   },
   "sideEffects": [
     "./core/**/*.css"
   ],
   "peerDependencies": {
     "vue": "^3.5.44",
-    "vue-router": "^5.4.0"
+    "vue-router": "^5.4.0",
+    "lucide-vue-next": "^0.468.0",
+    "katex": "^0.17.0"
   },
   "scripts": {
     "prepack": "node scripts/stage-core.mjs"

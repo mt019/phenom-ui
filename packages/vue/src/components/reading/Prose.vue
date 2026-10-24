@@ -1,0 +1,1 @@
+<script setup lang="ts">import 'katex/dist/katex.min.css';import '../../../core/styles/katex.css';</script><template><div class="prose-scaled prose-body"><slot/></div></template>
