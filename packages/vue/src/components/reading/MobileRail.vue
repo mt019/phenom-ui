@@ -1,5 +1,111 @@
 <script setup lang="ts">
-import {computed,nextTick,onBeforeUnmount,ref,watch} from 'vue';import {List,PanelRight,X} from 'lucide-vue-next';import VNodeOutlet from './VNodeOutlet';
-const props=withDefaults(defineProps<{panels?:any[]}>(),{panels:()=>[]}),openKey=ref<string|null>(null),panel=ref<HTMLElement>(),dialog=ref<HTMLElement>();const list=computed(()=>props.panels.filter(p=>p&&p.content)),open=computed(()=>list.value.find(p=>p.key===openKey.value));let cleanup=()=>{};
-watch(open,async value=>{cleanup();cleanup=()=>{};if(!value)return;const previous=document.body.style.overflow,focus=document.activeElement as HTMLElement;document.body.style.overflow='hidden';function key(e:KeyboardEvent){if(e.key==='Escape')openKey.value=null;else if(e.key==='Tab'){const nodes=Array.from(dialog.value?.querySelectorAll<HTMLElement>('a[href],button:not([disabled]),input, [tabindex="0"]')??[]).filter(el=>el.getClientRects().length);const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}}document.addEventListener('keydown',key);let frame=0;cleanup=()=>{cancelAnimationFrame(frame);document.body.style.overflow=previous;document.removeEventListener('keydown',key);focus?.focus();};await nextTick();frame=requestAnimationFrame(()=>{if(panel.value)panel.value.scrollTop=0;dialog.value?.querySelector<HTMLElement>('button[aria-label="關閉"]')?.focus();});});onBeforeUnmount(()=>cleanup());function click(e:MouseEvent){if((e.target as Element)?.closest('a'))openKey.value=null;}
-</script><template><template v-if="list.length"><div class="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-4 z-30 flex items-stretch overflow-hidden rounded-full border border-line bg-paper/95 text-token-sm text-ink shadow-sm backdrop-blur-sm lg:hidden" role="toolbar" aria-label="頁面導覽"><button v-for="(p,i) in list" :key="p.key" type="button" @click="openKey=p.key" :aria-expanded="openKey===p.key" :class="['inline-flex items-center gap-1.5 whitespace-nowrap px-4 py-2.5 transition-colors duration-fast hover:text-accent',i>0?'border-l border-line-soft':'']"><component :is="p.side==='right'?PanelRight:List" :size="16" aria-hidden="true"/>{{p.label}}</button></div><div v-if="open" ref="dialog" class="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" :aria-label="open.label"><button type="button" aria-label="關閉" class="absolute inset-0 h-full w-full cursor-default" :style="{background:'color-mix(in srgb, var(--c-ink) 32%, transparent)'}" @click="openKey=null"/><div @click="click" :class="['absolute inset-y-0 flex w-[min(22rem,86vw)] flex-col bg-paper shadow-token-sm',open.side==='right'?'right-0 border-l':'left-0 border-r','border-line-soft']"><div class="flex shrink-0 items-center justify-between border-b border-line-soft px-4 py-2.5"><span class="text-token-sm text-ink-muted">{{open.label}}</span><button type="button" @click="openKey=null" aria-label="關閉" class="-mr-2 inline-flex h-9 w-9 items-center justify-center text-ink-muted hover:text-accent"><X :size="18" aria-hidden="true"/></button></div><div v-if="open.head" class="shrink-0 px-4 pt-4"><VNodeOutlet :content="open.head"/></div><div ref="panel" class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4"><VNodeOutlet :content="open.content"/></div></div></div></template></template>
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
+import { List, PanelRight, X } from 'lucide-vue-next';
+import VNodeOutlet from './VNodeOutlet';
+const props = withDefaults(defineProps<{ panels?: any[] }>(), { panels: () => [] }),
+  openKey = ref<string | null>(null),
+  panel = ref<HTMLElement>(),
+  dialog = ref<HTMLElement>();
+const list = computed(() => props.panels.filter((p) => p && p.content)),
+  open = computed(() => list.value.find((p) => p.key === openKey.value));
+let cleanup = () => {};
+watch(open, async (value) => {
+  cleanup();
+  cleanup = () => {};
+  if (!value) return;
+  const previous = document.body.style.overflow,
+    focus = document.activeElement as HTMLElement;
+  document.body.style.overflow = 'hidden';
+  function key(e: KeyboardEvent) {
+    if (e.key === 'Escape') openKey.value = null;
+    else if (e.key === 'Tab') {
+      const nodes = Array.from(
+        dialog.value?.querySelectorAll<HTMLElement>(
+          'a[href],button:not([disabled]),input, [tabindex="0"]',
+        ) ?? [],
+      ).filter((el) => el.getClientRects().length);
+      const first = nodes[0],
+        last = nodes[nodes.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last?.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first?.focus();
+      }
+    }
+  }
+  document.addEventListener('keydown', key);
+  let frame = 0;
+  cleanup = () => {
+    cancelAnimationFrame(frame);
+    document.body.style.overflow = previous;
+    document.removeEventListener('keydown', key);
+    focus?.focus();
+  };
+  await nextTick();
+  frame = requestAnimationFrame(() => {
+    if (panel.value) panel.value.scrollTop = 0;
+    dialog.value?.querySelector<HTMLElement>('button[aria-label="關閉"]')?.focus();
+  });
+});
+onBeforeUnmount(() => cleanup());
+function click(e: MouseEvent) {
+  if ((e.target as Element)?.closest('a')) openKey.value = null;
+}
+</script>
+<template>
+  <template v-if="list.length"
+    ><div
+      class="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-4 z-30 flex items-stretch overflow-hidden rounded-full border border-line bg-paper/95 text-token-sm text-ink shadow-sm backdrop-blur-sm lg:hidden"
+      role="toolbar"
+      aria-label="頁面導覽"
+      ><button
+        v-for="(p, i) in list"
+        :key="p.key"
+        type="button"
+        @click="openKey = p.key"
+        :aria-expanded="openKey === p.key"
+        :class="[
+          'inline-flex items-center gap-1.5 whitespace-nowrap px-4 py-2.5 transition-colors duration-fast hover:text-accent',
+          i > 0 ? 'border-l border-line-soft' : '',
+        ]"
+        ><component :is="p.side === 'right' ? PanelRight : List" :size="16" aria-hidden="true" />{{
+          p.label
+        }}</button
+      ></div
+    ><div
+      v-if="open"
+      ref="dialog"
+      class="fixed inset-0 z-50 lg:hidden"
+      role="dialog"
+      aria-modal="true"
+      :aria-label="open.label"
+      ><button
+        type="button"
+        aria-label="關閉"
+        class="absolute inset-0 h-full w-full cursor-default"
+        :style="{ background: 'color-mix(in srgb, var(--c-ink) 32%, transparent)' }"
+        @click="openKey = null" /><div
+        @click="click"
+        :class="[
+          'absolute inset-y-0 flex w-[min(22rem,86vw)] flex-col bg-paper shadow-token-sm',
+          open.side === 'right' ? 'right-0 border-l' : 'left-0 border-r',
+          'border-line-soft',
+        ]"
+        ><div
+          class="flex shrink-0 items-center justify-between border-b border-line-soft px-4 py-2.5"
+          ><span class="text-token-sm text-ink-muted">{{ open.label }}</span
+          ><button
+            type="button"
+            @click="openKey = null"
+            aria-label="關閉"
+            class="-mr-2 inline-flex h-9 w-9 items-center justify-center text-ink-muted hover:text-accent"
+            ><X :size="18" aria-hidden="true" /></button></div
+        ><div v-if="open.head" class="shrink-0 px-4 pt-4"><VNodeOutlet :content="open.head" /></div
+        ><div
+          ref="panel"
+          class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4"
+          ><VNodeOutlet :content="open.content" /></div></div></div
+  ></template>
+</template>

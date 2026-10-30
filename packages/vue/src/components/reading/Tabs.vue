@@ -1,7 +1,18 @@
 <script setup lang="ts">
-import {computed,ref} from 'vue';import VNodeOutlet from './VNodeOutlet';
-const props=withDefaults(defineProps<{items:any[];value?:string;onChange:(value:string)=>void;variant?:string;className?:string;label?:string}>(),{variant:'underline'});
-const VARIANTS:Record<string,{list:string;item:string;on:string;off:string}> = {
+import { computed, ref } from 'vue';
+import VNodeOutlet from './VNodeOutlet';
+const props = withDefaults(
+  defineProps<{
+    items: any[];
+    value?: string;
+    onChange: (value: string) => void;
+    variant?: string;
+    className?: string;
+    label?: string;
+  }>(),
+  { variant: 'underline' },
+);
+const VARIANTS: Record<string, { list: string; item: string; on: string; off: string }> = {
   // Underline: the page's primary sections. Reads as a table of contents.
   underline: {
     list: 'flex flex-wrap gap-5 border-b border-line',
@@ -58,8 +69,57 @@ const VARIANTS:Record<string,{list:string;item:string;on:string;off:string}> = {
   },
 };
 
-
-const variantStyle=computed(()=>VARIANTS[props.variant]??VARIANTS.underline),root=ref<HTMLElement>();
-function choose(id:string){props.onChange(id);}
-function key(e:KeyboardEvent){const buttons=Array.from(root.value?.querySelectorAll<HTMLButtonElement>('button[role="tab"]')??[]);const index=buttons.indexOf(e.target as HTMLButtonElement);if(index<0)return;let next=index;if(e.key==='ArrowRight'||e.key==='ArrowDown')next=(index+1)%buttons.length;else if(e.key==='ArrowLeft'||e.key==='ArrowUp')next=(index-1+buttons.length)%buttons.length;else if(e.key==='Home')next=0;else if(e.key==='End')next=buttons.length-1;else return;e.preventDefault();buttons[next]?.focus();choose(props.items[next].id??props.items[next].value);}
-</script><template><div ref="root" role="tablist" :aria-label="label" :class="[variantStyle.list,className]" @keydown="key"><button v-for="item in items" :key="item.id??item.value" role="tab" type="button" :aria-selected="(item.id??item.value)===value" @click="choose(item.id??item.value)" :class="[variantStyle.item,(item.id??item.value)===value?variantStyle.on:variantStyle.off]"><VNodeOutlet :content="item.label"/><span v-if="item.count!=null" :class="['ml-1.5',(item.id??item.value)===value&&['dashboard','pill','bar'].includes(variant)?'text-paper/80':'text-ink-muted']">{{item.count}}</span></button></div></template>
+const variantStyle = computed(() => VARIANTS[props.variant] ?? VARIANTS.underline),
+  root = ref<HTMLElement>();
+function choose(id: string) {
+  props.onChange(id);
+}
+function key(e: KeyboardEvent) {
+  const buttons = Array.from(
+    root.value?.querySelectorAll<HTMLButtonElement>('button[role="tab"]') ?? [],
+  );
+  const index = buttons.indexOf(e.target as HTMLButtonElement);
+  if (index < 0) return;
+  let next = index;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (index + 1) % buttons.length;
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp')
+    next = (index - 1 + buttons.length) % buttons.length;
+  else if (e.key === 'Home') next = 0;
+  else if (e.key === 'End') next = buttons.length - 1;
+  else return;
+  e.preventDefault();
+  buttons[next]?.focus();
+  choose(props.items[next].id ?? props.items[next].value);
+}
+</script>
+<template>
+  <div
+    ref="root"
+    role="tablist"
+    :aria-label="label"
+    :class="[variantStyle.list, className]"
+    @keydown="key"
+    ><button
+      v-for="item in items"
+      :key="item.id ?? item.value"
+      role="tab"
+      type="button"
+      :aria-selected="(item.id ?? item.value) === value"
+      @click="choose(item.id ?? item.value)"
+      :class="[
+        variantStyle.item,
+        (item.id ?? item.value) === value ? variantStyle.on : variantStyle.off,
+      ]"
+      ><VNodeOutlet :content="item.label" /><span
+        v-if="item.count != null"
+        :class="[
+          'ml-1.5',
+          (item.id ?? item.value) === value && ['dashboard', 'pill', 'bar'].includes(variant)
+            ? 'text-paper/80'
+            : 'text-ink-muted',
+        ]"
+        >{{ item.count }}</span
+      ></button
+    ></div
+  >
+</template>

@@ -1,4 +1,4 @@
-import {onMounted,onBeforeUnmount} from 'vue';
+import { onMounted, onBeforeUnmount } from 'vue';
 
 /*
  * 點側欄的一項要捲到那一節，時間由這裡定，不交給瀏覽器。
@@ -17,13 +17,14 @@ const MIN_MS = 180;
 const MAX_MS = 420;
 
 function reduceMotion() {
-  return typeof window !== 'undefined'
-    && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  return (
+    typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  );
 }
 
 const easeOutCubic = (t) => 1 - (1 - t) ** 3;
 
-let running = null;   // 同時只有一個捲動動畫，後來的取代先前的
+let running = null; // 同時只有一個捲動動畫，後來的取代先前的
 
 /** 捲到文件座標 top。時間有上限，讀者一動就停。 */
 export function scrollToY(top) {
@@ -66,8 +67,7 @@ export function scrollToY(top) {
  */
 export function scrollToAnchor(id) {
   if (typeof document === 'undefined') return false;
-  const el = document.getElementById(id)
-    || document.querySelector(`[name="${CSS.escape(id)}"]`);
+  const el = document.getElementById(id) || document.querySelector(`[name="${CSS.escape(id)}"]`);
   if (!el) return false;
   const margin = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
   scrollToY(el.getBoundingClientRect().top + window.scrollY - margin);
@@ -79,10 +79,38 @@ export function scrollToAnchor(id) {
  * 用事件代理接整份文件，頁面與元件不必各自改連結。
  */
 export function useAnchorScroll(enabled = true) {
- let cleanup=()=>{};
- onMounted(()=>{
- if(!enabled)return;
- const onClick=(event)=>{if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;const a=event.target.closest?.('a[href]');if(!a||a.target==='_blank'||a.hasAttribute('download'))return;const href=a.getAttribute('href');if(!href||href[0]!=='#'||href.length<2)return;let id;try{id=decodeURIComponent(href.slice(1));}catch{return;}if(!scrollToAnchor(id))return;event.preventDefault();history.pushState(null,'',href);};
- document.addEventListener('click',onClick);cleanup=()=>{document.removeEventListener('click',onClick);if(running)running();};
- });onBeforeUnmount(()=>cleanup());
+  let cleanup = () => {};
+  onMounted(() => {
+    if (!enabled) return;
+    const onClick = (event) => {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      )
+        return;
+      const a = event.target.closest?.('a[href]');
+      if (!a || a.target === '_blank' || a.hasAttribute('download')) return;
+      const href = a.getAttribute('href');
+      if (!href || href[0] !== '#' || href.length < 2) return;
+      let id;
+      try {
+        id = decodeURIComponent(href.slice(1));
+      } catch {
+        return;
+      }
+      if (!scrollToAnchor(id)) return;
+      event.preventDefault();
+      history.pushState(null, '', href);
+    };
+    document.addEventListener('click', onClick);
+    cleanup = () => {
+      document.removeEventListener('click', onClick);
+      if (running) running();
+    };
+  });
+  onBeforeUnmount(() => cleanup());
 }

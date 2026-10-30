@@ -1,1 +1,74 @@
-<script setup lang="ts">import {onMounted,onBeforeUnmount,ref} from 'vue';import BackLink from './BackLink.vue';import FontSizeControl from '../FontSizeControl.vue';import AppearanceMenu from './AppearanceMenu.vue';import VNodeOutlet from './VNodeOutlet';defineProps<{back?:any;backIndexHref?:string;width?:string;lang?:string;onLangChange?:(v:string)=>void;scale?:number;onScaleChange?:(v:number)=>void;search?:any;sticky?:boolean}>();const hidden=ref(false);let cleanup=()=>{};onMounted(()=>{let last=window.scrollY,frame=0;function scroll(){if(frame)return;frame=requestAnimationFrame(()=>{frame=0;const y=window.scrollY;if(y<64)hidden.value=false;else if(y>last+4)hidden.value=true;else if(y<last-8)hidden.value=false;else return;last=y;});}window.addEventListener('scroll',scroll,{passive:true});cleanup=()=>{window.removeEventListener('scroll',scroll);cancelAnimationFrame(frame);};});onBeforeUnmount(()=>cleanup());</script><template><div :class="['mb-6',sticky?'sticky top-0 z-40 border-b border-line-soft bg-paper/95 backdrop-blur-sm':`max-lg:sticky max-lg:top-0 max-lg:z-40 max-lg:bg-paper/95 max-lg:backdrop-blur-sm max-lg:transition-transform max-lg:duration-200 ${hidden?'max-lg:-translate-y-full':''}`]"><div :class="['mx-auto flex items-center justify-between gap-4 py-2',width==='prose'?'px-4 sm:px-6 max-w-[52rem]':'px-4 sm:px-6 lg:px-10 xl:px-16 max-w-[86rem]']"><BackLink :back="back" :index-href="backIndexHref"/><div v-if="search" class="min-w-0 flex-1 px-4 sm:px-8"><div class="max-w-xl"><VNodeOutlet :content="search"/></div></div><span v-else class="flex-1"/><div class="flex items-center gap-2"><button v-if="onLangChange" type="button" @click="onLangChange(lang==='en'?'zh':'en')" class="text-token-xs text-ink-muted">{{lang==='en'?'中文':'EN'}}</button><FontSizeControl v-if="onScaleChange" :scale="scale" :on-change="onScaleChange"/><AppearanceMenu :lang="lang"/></div></div></div></template>
+<script setup lang="ts">
+import { onMounted, onBeforeUnmount, ref } from 'vue';
+import BackLink from './BackLink.vue';
+import FontSizeControl from '../FontSizeControl.vue';
+import AppearanceMenu from './AppearanceMenu.vue';
+import VNodeOutlet from './VNodeOutlet';
+defineProps<{
+  back?: any;
+  backIndexHref?: string;
+  width?: string;
+  lang?: string;
+  onLangChange?: (v: string) => void;
+  scale?: number;
+  onScaleChange?: (v: number) => void;
+  search?: any;
+  sticky?: boolean;
+}>();
+const hidden = ref(false);
+let cleanup = () => {};
+onMounted(() => {
+  let last = window.scrollY,
+    frame = 0;
+  function scroll() {
+    if (frame) return;
+    frame = requestAnimationFrame(() => {
+      frame = 0;
+      const y = window.scrollY;
+      if (y < 64) hidden.value = false;
+      else if (y > last + 4) hidden.value = true;
+      else if (y < last - 8) hidden.value = false;
+      else return;
+      last = y;
+    });
+  }
+  window.addEventListener('scroll', scroll, { passive: true });
+  cleanup = () => {
+    window.removeEventListener('scroll', scroll);
+    cancelAnimationFrame(frame);
+  };
+});
+onBeforeUnmount(() => cleanup());
+</script>
+<template>
+  <div
+    :class="[
+      'mb-6',
+      sticky
+        ? 'sticky top-0 z-40 border-b border-line-soft bg-paper/95 backdrop-blur-sm'
+        : `max-lg:sticky max-lg:top-0 max-lg:z-40 max-lg:bg-paper/95 max-lg:backdrop-blur-sm max-lg:transition-transform max-lg:duration-200 ${hidden ? 'max-lg:-translate-y-full' : ''}`,
+    ]"
+    ><div
+      :class="[
+        'mx-auto flex items-center justify-between gap-4 py-2',
+        width === 'prose'
+          ? 'px-4 sm:px-6 max-w-[52rem]'
+          : 'px-4 sm:px-6 lg:px-10 xl:px-16 max-w-[86rem]',
+      ]"
+      ><BackLink :back="back" :index-href="backIndexHref" /><div
+        v-if="search"
+        class="min-w-0 flex-1 px-4 sm:px-8"
+        ><div class="max-w-xl"><VNodeOutlet :content="search" /></div></div
+      ><span v-else class="flex-1" /><div class="flex items-center gap-2"
+        ><button
+          v-if="onLangChange"
+          type="button"
+          @click="onLangChange(lang === 'en' ? 'zh' : 'en')"
+          class="text-token-xs text-ink-muted"
+          >{{ lang === 'en' ? '中文' : 'EN' }}</button
+        ><FontSizeControl
+          v-if="onScaleChange"
+          :scale="scale"
+          :on-change="onScaleChange" /><AppearanceMenu :lang="lang" /></div></div
+  ></div>
+</template>

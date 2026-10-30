@@ -1,1 +1,19 @@
-import {defineComponent,onMounted,watch,nextTick} from 'vue';import {useRoute} from 'vue-router';export default defineComponent({name:'ScrollToTop',setup(){const route=useRoute();const scroll=async()=>{await nextTick();if(!route.hash&&typeof window!=='undefined')window.scrollTo({top:0,behavior:'instant'});};onMounted(()=>{const entry=performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;if(entry?.type!=='back_forward')scroll();});watch(()=>route.path,scroll);return()=>null;}});
+import { defineComponent, onMounted, watch, nextTick } from 'vue';
+import { useRoute } from 'vue-router';
+export default defineComponent({
+  name: 'ScrollToTop',
+  setup() {
+    const route = useRoute();
+    const scroll = async () => {
+      await nextTick();
+      if (!route.hash && typeof window !== 'undefined')
+        window.scrollTo({ top: 0, behavior: 'instant' });
+    };
+    onMounted(() => {
+      const entry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      if (entry?.type !== 'back_forward') scroll();
+    });
+    watch(() => route.path, scroll);
+    return () => null;
+  },
+});

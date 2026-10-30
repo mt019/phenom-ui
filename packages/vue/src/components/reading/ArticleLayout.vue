@@ -1,6 +1,100 @@
 <script setup lang="ts">
-import {computed,h,ref} from 'vue';import {useHeadings} from '../../composables/useHeadings';import {useAnchorScroll} from '../../composables/anchorScroll.js';import PageIdentity from './PageIdentity.vue';import TableOfContents from './TableOfContents.vue';import MobileRail from './MobileRail.vue';import VNodeOutlet from './VNodeOutlet';
-const props=withDefaults(defineProps<{title?:string;eyebrow?:string;eyebrowBack?:any;summary?:string;meta?:any;nav?:any;navBrand?:any;aside?:any;hideToc?:boolean;tocLabel?:string;tocLevels?:number[];tocKey?:any;wideContent?:boolean;mobileNavLabel?:string;asideLabel?:string;scaleContent?:boolean;children?:any;siteNav?:any;keepReadingWidth?:boolean;citeKey?:any}>(),{tocLabel:'本頁目次',tocLevels:()=>[2,3],asideLabel:'本頁',scaleContent:true});const body=ref<HTMLElement>();const {items,active}=useHeadings(body,()=>props.tocKey,()=>props.tocLevels);useAnchorScroll();
-const reserve=computed(()=>props.aside||!props.hideToc),show=computed(()=>!props.aside&&reserve.value&&items.value.length>0);const toc=()=>h(TableOfContents,{items:items.value,active:active.value,label:props.tocLabel});
-const panels=computed(()=>[(props.nav||props.navBrand)?{key:'nav',side:'left',label:props.mobileNavLabel??'目次',head:props.nav?props.navBrand:null,content:props.nav??props.navBrand}:null,props.aside?{key:'aside',side:'right',label:props.asideLabel,content:props.aside}:null,show.value?{key:'toc',side:'right',label:props.tocLabel,content:toc()}:null].filter(Boolean));
-</script><template><div :class="['mx-auto grid grid-cols-[minmax(0,1fr)] gap-10 px-4 sm:px-6 lg:px-10 xl:px-16 lg:gap-12',panels.length?'pb-20 lg:pb-0':'',reserve&&wideContent?'max-w-[96rem]':'max-w-[86rem]',reserve&&wideContent?'lg:grid-cols-[15rem_minmax(0,61rem)_14rem]':reserve?'lg:grid-cols-[15rem_minmax(0,44rem)_14rem]':wideContent?'lg:grid-cols-[15rem_minmax(0,61rem)]':'lg:grid-cols-[15rem_minmax(0,44rem)]']"><aside class="hidden lg:block"><div class="sticky top-16 flex max-h-[calc(100vh-6rem)] flex-col border-r border-line-soft pr-5"><div v-if="navBrand" class="shrink-0"><VNodeOutlet :content="navBrand"/></div><div class="min-h-0 flex-1 overflow-y-auto"><VNodeOutlet :content="nav"/></div></div></aside><article :class="['min-w-0',scaleContent?'reader-scale':'']"><header class="mb-8"><PageIdentity :eyebrow="eyebrow" :eyebrow-back="eyebrowBack" :title="title" :summary="summary"/><VNodeOutlet :content="meta"/></header><div ref="body" class="prose-body"><VNodeOutlet :content="children"><slot/></VNodeOutlet></div></article><aside v-if="aside" class="hidden lg:block"><div class="sticky top-16 max-h-[calc(100vh-6rem)] overflow-y-auto pb-10"><VNodeOutlet :content="aside"/></div></aside><aside v-if="show" class="hidden lg:block"><div class="sticky top-16 max-h-[calc(100vh-6rem)] overflow-y-auto pb-10"><TableOfContents :label="tocLabel" :items="items" :active="active"/></div></aside><MobileRail :panels="panels"/></div></template>
+import { computed, h, ref } from 'vue';
+import { useHeadings } from '../../composables/useHeadings';
+import { useAnchorScroll } from '../../composables/anchorScroll.js';
+import PageIdentity from './PageIdentity.vue';
+import TableOfContents from './TableOfContents.vue';
+import MobileRail from './MobileRail.vue';
+import VNodeOutlet from './VNodeOutlet';
+const props = withDefaults(
+  defineProps<{
+    title?: string;
+    eyebrow?: string;
+    eyebrowBack?: any;
+    summary?: string;
+    meta?: any;
+    nav?: any;
+    navBrand?: any;
+    aside?: any;
+    hideToc?: boolean;
+    tocLabel?: string;
+    tocLevels?: number[];
+    tocKey?: any;
+    wideContent?: boolean;
+    mobileNavLabel?: string;
+    asideLabel?: string;
+    scaleContent?: boolean;
+    children?: any;
+    siteNav?: any;
+    keepReadingWidth?: boolean;
+    citeKey?: any;
+  }>(),
+  { tocLabel: '本頁目次', tocLevels: () => [2, 3], asideLabel: '本頁', scaleContent: true },
+);
+const body = ref<HTMLElement>();
+const { items, active } = useHeadings(
+  body,
+  () => props.tocKey,
+  () => props.tocLevels,
+);
+useAnchorScroll();
+const reserve = computed(() => props.aside || !props.hideToc),
+  show = computed(() => !props.aside && reserve.value && items.value.length > 0);
+const toc = () =>
+  h(TableOfContents, { items: items.value, active: active.value, label: props.tocLabel });
+const panels = computed(() =>
+  [
+    props.nav || props.navBrand
+      ? {
+          key: 'nav',
+          side: 'left',
+          label: props.mobileNavLabel ?? '目次',
+          head: props.nav ? props.navBrand : null,
+          content: props.nav ?? props.navBrand,
+        }
+      : null,
+    props.aside
+      ? { key: 'aside', side: 'right', label: props.asideLabel, content: props.aside }
+      : null,
+    show.value ? { key: 'toc', side: 'right', label: props.tocLabel, content: toc() } : null,
+  ].filter(Boolean),
+);
+</script>
+<template>
+  <div
+    :class="[
+      'mx-auto grid grid-cols-[minmax(0,1fr)] gap-10 px-4 sm:px-6 lg:px-10 xl:px-16 lg:gap-12',
+      panels.length ? 'pb-20 lg:pb-0' : '',
+      reserve && wideContent ? 'max-w-[96rem]' : 'max-w-[86rem]',
+      reserve && wideContent
+        ? 'lg:grid-cols-[15rem_minmax(0,61rem)_14rem]'
+        : reserve
+          ? 'lg:grid-cols-[15rem_minmax(0,44rem)_14rem]'
+          : wideContent
+            ? 'lg:grid-cols-[15rem_minmax(0,61rem)]'
+            : 'lg:grid-cols-[15rem_minmax(0,44rem)]',
+    ]"
+    ><aside class="hidden lg:block"
+      ><div
+        class="sticky top-16 flex max-h-[calc(100vh-6rem)] flex-col border-r border-line-soft pr-5"
+        ><div v-if="navBrand" class="shrink-0"><VNodeOutlet :content="navBrand" /></div
+        ><div class="min-h-0 flex-1 overflow-y-auto"
+          ><VNodeOutlet :content="nav" /></div></div></aside
+    ><article :class="['min-w-0', scaleContent ? 'reader-scale' : '']"
+      ><header class="mb-8"
+        ><PageIdentity
+          :eyebrow="eyebrow"
+          :eyebrow-back="eyebrowBack"
+          :title="title"
+          :summary="summary" /><VNodeOutlet :content="meta" /></header
+      ><div ref="body" class="prose-body"
+        ><VNodeOutlet :content="children"><slot /></VNodeOutlet></div></article
+    ><aside v-if="aside" class="hidden lg:block"
+      ><div class="sticky top-16 max-h-[calc(100vh-6rem)] overflow-y-auto pb-10"
+        ><VNodeOutlet :content="aside" /></div></aside
+    ><aside v-if="show" class="hidden lg:block"
+      ><div class="sticky top-16 max-h-[calc(100vh-6rem)] overflow-y-auto pb-10"
+        ><TableOfContents :label="tocLabel" :items="items" :active="active" /></div></aside
+    ><MobileRail :panels="panels"
+  /></div>
+</template>

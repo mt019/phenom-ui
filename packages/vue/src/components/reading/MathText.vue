@@ -1,1 +1,19 @@
-<script setup lang="ts">import {computed} from 'vue';import {renderMath} from './mathRender.js';const props=defineProps<{text:string}>();const segments=computed(()=>props.text.split(/(\$[^$]+\$)/g).map(s=>s.startsWith('$')&&s.endsWith('$')?{html:renderMath(s.slice(1,-1))}:{text:s}));</script><template><template v-for="(segment,i) in segments" :key="i"><span v-if="segment.html" v-html="segment.html"/><template v-else>{{segment.text}}</template></template></template>
+<script setup lang="ts">
+import { computed } from 'vue';
+import { renderMath } from './mathRender.js';
+const props = defineProps<{ text: string }>();
+const segments = computed(() =>
+  props.text
+    .split(/(\$[^$]+\$)/g)
+    .map((s) =>
+      s.startsWith('$') && s.endsWith('$') ? { html: renderMath(s.slice(1, -1)) } : { text: s },
+    ),
+);
+</script>
+<template>
+  <template v-for="(segment, i) in segments" :key="i"
+    ><span v-if="segment.html" v-html="segment.html" /><template v-else>{{
+      segment.text
+    }}</template></template
+  >
+</template>
