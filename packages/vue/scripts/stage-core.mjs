@@ -11,3 +11,12 @@ for(const source of inputs){const bytes=await readFile(join(root,source)),target
 await cp(join(root,'LICENSE'),join(here,'LICENSE'));await cp(join(root,'fonts/LICENSES.md'),join(out,'FONT-LICENSES.md'));
 await writeFile(join(out,'source-manifest.json'),JSON.stringify({schemaVersion:1,repository:'mt019/phenom-ui',sourceCommit:execFileSync('git',['log','-1','--format=%H','--',...inputs],{cwd:root,encoding:'utf8'}).trim(),policy:'Generated from the existing root sources. Edit the originals, never core/.',files},null,2)+'\n');
 console.log(`Staged ${files.length} unchanged framework-neutral design sources`);
+
+// Preserve a consumer's existing visual baseline during framework-only migration.
+// Read immutable Git inputs; generated compatibility themes are never edited here.
+const legacyRef='v0.1.31',legacyCommit=execFileSync('git',['rev-parse',legacyRef+'^{commit}'],{cwd:root,encoding:'utf8'}).trim();
+const legacyPaths=['src/styles.css','src/styles/tokens.css','src/styles/marks.css','tailwind-preset.js',...execFileSync('git',['ls-tree','-r','--name-only',legacyRef,'fonts'],{cwd:root,encoding:'utf8'}).trim().split('\n').filter(Boolean)];
+const legacyFiles=[];
+for(const source of legacyPaths){const bytes=execFileSync('git',['show',`${legacyCommit}:${source}`],{cwd:root,maxBuffer:16*1024*1024});const target=join(out,'legacy',legacyRef,source);await mkdir(resolve(target,'..'),{recursive:true});await writeFile(target,bytes);legacyFiles.push({source,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex')});}
+await writeFile(join(out,'legacy',legacyRef,'source-manifest.json'),JSON.stringify({schemaVersion:1,repository:'mt019/phenom-ui',sourceCommit:legacyCommit,tag:legacyRef,policy:'Exact immutable legacy design inputs for framework migration; no manually editable duplicate theme.',files:legacyFiles},null,2)+'\n');
+console.log(`Staged exact ${legacyRef} compatibility theme (${legacyFiles.length} inputs)`);

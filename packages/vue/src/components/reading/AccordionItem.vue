@@ -1,0 +1,4 @@
+<script setup lang="ts">
+import {ChevronDown} from 'lucide-vue-next';import VNodeOutlet from './VNodeOutlet';
+defineProps<{id:string|number;title?:any;meta?:any;isOpen:boolean;onToggle:(id:any)=>void;children?:any}>();
+</script><template><div class="border-b border-line-soft last:border-b-0"><button type="button" @click="onToggle(id)" :aria-expanded="isOpen" class="flex w-full items-center gap-3 py-3 text-left transition-colors duration-fast hover:text-accent"><ChevronDown :size="15" :class="['shrink-0 text-ink-faint transition-transform duration-fast',isOpen?'':'-rotate-90']"/><span class="flex-1 text-token-base"><VNodeOutlet :content="title"/></span><span v-if="meta" class="shrink-0 text-token-xs text-ink-faint"><VNodeOutlet :content="meta"/></span></button><div v-if="isOpen" class="pb-4 pl-[27px] pr-1"><VNodeOutlet :content="children"><slot/></VNodeOutlet></div></div></template>

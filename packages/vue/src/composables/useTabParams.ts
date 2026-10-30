@@ -1,9 +1,13 @@
-import {computed,toValue,type MaybeRefOrGetter} from 'vue';
+import {computed,inject,onMounted,ref,toValue,type InjectionKey,type MaybeRefOrGetter} from 'vue';
 import {useRoute,useRouter,type LocationQueryRaw} from 'vue-router';
+/** Opt in only when static HTML was generated for a route's default query. */
+export const STATIC_QUERY_HYDRATION:InjectionKey<boolean>=Symbol('phenom:static-query-hydration');
 export function useTabParams<T extends Record<string,string>>(defaults:MaybeRefOrGetter<T>){
   const route=useRoute(),router=useRouter();
+  const hydrationPending=ref(inject(STATIC_QUERY_HYDRATION,false)&&typeof window!=='undefined');
+  onMounted(()=>{hydrationPending.value=false;});
   const values=computed(()=>Object.fromEntries(Object.entries(toValue(defaults)).map(([key,fallback])=>{
-    const value=route.query[key];return [key,(Array.isArray(value)?value[0]:value)??fallback];
+    const value=hydrationPending.value?undefined:route.query[key];return [key,(Array.isArray(value)?value[0]:value)??fallback];
   })) as T);
   async function setValues(patch:Partial<T>,{scroll='preserve',replace=false}:{scroll?:'preserve'|'top';replace?:boolean}={}){
     // Read the current route at write time; one patch changes every dimension atomically.

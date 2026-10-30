@@ -17,12 +17,34 @@ without extra wrappers. FontSizeControl supports modelValue/update:modelValue
 and the existing scale/onChange contract. AnnotatedHtml accepts trusted,
 build-rendered HTML; it does not sanitize arbitrary user input. Notes remain
 numbered by the content build; runtime citation registries for MDX consumers
-are outside this release. Other consumers must validate their own requirements.
+are outside this release. PageShell retains the standalone page frame and
+ScrollToTop handles navigation between pages.
+
+Version 0.3 adds the controls consumed by the Judicial migration candidate:
+RailLayout, PdfViewer, SearchField, Tabs, Accordion/AccordionItem,
+useExpandedSet and FacetFilterBar. RailLayout and Tabs preserve the v0.1.31
+layout and tab variants. PdfViewer embeds the supplied public URL, retaining
+new-tab opening, random selection and related-document buttons; it restores
+focus and the previous body scroll setting on close. FacetFilterBar only
+renders supplied facets, counts and selected sets. Domain filtering, legal term
+rows, quiz rules and data access remain consumer responsibilities.
+
+Notes uses the reviewed 0.2 package. Judicial targets the 0.3 candidate; its
+consumer acceptance remains pending until the exact installed tarball passes
+its type check, route/content checks and desktop/mobile browser checks. A direct
+source type check with mapped dependencies does not establish that the packed
+consumer passes.
 
 Design sources have one editable home: the existing repository root `src/` and
 `tailwind-preset.js`. `npm pack` runs scripts/stage-core.mjs, copying those exact
 files into ignored generated core/ and recording source hashes. Never edit core/
 or treat it as an independent theme. The font CSS and URLs remain unchanged.
+
+For Judicial parity, staging also produces core/legacy/v0.1.31 from that exact
+Git tag: CSS, tokens, marks, font declarations, font metadata and Tailwind preset.
+These generated files have no separate editable source. Judicial selects the
+legacy entry explicitly; the default styles and Notes theme remain unchanged.
+A later theme upgrade needs its own visual acceptance.
 
 Consumers import styles from @phenomcanvas/ui-vue/styles.css, use the package's
 Tailwind preset, and include its src/**/*.vue and src/**/*.ts in Tailwind content.
@@ -38,3 +60,23 @@ callers explicitly request top or preserve per interaction.
 
 Every consumer still needs full route, mobile, SEO, content and behavior
 acceptance. This foundation package does not itself migrate a site.
+
+Static sites that render only default query views can opt into query hydration:
+
+```ts
+import {STATIC_QUERY_HYDRATION} from '@phenomcanvas/ui-vue';
+app.provide(STATIC_QUERY_HYDRATION, true);
+```
+
+Provide the key on both client and server applications for that static consumer.
+On the client, useTabParams/useTabParam initially return declared defaults so
+hydration matches the static HTML, then apply the actual URL query after mount.
+They do not rewrite the URL. Server rendering continues to read its supplied
+route normally. Dynamic SSR consumers and other applications leave this opt-in
+unset and continue to read query values immediately. This is appropriate only
+for default-query static HTML; it is not a way to suppress hydration warnings
+for server HTML rendered from a different nondefault query.
+
+AppearanceMenu uses a viewport-clamped popup outside scrollable rails. It keeps
+right alignment where space permits and cleans up scroll, resize and dismissal
+listeners when unmounted.

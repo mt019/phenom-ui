@@ -2,7 +2,7 @@ export {default as FontSizeControl} from './components/FontSizeControl.vue';
 export {default as RailBrand} from './components/RailBrand.vue';
 export {default as ReadingShell} from './components/ReadingShell.vue';
 export {useFontScale,FONT_SCALES,FONT_SCALE_STORAGE_KEY} from './composables/useFontScale';
-export {useTabParams} from './composables/useTabParams';
+export {useTabParams,STATIC_QUERY_HYDRATION} from './composables/useTabParams';
 
 export {useTabParam} from "./composables/useTabParam";
 export {bootSitePalette} from "../core/styles/palettes.js";
@@ -21,3 +21,12 @@ export {default as Prose} from "./components/reading/Prose.vue";
 export {default as AnnotatedHtml} from "./components/reading/AnnotatedHtml.vue";
 export {default as ScrollToTop} from "./components/reading/ScrollToTop";
 export {default as PageShell} from './components/reading/PageShell.vue';
+
+export {useExpandedSet} from "./composables/useExpandedSet";
+export {default as RailLayout} from "./components/reading/RailLayout.vue";
+export {default as PdfViewer} from "./components/reading/PdfViewer.vue";
+export {default as SearchField} from "./components/reading/SearchField.vue";
+export {default as AccordionItem} from "./components/reading/AccordionItem.vue";
+export {default as Accordion} from "./components/reading/Accordion.vue";
+export {default as Tabs} from "./components/reading/Tabs.vue";
+export {default as FacetFilterBar} from './components/reading/FacetFilterBar.vue';

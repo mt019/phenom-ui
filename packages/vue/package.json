@@ -1,6 +1,6 @@
 {
   "name": "@phenomcanvas/ui-vue",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "Vue components and composables using the existing Phenom design sources",
   "license": "MIT",
@@ -20,7 +20,9 @@
     "./fonts/*": "./core/fonts/*",
     "./scripts/*": "./core/scripts/*",
     "./validators/*": "./core/scripts/*",
-    "./assets/*": "./core/assets/*"
+    "./assets/*": "./core/assets/*",
+    "./legacy/0.1.31/styles.css": "./core/legacy/v0.1.31/src/styles.css",
+    "./legacy/0.1.31/tailwind-preset": "./core/legacy/v0.1.31/tailwind-preset.js"
   },
   "sideEffects": [
     "./core/**/*.css"
