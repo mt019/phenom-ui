@@ -29,6 +29,21 @@ focus and the previous body scroll setting on close. FacetFilterBar only
 renders supplied facets, counts and selected sets. Domain filtering, legal term
 rows, quiz rules and data access remain consumer responsibilities.
 
+## 0.4：studies 四站所用的目次、浮卡與公式元件
+
+0.4 加入 guzhun、chenyinke、xiaozhuanling、zhujiahua 四站遷移所需的 BookTree、HoverCard、Math，並把 0.3 已有的 MathText 列入匯出表。props 名稱與 React 正本相同；React 版以函式 prop 傳入的回呼（如 onSelect），Vue 版寫 `:on-select` 或 `@select` 皆可。
+
+| 元件 | React 正本 | 介面與行為 |
+|---|---|---|
+| BookTree | phenom-guzhun `src/components/lab/BookTree.jsx` | 整本書的目次，放進 ArticleLayout 的 `nav`。items 由呼叫端攤平為 `{ id, title, href, group, subgroup?, lead?, badge?, hint? }`，照書的順序排好；相鄰同名的 group、subgroup 併為一段。傳 onSelect 時每篇是按鈕，否則是 RouterLink。header 用 prop 或 `header` slot 傳入。分組、搜尋與捲動定位寫在 `bookTree.js`。zhujiahua 那份與 guzhun 只差 SearchField 的匯入來源，功能相同。 |
+| HoverCard | phenom-ui 根目錄 `src/components/lab/HoverCard.jsx` | 包住一段文字的浮卡：滑過或聚焦時開啟，點擊固定，按 Esc 或點卡外關閉，同時只開一張。正文用 default slot，卡片內容用 `card` prop 或 `card` slot。開啟期間在 document 掛 keydown、pointerdown，在 window 掛 scroll（capture）與 resize，關閉與卸載時移除。定位計算寫在 `floatingCard.js`。 |
+| Math | 各站 `src/components/lab/Math.jsx` | `tex`、`display`、`className`。display 為 true 時輸出以 div 包住的區塊公式，否則以 span 包住的行內公式；KaTeX 選項與 React 版相同，見 `mathRender.js` 的 renderFormula。匯出名 Math 會遮蔽所在模組的全域 Math，該模組另用到 Math.max 之類時，改寫 `import { Math as Formula }`。 |
+| MathText | 各站 `src/components/lab/MathText.jsx` | 字串由 `text` prop 傳入；React 版由 children 傳入。 |
+
+AnnotatedHtml 處理建置時產生、帶 `data-note`／`data-term` 屬性的 HTML，卡片欄位固定為註釋與術語兩種。HoverCard 包住呼叫端自己組的節點，卡片內容也由呼叫端提供，chenyinke 正文裡的人名卡屬於這種用法。AnnotatedHtml 未涵蓋這種用法，兩個元件因此並存。
+
+根目錄 `npm test` 含兩支 ui-vue 測試：`tests/vue-ssr.test.mjs` 在不載入 DOM 的情況下以 renderToString 渲染，`tests/vue-mount.test.mjs` 以 happy-dom 掛載、操作，並計數卸載後殘留在 document 與 window 的監聽器。兩支從 `packages/vue/node_modules` 取 vue、vue-router、katex、lucide-vue-next、happy-dom，版本固定在本套件的 devDependencies；跑之前先在 `packages/vue` 下 `npm ci`，Node 用 22.23.4。
+
 Notes uses the reviewed 0.2 package. Judicial targets the 0.3 candidate; its
 consumer acceptance remains pending until the exact installed tarball passes
 its type check, route/content checks and desktop/mobile browser checks. A direct

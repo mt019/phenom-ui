@@ -30,3 +30,8 @@ export { default as AccordionItem } from './components/reading/AccordionItem.vue
 export { default as Accordion } from './components/reading/Accordion.vue';
 export { default as Tabs } from './components/reading/Tabs.vue';
 export { default as FacetFilterBar } from './components/reading/FacetFilterBar.vue';
+
+export { default as BookTree } from './components/reading/BookTree.vue';
+export { default as HoverCard } from './components/reading/HoverCard.vue';
+export { default as Math } from './components/reading/Math.vue';
+export { default as MathText } from './components/reading/MathText.vue';
