@@ -95,6 +95,9 @@ const legacyRef = 'v0.1.31',
     cwd: root,
     encoding: 'utf8',
   }).trim();
+// 字型不打包：相容主題六個 woff2 共 12.7 MB，與 src/fonts-external.css 指向的 assets.phenomcanvas.com
+// 內容定址檔逐位元組相同（以 sha256 核），所以 styles.css 的 url('../fonts/<名>') 改指該網址。
+// 每個名字都要在 fonts-external.css 找到同名、且 v0.1.31 的 blob sha256 與網址裡的 sha256 相等，否則中止。
 const legacyPaths = [
   'src/styles.css',
   'src/styles/tokens.css',
@@ -106,14 +109,41 @@ const legacyPaths = [
   })
     .trim()
     .split('\n')
-    .filter(Boolean),
+    .filter((f) => f && !f.endsWith('.woff2')),
 ];
-const legacyFiles = [];
+const externalCss = await readFile(join(root, 'src/fonts-external.css'), 'utf8'),
+  externalUrls = new Map(
+    [...externalCss.matchAll(/url\('(https:\/\/assets\.phenomcanvas\.com\/v1\/([0-9a-f]{64})\/fonts\/([A-Za-z0-9._-]+\.woff2))'\)/g)].map(
+      (m) => [m[3], { url: m[1], sha256: m[2] }],
+    ),
+  );
+const legacyFiles = [],
+  legacyFontRewrites = [];
 for (const source of legacyPaths) {
-  const bytes = execFileSync('git', ['show', `${legacyCommit}:${source}`], {
+  const sourceBytes = execFileSync('git', ['show', `${legacyCommit}:${source}`], {
     cwd: root,
     maxBuffer: 16 * 1024 * 1024,
   });
+  let bytes = sourceBytes;
+  if (source === 'src/styles.css') {
+    let text = sourceBytes.toString('utf8');
+    for (const m of [...text.matchAll(/url\('\.\.\/fonts\/([A-Za-z0-9._-]+\.woff2)'\)/g)]) {
+      const name = m[1],
+        external = externalUrls.get(name);
+      if (!external) throw new Error(`相容主題字型 ${name} 在 src/fonts-external.css 沒有同名的外部檔`);
+      const blob = execFileSync('git', ['show', `${legacyCommit}:fonts/${name}`], {
+        cwd: root,
+        maxBuffer: 16 * 1024 * 1024,
+      });
+      const sha = createHash('sha256').update(blob).digest('hex');
+      if (sha !== external.sha256)
+        throw new Error(`相容主題字型 ${name} 的 sha256 ${sha} 與外部檔 ${external.sha256} 不同，不能改指外部網址`);
+      text = text.replaceAll(m[0], `url('${external.url}')`);
+      legacyFontRewrites.push({ font: name, sha256: sha, url: external.url });
+    }
+    if (!legacyFontRewrites.length) throw new Error('相容主題 styles.css 找不到任何 ../fonts/ 的 url()，原檔改了就改這段');
+    bytes = Buffer.from(text, 'utf8');
+  }
   const target = join(out, 'legacy', legacyRef, source);
   await mkdir(resolve(target, '..'), { recursive: true });
   await writeFile(target, bytes);
@@ -121,22 +151,26 @@ for (const source of legacyPaths) {
     source,
     bytes: bytes.length,
     sha256: createHash('sha256').update(bytes).digest('hex'),
+    ...(bytes !== sourceBytes
+      ? { sourceSha256: createHash('sha256').update(sourceBytes).digest('hex'), rewrites: ['../fonts/*.woff2 -> assets.phenomcanvas.com 內容定址網址'] }
+      : {}),
   });
 }
 await writeFile(
   join(out, 'legacy', legacyRef, 'source-manifest.json'),
   JSON.stringify(
     {
-      schemaVersion: 1,
+      schemaVersion: 2,
       repository: 'mt019/phenom-ui',
       sourceCommit: legacyCommit,
       tag: legacyRef,
       policy:
-        'Exact immutable legacy design inputs for framework migration; no manually editable duplicate theme.',
+        'Exact immutable legacy design inputs for framework migration; no manually editable duplicate theme. Fonts are not bundled: styles.css points at the byte-identical content-addressed files on assets.phenomcanvas.com.',
       files: legacyFiles,
+      fonts: legacyFontRewrites,
     },
     null,
     2,
   ) + '\n',
 );
-console.log(`Staged exact ${legacyRef} compatibility theme (${legacyFiles.length} inputs)`);
+console.log(`Staged exact ${legacyRef} compatibility theme (${legacyFiles.length} inputs, ${legacyFontRewrites.length} fonts served from assets.phenomcanvas.com)`);

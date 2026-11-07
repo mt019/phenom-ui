@@ -84,3 +84,12 @@ test('index.ts 匯出新補的元件', async () => {
     assert.match(index, new RegExp(`default as ${name} \\}`), name);
   }
 });
+
+// 各站多半只預先渲染不帶 query 的那條路由；SSR 若標了 aria-current，帶 query 進站時水合
+// 不比對屬性，標記會留在 DOM 上（guzhun parity 每頁 1 條非刻意差異的成因）。所以 SSR 一律不標。
+test('RailBrand 伺服器端渲染不帶 aria-current，掛載後才算目前頁', async () => {
+  const RailBrand = (await import(new URL('../packages/vue/src/components/RailBrand.vue', import.meta.url).href)).default;
+  const html = await render(RailBrand, { title: '顧準研究室', to: '/' });
+  assert.match(html, /<a href="\/"/);
+  assert.doesNotMatch(html, /aria-current/);
+});

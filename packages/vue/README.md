@@ -59,7 +59,11 @@ For Judicial parity, staging also produces core/legacy/v0.1.31 from that exact
 Git tag: CSS, tokens, marks, font declarations, font metadata and Tailwind preset.
 These generated files have no separate editable source. Judicial selects the
 legacy entry explicitly; the default styles and Notes theme remain unchanged.
-A later theme upgrade needs its own visual acceptance.
+A later theme upgrade needs its own visual acceptance. Since 0.4.2 the legacy
+fonts are not bundled: staging verifies that each v0.1.31 woff2 is byte-identical
+(sha256) to the content-addressed file on assets.phenomcanvas.com and rewrites
+the legacy styles.css urls to those files, which cut the tarball from 12.9 MB to
+under 1 MB. The legacy entry is scheduled to leave the package at 1.0.
 
 Consumers import styles from @phenomcanvas/ui-vue/styles.css, use the package's
 Tailwind preset, and include its src/**/*.vue and src/**/*.ts in Tailwind content.

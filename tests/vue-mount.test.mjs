@@ -143,3 +143,22 @@ test('Math：區塊公式掛載為 div，行內為 span', async () => {
   view.unmount();
   assert.equal(live.length, 0);
 });
+
+test('RailBrand：掛載後目前頁帶 aria-current，換到帶 query 的分頁即移除', async () => {
+  const RailBrand = (await import(new URL('../packages/vue/src/components/RailBrand.vue', import.meta.url).href)).default;
+  const router = createRouter({ history: createMemoryHistory(), routes: [{ path: '/:p(.*)*', component: { render: () => null } }] });
+  const app = createApp({ render: () => h(RailBrand, { title: '站名', to: '/g' }) });
+  app.use(router);
+  await router.push('/g');
+  await router.isReady();
+  const host = document.createElement('div');
+  document.body.append(host);
+  app.mount(host);
+  await nextTick();
+  assert.equal(host.querySelector('a').getAttribute('aria-current'), 'page');
+  await router.push('/g?tab=texts');
+  await nextTick();
+  assert.equal(host.querySelector('a').getAttribute('aria-current'), null);
+  app.unmount();
+  host.remove();
+});

@@ -1,12 +1,22 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { RouterLink, useRoute, useRouter, type RouteLocationRaw } from 'vue-router';
 const props = defineProps<{ title: string; subtitle?: string; to: RouteLocationRaw }>();
 // 目前頁的判斷連 query 一起比：站首頁 /guzhun 與分頁 /guzhun?tab=… 路徑相同，
 // RouterLink 只比路徑會把每個分頁都標成目前頁。
+// 掛載後才算：各站多半只預先渲染不帶 query 的那一條路由，SSR 若在這裡標了 aria-current，
+// 帶 query 進站時水合不比對屬性，SSR 的標記會留在 DOM 上。SSR 與第一次水合一律不標，
+// 掛載後依實際網址補上，之後隨路由變動。
 const route = useRoute(),
   router = useRouter();
-const current = computed(() => router.resolve(props.to).fullPath === route.fullPath);
+const current = ref(false);
+const compute = () => {
+  current.value = router.resolve(props.to).fullPath === route.fullPath;
+};
+onMounted(() => {
+  compute();
+  watch(() => [route.fullPath, props.to], compute);
+});
 </script>
 <template>
   <RouterLink v-slot="{ href, navigate }" :to="to" custom
