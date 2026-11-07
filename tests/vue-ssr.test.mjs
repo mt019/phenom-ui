@@ -41,8 +41,10 @@ test('BookTree 伺服器端渲染：分組、分節、頁碼、標記與目前�
   assert.match(html, />乙<\/p>/);
   assert.equal(html.match(/<a /g).length, 4, '未傳 onSelect 時每篇是連結');
   assert.match(html, /href="\/p\/a3"[^>]*title="原刊 1931"/);
-  assert.match(html, /<a href="\/p\/a2" class="[^"]*border-accent[^"]*" data-leaf-active>/);
+  assert.match(html, /<a href="\/p\/a2" aria-current="page" data-leaf-active class="[^"]*border-accent[^"]*">/);
   assert.equal(html.match(/data-leaf-active/g).length, 1);
+  // 目前頁只看呼叫端的 activeId，不看 RouterLink 的路徑比對（只差 query 的連結不得全標成目前頁）。
+  assert.equal(html.match(/aria-current/g).length, 1);
   assert.match(html, />全文<\/span>/);
   assert.match(html, /placeholder="搜尋篇名…"/);
 });
