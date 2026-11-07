@@ -162,3 +162,25 @@ test('RailBrand：掛載後目前頁帶 aria-current，換到帶 query 的分頁
   app.unmount();
   host.remove();
 });
+
+test('PageIdentity：眉標連結掛載在路徑相同的分頁上不帶 aria-current，點擊走 router', async () => {
+  const PageIdentity = (await import(new URL('../packages/vue/src/components/reading/PageIdentity.vue', import.meta.url).href)).default;
+  const router = createRouter({ history: createMemoryHistory(), routes: [{ path: '/:p(.*)*', component: { render: () => null } }] });
+  const app = createApp({ render: () => h(PageIdentity, { eyebrow: 'GU ZHUN', eyebrowBack: { href: '/g', label: '顧準研究室' } }) });
+  app.use(router);
+  await router.push('/g?tab=works');
+  await router.isReady();
+  const host = document.createElement('div');
+  document.body.append(host);
+  app.mount(host);
+  await nextTick();
+  const a = host.querySelector('a');
+  assert.equal(a.getAttribute('href'), '/g');
+  assert.equal(a.getAttribute('aria-current'), null);
+  a.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 }));
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  await nextTick();
+  assert.equal(router.currentRoute.value.fullPath, '/g');
+  app.unmount();
+  host.remove();
+});

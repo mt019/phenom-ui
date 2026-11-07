@@ -93,3 +93,14 @@ test('RailBrand 伺服器端渲染不帶 aria-current，掛載後才算目前頁
   assert.match(html, /<a href="\/"/);
   assert.doesNotMatch(html, /aria-current/);
 });
+
+test('PageIdentity 眉標連結畫成 <a>，在站首頁也不帶 aria-current', async () => {
+  const PageIdentity = await load('PageIdentity.vue');
+  const html = await render(PageIdentity, { eyebrow: 'GU ZHUN · SELECTED WORKS', eyebrowBack: { href: '/', label: '顧準研究室' }, title: '顧準' });
+  assert.match(html, /<a href="\/" aria-label="回顧準研究室"/);
+  assert.doesNotMatch(html, /aria-current/);
+  assert.match(html, />GU<\/span>/);
+  const plain = await render(PageIdentity, { eyebrow: 'GU ZHUN', title: '顧準' });
+  assert.doesNotMatch(plain, /<a /);
+  assert.match(plain, /<div class="flex/);
+});
