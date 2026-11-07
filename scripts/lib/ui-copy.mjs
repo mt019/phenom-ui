@@ -54,7 +54,7 @@ const ENGINEERING_WORDS = [
   ['資料倉名', /\b(?:[a-z][a-z0-9-]*-research-data|phenom-[a-z0-9-]+-data|brief-data|vocal-training-data|statistics-lab-data|jirs-foreign-law|intl-tax-ops-lab)\b/g],
 ];
 
-const EXTENSIONS = new Set(['.jsx', '.tsx']);
+const EXTENSIONS = new Set(['.jsx', '.tsx', '.vue']);
 
 function filesIn(dir) {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -67,6 +67,8 @@ function filesIn(dir) {
 function withoutComments(source) {
   return source
     .replace(/\/\*[\s\S]*?\*\//g, '')
+    // .vue 的 <template> 用 HTML 註解。
+    .replace(/<!--[\s\S]*?-->/g, '')
     // 整行註解，以及跟在程式碼後面的行末註解。`[^:\w]` 那個條件是為了不要把
     // `https://` 當成註解起點切掉半個網址。
     .replace(/^\s*\/\/.*$/gm, '')

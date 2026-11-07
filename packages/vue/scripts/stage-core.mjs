@@ -20,6 +20,17 @@ const inputs = [
   'assets/phenom-ring.svg',
   'scripts/vite-font-preload.mjs',
   'scripts/lib/font-delivery.mjs',
+  // 站群共用的判定（消費端經 ./validators/lib/* 取）。font-chars.mjs 不打包：它依賴 fontkit，
+  // 而 ui-vue 不帶子集檔，字型覆蓋檢查留在 phenom-ui。
+  'scripts/lib/design-tokens.mjs',
+  'scripts/lib/prose-typography.mjs',
+  'scripts/lib/ui-copy.mjs',
+  'scripts/lib/floating-surfaces.mjs',
+  'scripts/lib/color-system.mjs',
+  'scripts/lib/math-notation.mjs',
+  'scripts/lib/absolute-paths.mjs',
+  'scripts/lib/shell-chrome.mjs',
+  'scripts/lib/vue-sources.mjs',
   ...(await readdir(join(root, 'src/styles')))
     .filter((f) => f.endsWith('.css'))
     .map((f) => 'src/styles/' + f),
@@ -28,16 +39,32 @@ execFileSync('git', ['diff', '--exit-code', 'HEAD', '--', ...inputs], { cwd: roo
 await mkdir(join(out, 'assets'), { recursive: true });
 await mkdir(join(out, 'fonts'), { recursive: true });
 await mkdir(join(out, 'scripts/lib'), { recursive: true });
+// core/ 沒有 src/ 這一層：根目錄的 scripts/lib/color-system.mjs 以 ../../src/styles/ 取 oklch.js、
+// palettes.js、tokens.css，進了 core/scripts/lib/ 要改成 ../../styles/。只改這一種路徑，改了就記進 manifest。
+const REWRITES = { 'scripts/lib/color-system.mjs': [["'../../src/styles/", "'../../styles/"]] };
 const files = [];
 for (const source of inputs) {
-  const bytes = await readFile(join(root, source)),
+  const sourceBytes = await readFile(join(root, source)),
     target = source.replace(/^src\//, '');
+  let bytes = sourceBytes;
+  const rewrites = REWRITES[source] ?? [];
+  if (rewrites.length) {
+    let text = sourceBytes.toString('utf8');
+    for (const [from, to] of rewrites) {
+      if (!text.includes(from)) throw new Error(`${source} 找不到要改寫的路徑 ${from}；原檔改了就改 REWRITES`);
+      text = text.replaceAll(from, to);
+    }
+    bytes = Buffer.from(text, 'utf8');
+  }
   await writeFile(join(out, target), bytes);
   files.push({
     source,
     target,
     bytes: bytes.length,
     sha256: createHash('sha256').update(bytes).digest('hex'),
+    ...(rewrites.length
+      ? { sourceSha256: createHash('sha256').update(sourceBytes).digest('hex'), rewrites: rewrites.map(([from, to]) => `${from} -> ${to}`) }
+      : {}),
   });
 }
 await cp(join(root, 'LICENSE'), join(here, 'LICENSE'));
@@ -59,7 +86,7 @@ await writeFile(
     2,
   ) + '\n',
 );
-console.log(`Staged ${files.length} unchanged framework-neutral design sources`);
+console.log(`Staged ${files.length} framework-neutral design sources and validators (${Object.keys(REWRITES).length} with recorded path rewrites)`);
 
 // Preserve a consumer's existing visual baseline during framework-only migration.
 // Read immutable Git inputs; generated compatibility themes are never edited here.

@@ -73,7 +73,7 @@ export function checkDesignTokens({
 
   const files = walk(root).filter(
     (path) =>
-      /\.(jsx|tsx|js|css)$/.test(path) &&
+      /\.(jsx|tsx|js|css|vue)$/.test(path) &&
       path !== join(root, 'styles', 'tokens.css') &&
       !exceptions.includes(path),
   );

@@ -53,7 +53,7 @@ export function checkProseTypography({ root = 'src', exceptionsPath }) {
   const allowed = (file, value) =>
     SCALE.has(value) || exceptions.some((e) => e.file === file && e.value === value);
 
-  const files = walk(root).filter((f) => /\.(jsx?|mdx)$/.test(f));
+  const files = walk(root).filter((f) => /\.(jsx?|mdx|vue)$/.test(f));
   const problems = [];
   const used = new Set();
   for (const file of files) {

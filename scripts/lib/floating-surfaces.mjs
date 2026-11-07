@@ -16,6 +16,11 @@ const HOVER_CARD = 'src/components/lab/HoverCard.jsx';
 // 而是照 HoverCard 的規格逐項驗核心行為。定位與避讓在共用的 useFloatingCard.js。
 const ANNOTATED_HTML = 'src/components/lab/AnnotatedHtml.jsx';
 const FLOATING_HOOK = 'src/components/lab/useFloatingCard.js';
+// ui-vue 的三個產生者（packages/vue/src/…）。同一組核心行為，寫法換成 Vue 的：Teleport 代替
+// createPortal、shallowRef 代替 useState、定位交給 floatingCard.js 的 placeFloatingCard。
+const VUE_HOVER_CARD = 'src/components/reading/HoverCard.vue';
+const VUE_ANNOTATED_HTML = 'src/components/reading/AnnotatedHtml.vue';
+const VUE_FLOATING_CARD = 'src/components/reading/floatingCard.js';
 
 const walk = (dir) => readdirSync(dir).flatMap((name) => {
   const path = join(dir, name);
@@ -45,6 +50,28 @@ const PRODUCERS = [
   ]],
 ];
 
+const VUE_PRODUCERS = [
+  [VUE_HOVER_CARD, [
+    ['<Teleport', 'Teleport 脫離裁切層'],
+    ["document.addEventListener('pointerdown'", '點外關閉'],
+    ["e.key === 'Escape'", 'Esc 關閉'],
+    ['placeFloatingCard(', 'viewport 左右避讓'],
+    ['closeActiveCard', '單次只開一張'],
+  ]],
+  [VUE_ANNOTATED_HTML, [
+    ['<Teleport', 'Teleport 脫離裁切層'],
+    ["document.addEventListener('pointerdown'", '點外關閉'],
+    ["e.key === 'Escape'", 'Esc 關閉'],
+    [['placeFloatingCard(', 'innerWidth - w - 8'], 'viewport 左右避讓'],
+    ['active = shallowRef', '單一 active 狀態，單次只開一張'],
+  ]],
+  [VUE_FLOATING_CARD, [
+    ['viewportW - cardW - CARD_GAP', 'viewport 左右避讓'],
+  ]],
+];
+
+const PRODUCERS_BY_FRAMEWORK = { react: PRODUCERS, vue: VUE_PRODUCERS };
+
 /**
  * @param {object} [opts]
  * @param {string[]} [opts.roots]           掃描根，預設 src/pages 與 src/components
@@ -52,13 +79,18 @@ const PRODUCERS = [
  * @param {string}   [opts.producerPrefix]  產生者路徑的前綴，不給就同 prefix。倉自己沒有
  *                                          HoverCard、以 node_modules 那份為準時要指過去
  *                                          （phenom-court 的內容型浮層全部來自共用包）。
+ * @param {'react'|'vue'} [opts.framework]  產生者是哪一套：react 查 src/components/lab 的三檔，
+ *                                          vue 查 ui-vue 的 src/components/reading 三檔
+ *                                          （消費端 producerPrefix 給 node_modules/@phenomcanvas/ui-vue）。
  */
-export function checkFloatingSurfaces({ roots = DEFAULT_ROOTS, prefix = '', producerPrefix = prefix } = {}) {
+export function checkFloatingSurfaces({ roots = DEFAULT_ROOTS, prefix = '', producerPrefix = prefix, framework = 'react' } = {}) {
+  const producers = PRODUCERS_BY_FRAMEWORK[framework];
+  if (!producers) throw new Error(`floating-surfaces：framework 只認 react 或 vue，收到 ${framework}`);
   const present = roots.filter((root) => existsSync(join(prefix, root)));
-  const files = present.flatMap((root) => walk(join(prefix, root))).filter((path) => /\.(jsx|tsx)$/.test(path));
+  const files = present.flatMap((root) => walk(join(prefix, root))).filter((path) => /\.(jsx|tsx|vue)$/.test(path));
   const failures = [];
 
-  const producerPaths = new Set(PRODUCERS.map(([file]) => join(producerPrefix, file)));
+  const producerPaths = new Set(producers.map(([file]) => join(producerPrefix, file)));
   for (const path of files) {
     const source = readFileSync(path, 'utf8');
     const rel = relative('.', path);
@@ -71,7 +103,7 @@ export function checkFloatingSurfaces({ roots = DEFAULT_ROOTS, prefix = '', prod
     }
   }
 
-  for (const [file, needles] of PRODUCERS) {
+  for (const [file, needles] of producers) {
     const path = join(producerPrefix, file);
     let source;
     try {
