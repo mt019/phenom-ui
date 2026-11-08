@@ -104,3 +104,25 @@ test('PageIdentity 眉標連結畫成 <a>，在站首頁也不帶 aria-current',
   assert.doesNotMatch(plain, /<a /);
   assert.match(plain, /<div class="flex/);
 });
+
+const strip = (html) => html.replace(/<!--[^>]*-->/g, '');
+
+test('Eyebrow：純文字切詞、間隔號畫成圓點；back 畫成 <a> 不帶 aria-current；含元素的 slot 原樣輸出', async () => {
+  const Eyebrow = await load('Eyebrow.vue');
+  const plain = strip(await render(Eyebrow, { className: 'mb-2' }, { default: () => 'Ming & Qing · Plates' }));
+  assert.match(plain, /^<div class="flex [^"]*tracking-\[0\.26em\][^"]* mb-2" style="font-synthesis:none;">/);
+  assert.match(plain, /<span>Ming<\/span><span>&amp;<\/span><span>Qing<\/span><span class="h-\[3px\]/);
+  const linked = strip(await render(Eyebrow, { back: { href: '/', label: '圖錄' } }, { default: () => 'Catalog' }));
+  assert.match(linked, /^<a href="\/" aria-label="回圖錄" class="flex /);
+  assert.doesNotMatch(linked, /aria-current/);
+  assert.match(linked, /<span class="underline [^"]*">Catalog<\/span>/);
+  const rich = strip(await render(Eyebrow, {}, { default: () => h('em', 'x') }));
+  assert.match(rich, /<div class="flex [^"]*"[^>]*><em>x<\/em><\/div>/);
+});
+
+test('HoverCard：模板寫 class 落在標記上', async () => {
+  const HoverCard = await load('HoverCard.vue');
+  const html = strip(await render(HoverCard, { class: 'spec-term', label: '還原燒是什麼' }, { default: () => '還原燒', card: () => '說明' }));
+  assert.match(html, /<span class="spec-term" role="button" tabindex="0" aria-label="還原燒是什麼"|<span[^>]*class="spec-term"/);
+  assert.match(html, />還原燒<\/span>/);
+});

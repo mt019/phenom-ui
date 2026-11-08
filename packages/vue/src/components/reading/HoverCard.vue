@@ -15,6 +15,8 @@ import { CARD_GAP, ESTIMATED_CARD_H, placeFloatingCard } from './floatingCard.js
  * 會因此脫離同一個文字串，避頭規則管不到，句號被推到下一行行首。
  * 卡片以 Teleport 放在 body 末端，不插在段落裡，開合時段落的行盒不會位移。
  */
+// 標記與卡片是兩個根節點，attribute 不會自動落下；明寫落到標記上，模板寫 class 與寫 className 同效。
+defineOptions({ inheritAttrs: false });
 const props = withDefaults(
   defineProps<{
     card?: any;
@@ -139,6 +141,7 @@ onBeforeUnmount(() => {
 <template>
   <span
     ref="marker"
+    v-bind="$attrs"
     :role="canPin ? 'button' : undefined"
     :tabindex="focusable ? 0 : undefined"
     :aria-label="label"
