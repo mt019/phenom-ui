@@ -377,3 +377,16 @@ h1, h2, h3 {
   background-clip: text;
   color: transparent;
 }
+
+/* 共用頂列吸頂（ui-vue 0.5.0 起，SiteHeader 預設）。--site-header-h 只在桌機寬度、頁面上真的有
+   吸頂頂列時才有值；DashboardLayout 的分頁列與 RailLayout 的左欄用它讓出頂列的高度，錨點落點
+   也扣掉它。選擇器只認 Vue 版 SiteHeader 輸出的 .phenom-site-header--sticky，React 版站沒有
+   這個 class，不受影響。:where 的特異度為零，各站自己寫的 scroll-mt 優先。 */
+@media (min-width: 1024px) {
+  html:has(.phenom-site-header--sticky) {
+    --site-header-h: 3rem;
+  }
+  html:has(.phenom-site-header--sticky) :where([id]) {
+    scroll-margin-top: calc(var(--site-header-h) + 1rem);
+  }
+}

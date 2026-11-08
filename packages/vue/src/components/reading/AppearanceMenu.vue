@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onBeforeUnmount, ref, watch, type CSSProperties } from 'vue';
 import { Palette } from 'lucide-vue-next';
+import FontSizeControl from '../FontSizeControl.vue';
 import {
   PALETTES,
   TEXTURES,
@@ -9,7 +10,7 @@ import {
   getSiteTextureId,
   setSiteTexture,
 } from '../../../core/styles/palettes.js';
-defineProps<{ lang?: string }>();
+defineProps<{ lang?: string; scale?: number; onScaleChange?: (v: number) => void }>();
 const open = ref(false),
   palette = ref(''),
   texture = ref(''),
@@ -91,6 +92,12 @@ function paper(id: string) {
         :style="position"
         class="z-50 w-[17rem] rounded-token-md border border-line-soft bg-paper p-3 shadow-token-sm"
         role="menu"
+        ><template v-if="onScaleChange"
+          ><p class="mb-2 font-accent text-token-xs uppercase tracking-[0.12em] text-ink-faint">{{
+            lang === 'en' ? 'Text size' : '字級'
+          }}</p
+          ><div class="mb-4"
+            ><FontSizeControl :scale="scale" :on-change="onScaleChange" /></div></template
         ><p class="mb-2 font-accent text-token-xs uppercase tracking-[0.12em] text-ink-faint">{{
           lang === 'en' ? 'Colour' : '色票'
         }}</p

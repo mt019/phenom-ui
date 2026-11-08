@@ -184,3 +184,61 @@ test('PageIdentity：眉標連結掛載在路徑相同的分頁上不帶 aria-cu
   app.unmount();
   host.remove();
 });
+
+test('SiteHeader：預設吸頂、字級在外觀選單內、sticky=false 維持舊行為', async () => {
+  const SiteHeader = await load('SiteHeader.vue');
+  const scales = [];
+  const view = await mount(SiteHeader, { back: { href: '/', label: '' }, scale: 1, onScaleChange: (v) => scales.push(v) });
+  const root = view.el.firstElementChild;
+  assert.ok(root.classList.contains('phenom-site-header--sticky'), '預設帶吸頂 class');
+  assert.match(root.className, /(^|\s)lg:sticky/);
+  assert.match(root.firstElementChild.className, /\bh-12\b/);
+  assert.equal(view.el.querySelectorAll('[aria-label="Font size"]').length, 0, '頂列本身不再單獨畫字級');
+  [...view.el.querySelectorAll('button')].find((b) => /外觀/.test(b.textContent)).click();
+  await settle();
+  const menu = document.body.querySelector('[role="menu"]');
+  assert.ok(menu, '外觀選單開啟');
+  assert.match(menu.textContent, /字級/);
+  menu.querySelector('[aria-label="Larger text"]').click();
+  assert.equal(scales.length, 1);
+  view.unmount();
+  await settle();
+
+  // 標題捲出後頂列顯示篇名、外觀鈕淡出；currentTitle 覆寫
+  const main = document.createElement('main');
+  main.innerHTML = '<h1>第三篇　某某</h1>';
+  document.body.append(main);
+  let bottom = 300;
+  main.firstChild.getBoundingClientRect = () => ({ left: 120, right: 720, width: 600, top: bottom - 40, bottom, height: 40 });
+  const titled = await mount(SiteHeader, {});
+  const tspan = () => titled.el.querySelector('span[aria-hidden="true"]');
+  const appear = () => [...titled.el.querySelectorAll('button')].find((b) => /外觀/.test(b.textContent)).closest('[class*="transition-opacity"]');
+  assert.match(tspan().className, /opacity-0/, '標題在視窗內時篇名隱藏');
+  assert.doesNotMatch(appear().className, /opacity-0/);
+  bottom = 10;
+  window.dispatchEvent(new win.Event('scroll'));
+  await new Promise((r) => setTimeout(r, 50));
+  await nextTick();
+  assert.match(tspan().className, /opacity-100/, 'h1 捲出後篇名出現');
+  assert.equal(tspan().textContent, '第三篇　某某');
+  assert.match(appear().className, /opacity-0/);
+  assert.equal(appear().getAttribute('aria-hidden'), 'true');
+  titled.unmount();
+  const over = await mount(SiteHeader, { currentTitle: '覆寫篇名' });
+  window.dispatchEvent(new win.Event('scroll'));
+  await new Promise((r) => setTimeout(r, 50));
+  await nextTick();
+  assert.equal(over.el.querySelector('span[aria-hidden="true"]').textContent, '覆寫篇名');
+  over.unmount();
+  main.remove();
+  await settle();
+
+  const plain = await mount(SiteHeader, { sticky: false });
+  const r2 = plain.el.firstElementChild;
+  assert.ok(!r2.classList.contains('phenom-site-header--sticky'));
+  assert.doesNotMatch(r2.className, /(^|\s)lg:sticky/);
+  assert.match(r2.className, /max-lg:sticky/);
+  plain.unmount();
+  await settle();
+  assert.equal(live.length, 0, JSON.stringify(live.map((r) => r.type)));
+});

@@ -65,7 +65,7 @@ const panels = computed(() =>
             :title="title"
             :title-class-name="titleClassName"
             :summary="summary" /></div></div></header
-    ><div v-if="tabs" class="sticky top-0 z-20 border-b border-line-soft bg-paper"
+    ><div v-if="tabs" class="sticky top-[var(--site-header-h,0px)] z-20 border-b border-line-soft bg-paper"
       ><div :class="['mx-auto max-w-7xl', padX]"
         ><div class="reader-scale flex"
           ><Tabs
