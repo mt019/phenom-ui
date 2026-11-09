@@ -48,9 +48,7 @@ function measure() {
   past.value = r.bottom < 48;
   const host = row.value?.getBoundingClientRect();
   if (host && r.width > 0) {
-    // 正文欄左緣若與返回鍵重疊（手機寬度），讓到返回鍵右側。
-    const back = row.value?.firstElementChild?.getBoundingClientRect();
-    const left = Math.max(0, r.left - host.left, back && back.width ? back.right - host.left + 12 : 0);
+    const left = Math.max(0, r.left - host.left);
     titleStyle.value = {
       left: `${left}px`,
       maxWidth: `${Math.max(0, Math.min(r.width, host.right - host.left - left - 16))}px`,
@@ -98,8 +96,8 @@ onBeforeUnmount(() => cleanup());
     :class="[
       'mb-6',
       sticky
-        ? `phenom-site-header--sticky bg-paper/95 backdrop-blur-sm max-lg:sticky max-lg:top-0 max-lg:z-40 max-lg:transition-transform max-lg:duration-200 lg:sticky lg:top-0 lg:z-40 lg:border-b lg:border-line-soft ${hidden ? 'max-lg:-translate-y-full' : ''}`
-        : `max-lg:sticky max-lg:top-0 max-lg:z-40 max-lg:bg-paper/95 max-lg:backdrop-blur-sm max-lg:transition-transform max-lg:duration-200 ${hidden ? 'max-lg:-translate-y-full' : ''}`,
+        ? `phenom-site-header--sticky bg-paper max-lg:sticky max-lg:top-0 max-lg:z-40 max-lg:transition-transform max-lg:duration-200 lg:sticky lg:top-0 lg:z-40 lg:border-b lg:border-line-soft ${hidden ? 'max-lg:-translate-y-full' : ''}`
+        : `max-lg:sticky max-lg:top-0 max-lg:z-40 max-lg:bg-paper max-lg:transition-transform max-lg:duration-200 ${hidden ? 'max-lg:-translate-y-full' : ''}`,
     ]"
     ><div
       ref="row"
@@ -114,7 +112,7 @@ onBeforeUnmount(() => cleanup());
         aria-hidden="true"
         :style="titleStyle"
         :class="[
-          'pointer-events-none absolute top-1/2 -translate-y-1/2 truncate whitespace-nowrap text-token-sm text-ink-muted transition-opacity duration-fast',
+          'pointer-events-none absolute top-1/2 max-lg:hidden -translate-y-1/2 truncate whitespace-nowrap text-token-sm text-ink-muted transition-opacity duration-fast',
           shown() ? 'opacity-100' : 'opacity-0',
         ]"
         >{{ currentTitle || h1Text }}</span

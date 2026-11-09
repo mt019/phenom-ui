@@ -63,7 +63,7 @@
 
 ## 共用頂列（ui-vue 0.5.0 起）
 
-- Vue 版 `SiteHeader` 桌機預設吸頂（`sticky` 預設 true，傳 false 回到跟著捲走），高度固定 `h-12`，
+- Vue 版 `SiteHeader` 桌機預設吸頂（`sticky` 預設 true，傳 false 回到跟著捲走），高度固定 `h-12`，底色為實色 `bg-paper`（不用半透明加模糊，捲動時會透出糊字），
   根節點帶 `phenom-site-header--sticky`；手機寬度維持往下捲藏、往上捲出。
 - 共用 CSS 在桌機寬度、頁面有吸頂頂列時設 `--site-header-h: 3rem`。`DashboardLayout` 的分頁列
   與 `RailLayout` 的左欄與分頁用 `top-[var(--site-header-h,0px)]`，錨點以 `:where([id])` 補
@@ -71,7 +71,7 @@
 - 左上角的返回鍵維持 0.4.4 的樣子：平時透明，旁邊不放站名或任何會顯露它的東西。
 - 頁面主標題（`main h1`）捲出視窗上緣後，頂列淡入該標題的文字（可用 `currentTitle` 覆寫），
   純文字、單行截斷、`aria-hidden`；水平位置對齊正文欄左緣，執行時量 h1 的位置，resize 與路由
-  切換時重算。手機寬度正文欄左緣與返回鍵重疊時讓到返回鍵右側。同時「外觀」按鈕淡出且
+  切換時重算。手機寬度不顯示篇名（正文欄左緣與返回鍵重疊，篇名不得擺在返回鍵旁）。同時「外觀」按鈕淡出且
   不可點（`inert`），回到頁首再出現。頁面沒有 `h1` 時以捲動距離 160px 為界，且不顯示文字。
 - 字級控制（`FontSizeControl`）併入「外觀」選單最上方一節，`SiteHeader` 不再單獨畫它。
 - React 版 `@phenomcanvas/ui` 不改；上述 CSS 只認 Vue 版輸出的 class。

@@ -193,6 +193,8 @@ test('SiteHeader：預設吸頂、字級在外觀選單內、sticky=false 維持
   assert.ok(root.classList.contains('phenom-site-header--sticky'), '預設帶吸頂 class');
   assert.match(root.className, /(^|\s)lg:sticky/);
   assert.match(root.firstElementChild.className, /\bh-12\b/);
+  assert.match(root.className, /(^|\s)bg-paper(\s|$)/, '頂列底色為實色紙底');
+  assert.doesNotMatch(root.className, /backdrop-blur|bg-paper\//, '不用半透明加模糊');
   assert.equal(view.el.querySelectorAll('[aria-label="Font size"]').length, 0, '頂列本身不再單獨畫字級');
   [...view.el.querySelectorAll('button')].find((b) => /外觀/.test(b.textContent)).click();
   await settle();
@@ -221,6 +223,7 @@ test('SiteHeader：預設吸頂、字級在外觀選單內、sticky=false 維持
   await nextTick();
   assert.match(tspan().className, /opacity-100/, 'h1 捲出後篇名出現');
   assert.equal(tspan().textContent, '第三篇　某某');
+  assert.match(tspan().className, /(^|\s)max-lg:hidden(\s|$)/, '手機寬度不顯示篇名');
   assert.match(appear().className, /opacity-0/);
   assert.equal(appear().getAttribute('aria-hidden'), 'true');
   titled.unmount();
