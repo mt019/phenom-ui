@@ -35,6 +35,19 @@
   background: color-mix(in oklab, var(--c-ink) 40%, transparent);
 }
 
+/* type="search" 的輸入框。WebKit 與 Blink 在有字時自動畫一個原生清除叉與放大鏡裝飾，
+   SearchField、Dropdown 各自已畫清除鈕（與 Lucide 搜尋圖示），並排就是兩個叉。這裡在共用
+   樣式層一次拿掉原生裝飾，保留 type="search" 讓行動鍵盤顯示「搜尋」鍵並帶搜尋語意。
+   新寫的 type="search" 輸入框若要有清除鈕，自己畫（見 SearchField），不用原生叉。 */
+input[type='search']::-webkit-search-cancel-button,
+input[type='search']::-webkit-search-decoration,
+input[type='search']::-webkit-search-results-button,
+input[type='search']::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
 /* The shared back arrow is quiet until desktop hover/focus or the first tap on
    its reserved corner. Touch's first tap reveals; a later tap performs nav. */
 .phenom-back-link--quiet {
