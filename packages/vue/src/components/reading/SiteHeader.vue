@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onBeforeUnmount, ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { RouterLink, useRoute } from 'vue-router';
 import BackLink from './BackLink.vue';
 import AppearanceMenu from './AppearanceMenu.vue';
 import VNodeOutlet from './VNodeOutlet';
@@ -16,6 +16,7 @@ defineProps<{
   search?: any;
   sticky?: boolean;
   currentTitle?: string;
+  home?: { href: string; label: string };
 }>(),
   { sticky: true },
 );
@@ -24,8 +25,11 @@ const hidden = ref(false),
   h1Text = ref(''),
   titleStyle = ref<Record<string, string>>({}),
   row = ref<HTMLElement>(),
+  homeEl = ref<any>(),
   route = useRoute();
 const shown = () => past.value && !!(props.currentTitle || h1Text.value);
+// home 的 href 為絕對網址時用 a，否則交給 RouterLink，站在子路徑（base）下時才會帶上 base。
+const isAbsolute = (href: string) => /^[a-z][a-z\d+.-]*:/i.test(href) || href.startsWith('//');
 let h1: Element | null = null,
   mo: MutationObserver | undefined;
 // 頁面主標題取 main 內第一個 h1；捲出頂列之後，頂列顯示它的文字，位置對齊正文欄左緣。
@@ -47,7 +51,15 @@ function measure() {
   const r = h1.getBoundingClientRect();
   past.value = r.bottom < 48;
   const host = row.value?.getBoundingClientRect();
-  if (host && r.width > 0) {
+  // 傳了 home 時，篇名接在站名後面成「站名 › 篇名」，起點是站名的右緣，不對齊正文欄。
+  const homeNode: Element | undefined = homeEl.value?.$el ?? homeEl.value;
+  if (host && homeNode?.getBoundingClientRect) {
+    const left = Math.max(0, homeNode.getBoundingClientRect().right - host.left + 6);
+    titleStyle.value = {
+      left: `${left}px`,
+      maxWidth: `${Math.max(0, host.right - host.left - left - 16)}px`,
+    };
+  } else if (host && r.width > 0) {
     const left = Math.max(0, r.left - host.left);
     titleStyle.value = {
       left: `${left}px`,
@@ -108,17 +120,25 @@ onBeforeUnmount(() => cleanup());
           ? 'px-4 sm:px-6 max-w-[52rem]'
           : 'px-4 sm:px-6 lg:px-10 xl:px-16 max-w-[86rem]',
       ]"
-      ><BackLink :back="back" :index-href="backIndexHref" /><span
+      ><BackLink :back="back" :index-href="backIndexHref" /><component
+        v-if="home"
+        ref="homeEl"
+        :is="isAbsolute(home.href) ? 'a' : RouterLink"
+        v-bind="isAbsolute(home.href) ? { href: home.href } : { to: home.href }"
+        class="phenom-site-header__home ml-3 block min-w-0 max-w-[45%] shrink truncate font-display text-token-sm font-medium leading-tight text-ink underline-offset-4 decoration-1 hover:underline focus-visible:underline sm:max-w-[16rem]"
+        >{{ home.label }}</component
+      ><span
         aria-hidden="true"
         :style="titleStyle"
         :class="[
           'pointer-events-none absolute top-1/2 max-lg:hidden -translate-y-1/2 truncate whitespace-nowrap text-token-sm text-ink-muted transition-opacity duration-fast',
           shown() ? 'opacity-100' : 'opacity-0',
         ]"
+        ><template v-if="home"><span class="mr-1.5 text-ink-faint">›</span></template
         >{{ currentTitle || h1Text }}</span
       ><div
         v-if="search"
-        class="min-w-0 flex-1 px-4 sm:px-8"
+        :class="['flex-1 px-4 sm:px-8', home ? 'min-w-fit' : 'min-w-0']"
         ><div class="max-w-xl"><VNodeOutlet :content="search" /></div></div
       ><span v-else class="flex-1" /><div class="flex items-center gap-2"
         ><button

@@ -173,11 +173,14 @@ export function ArticleNav({ topics = [], articles = [], currentSlug, homeHref, 
 
   return (
     <nav aria-label={homeLabel} className="text-token-xs">
+      {/* 回本站首頁的站名連結與 Vue 版 ArticleNav.vue 用同一套 class（2026-11-16 修，原樣式讀起來像欄位說明）。 */}
       <Link
         to={homeHref}
-        className="mb-4 block font-accent uppercase tracking-[0.12em] text-ink-faint transition-colors duration-fast hover:text-accent"
+        className="group mb-4 flex w-fit max-w-full items-center gap-2 font-display text-token-sm font-medium leading-tight text-ink"
       >
-        {homeLabel}
+        <span className="min-w-0 underline-offset-4 decoration-1 group-hover:underline group-focus-visible:underline">
+          {homeLabel}
+        </span>
       </Link>
       {topics.map((t) => {
         const list = articles.filter((a) => a.topic === t.id);

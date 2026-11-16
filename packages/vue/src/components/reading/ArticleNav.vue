@@ -11,13 +11,20 @@ withDefaults(
   }>(),
   { topics: () => [], articles: () => [], lang: 'zh' },
 );
+// 回本站首頁的站名連結用正文墨、display 字，比下面的清單大一級，滑過加底線。
+// 2026-11-16 以前是 accent 字大寫加字距的淡墨小字，站主指出讀起來像欄位說明、看不出能點。
+// 具名插槽 icon 可放一個前置圖標。React 版 lab/ArticleLayout.jsx 的 ArticleNav 同一套 class。
 </script>
 <template>
   <nav :aria-label="homeLabel" class="text-token-xs"
     ><RouterLink
       :to="homeHref"
-      class="mb-4 block font-accent uppercase tracking-[0.12em] text-ink-faint transition-colors duration-fast hover:text-accent"
-      >{{ homeLabel }}</RouterLink
+      class="group mb-4 flex w-fit max-w-full items-center gap-2 font-display text-token-sm font-medium leading-tight text-ink"
+      ><span v-if="$slots.icon" class="shrink-0 text-ink-muted" aria-hidden="true"><slot name="icon" /></span
+      ><span
+        class="min-w-0 underline-offset-4 decoration-1 group-hover:underline group-focus-visible:underline"
+        >{{ homeLabel }}</span
+      ></RouterLink
     ><template v-for="t in topics" :key="t.id"
       ><div v-if="articles.some((a: any) => a.topic === t.id)" class="mb-5"
         ><p class="mb-1.5 text-ink-muted">{{

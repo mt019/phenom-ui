@@ -185,6 +185,52 @@ test('PageIdentity：眉標連結掛載在路徑相同的分頁上不帶 aria-cu
   host.remove();
 });
 
+test('SiteHeader home：未傳不畫站名，傳了畫在返回鍵之後；捲過 h1 顯示「站名 › 篇名」且站名可點', async () => {
+  const SiteHeader = await load('SiteHeader.vue');
+  const none = await mount(SiteHeader, { back: { href: '/', label: '' } });
+  assert.equal(none.el.querySelector('.phenom-site-header__home'), null, '未傳 home 不畫站名');
+  assert.doesNotMatch(none.el.querySelector('span[aria-hidden="true"]').textContent, /›/, '未傳 home 篇名不帶分隔號');
+  none.unmount();
+
+  const main = document.createElement('main');
+  main.innerHTML = '<h1>第八集　某某</h1>';
+  document.body.append(main);
+  let bottom = 300;
+  main.firstChild.getBoundingClientRect = () => ({ left: 400, right: 1000, width: 600, top: bottom - 40, bottom, height: 40 });
+  const view = await mount(SiteHeader, { back: { href: 'https://phenomcanvas.com/', label: '' }, home: { href: '/', label: '本站名' } });
+  const row = view.el.firstElementChild.firstElementChild;
+  const home = view.el.querySelector('.phenom-site-header__home');
+  assert.ok(home, '傳 home 畫出站名');
+  assert.equal(home.tagName, 'A');
+  assert.equal(home.getAttribute('href'), '/', '站內路徑交給 RouterLink');
+  assert.equal(home.textContent, '本站名');
+  assert.ok(home.previousElementSibling.querySelector('a[aria-label]'), '站名接在返回鍵之後');
+  assert.doesNotMatch(row.className, /\bgroup\b/, '頂列不掛 group，滑過站名不顯露返回鍵');
+  assert.doesNotMatch(home.className, /opacity|pointer-events-none/);
+  home.getBoundingClientRect = () => ({ left: 40, right: 160, width: 120, top: 10, bottom: 30, height: 20 });
+  bottom = 10;
+  window.dispatchEvent(new win.Event('scroll'));
+  await new Promise((r) => setTimeout(r, 50));
+  await nextTick();
+  const tspan = view.el.querySelector('span[aria-hidden="true"]');
+  assert.match(tspan.className, /opacity-100/);
+  assert.equal(tspan.textContent, '›第八集　某某');
+  assert.ok(home.isConnected && !home.closest('[inert]'), '捲過後站名仍可點');
+  view.unmount();
+  const withSearch = await mount(SiteHeader, { home: { href: '/', label: '本站名' }, search: h('span', 'tools') });
+  assert.match(withSearch.el.querySelector('.max-w-xl').parentElement.className, /\bmin-w-fit\b/, '傳 home 時 search 欄不縮進站名底下');
+  withSearch.unmount();
+  const plainSearch = await mount(SiteHeader, { search: h('span', 'tools') });
+  assert.match(plainSearch.el.querySelector('.max-w-xl').parentElement.className, /\bmin-w-0\b/, '未傳 home 時 search 欄照舊');
+  plainSearch.unmount();
+  const abs = await mount(SiteHeader, { home: { href: 'https://example.org/x/', label: '外站' } });
+  assert.equal(abs.el.querySelector('.phenom-site-header__home').getAttribute('href'), 'https://example.org/x/', '絕對網址用一般連結');
+  abs.unmount();
+  main.remove();
+  await settle();
+  assert.equal(live.length, 0, JSON.stringify(live.map((r) => r.type)));
+});
+
 test('SiteHeader：預設吸頂、字級在外觀選單內、sticky=false 維持舊行為', async () => {
   const SiteHeader = await load('SiteHeader.vue');
   const scales = [];
