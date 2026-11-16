@@ -36,3 +36,9 @@ export { default as Eyebrow } from './components/reading/Eyebrow.vue';
 export { default as HoverCard } from './components/reading/HoverCard.vue';
 export { default as Math } from './components/reading/Math.vue';
 export { default as MathText } from './components/reading/MathText.vue';
+
+export { default as SeoHead } from './components/SeoHead';
+export { applySeoHead } from './composables/seoHead';
+export type { SeoPage, SeoSite, SeoItem } from './composables/seoHead';
+export { useStickyTop, useStuckToTop } from './composables/sticky';
+export { SHELL_PAD_X, SHELL_PAD_X_RAIL, SHELL_PAD_X_TIGHT } from './composables/shellPadding';

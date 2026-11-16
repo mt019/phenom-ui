@@ -96,6 +96,18 @@ unset and continue to read query values immediately. This is appropriate only
 for default-query static HTML; it is not a way to suppress hydration warnings
 for server HTML rendered from a different nondefault query.
 
+Since 0.5.3 the package also exports the shell helpers the React package
+ships: `SHELL_PAD_X`, `SHELL_PAD_X_RAIL` and `SHELL_PAD_X_TIGHT` (identical
+strings to src/components/shellPadding.js, pinned by a test); `useStickyTop(elRef,
+{varName, targetRef})`, which measures a sticky element with a ResizeObserver,
+writes its height to a CSS variable (default `--lab-sticky-top`) and returns a
+height ref; `useStuckToTop(elRef)`, a boolean ref that is true while a
+`position: sticky` element sits at its stuck offset; and `<SeoHead page site
+itemList />` with the underlying `applySeoHead({page, site, pathname, itemList})`,
+which rewrites title, meta, canonical and the JSON-LD graph from the current
+route. It renders nothing; build-time head output remains the site's own
+prerender script's job.
+
 AppearanceMenu uses a viewport-clamped popup outside scrollable rails. It keeps
 right alignment where space permits and cleans up scroll, resize and dismissal
 listeners when unmounted.

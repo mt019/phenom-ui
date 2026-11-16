@@ -245,3 +245,67 @@ test('SiteHeader：預設吸頂、字級在外觀選單內、sticky=false 維持
   await settle();
   assert.equal(live.length, 0, JSON.stringify(live.map((r) => r.type)));
 });
+
+const lib = new URL('../packages/vue/src/', import.meta.url);
+const loadLib = (name) => import(new URL(name, lib).href);
+
+test('shellPadding：三個內距常數與 React 版 shellPadding.js 逐字一致', async () => {
+  const vue = await loadLib('composables/shellPadding.ts');
+  const react = await import(new URL('../src/components/shellPadding.js', import.meta.url).href);
+  for (const key of ['SHELL_PAD_X', 'SHELL_PAD_X_RAIL', 'SHELL_PAD_X_TIGHT']) {
+    assert.equal(vue[key], react[key]);
+  }
+});
+
+test('useStickyTop：掛載後量高寫進 CSS 變數，卸載後停止觀察', async () => {
+  const { useStickyTop } = await loadLib('composables/sticky.ts');
+  const { ref } = await import('vue');
+  let observed = 0, disconnected = 0, fire;
+  globalThis.ResizeObserver = class { constructor(fn) { fire = fn; } observe() { observed++; } disconnect() { disconnected++; } };
+  const bar = document.createElement('div');
+  bar.getBoundingClientRect = () => ({ height: 48.4, top: 0 });
+  document.body.appendChild(bar);
+  let height;
+  const view = await mount({ setup() { height = useStickyTop(ref(bar)); return () => null; } });
+  assert.equal(height.value, 48);
+  assert.equal(document.documentElement.style.getPropertyValue('--lab-sticky-top'), '48px');
+  assert.equal(observed, 1);
+  bar.getBoundingClientRect = () => ({ height: 60, top: 0 });
+  fire();
+  assert.equal(height.value, 60);
+  view.unmount();
+  bar.remove();
+  assert.equal(disconnected, 1);
+});
+
+test('useStuckToTop：貼齊位置時為 true，卸載後監聽器歸零', async () => {
+  const { useStuckToTop } = await loadLib('composables/sticky.ts');
+  const { ref } = await import('vue');
+  const bar = document.createElement('div');
+  bar.style.top = '10px';
+  bar.getBoundingClientRect = () => ({ top: 10, height: 20 });
+  document.body.appendChild(bar);
+  const before = live.length;
+  let stuck;
+  const view = await mount({ setup() { stuck = useStuckToTop(ref(bar)); return () => null; } });
+  assert.equal(stuck.value, true);
+  assert.ok(live.length > before);
+  view.unmount();
+  bar.remove();
+  assert.equal(live.length, before);
+});
+
+test('SeoHead：依路由與 page 改寫 title、canonical、JSON-LD，不輸出 DOM', async () => {
+  const { SeoHead } = await loadLib('index.ts');
+  const view = await mount(SeoHead, {
+    page: { title: '測試頁', description: '說明', type: 'Article', keywords: 'a,b' },
+    site: { url: 'https://example.test/', name: '測試站' },
+  });
+  await settle();
+  assert.equal(document.title, '測試頁');
+  assert.equal(document.head.querySelector('link[rel="canonical"]').getAttribute('href'), 'https://example.test/');
+  assert.equal(document.head.querySelector('meta[name="keywords"]').getAttribute('content'), 'a,b');
+  const graph = JSON.parse(document.head.querySelector('script[data-seo-schema]').textContent)['@graph'];
+  assert.deepEqual(graph.map((n) => n['@type']), ['Organization', 'WebSite', 'Article', 'BreadcrumbList']);
+  view.unmount();
+});
