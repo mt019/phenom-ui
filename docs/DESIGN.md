@@ -21,6 +21,12 @@
   站主點名、或同一套被兩頁以上使用，才升進 `tokens.css`。中途要給站主比選時，
   在 scratchpad 做 HTML 並排 mock 開瀏覽器看，不部署試錯。
 
+- **頁內淡底與高亮用站識別色 rose，禁 slate、amber 與寫死色**（2026-11-17 站主「醜東西禁止再犯 全局底層」，
+  起因是人文來風的編註塊、導言、條目註、搜尋命中、播放中句、回報框用了 slate 與 amber）。底為
+  `--tone-rose-bg` 與 `--c-paper` 相混，色條為 `--tone-rose-tx`；分類用途（cat 分類色、分類 chip、
+  狀態 chip）不在此限，登記進 phenom-ops `infra/wash-tone-allow.json` 或同行加 `wash-tone-ok: 理由`。
+  閘：phenom-ops `npm run check:wash-tone`。
+
 ## 帶寬（validator 強制，飄出即 build 失敗）
 
 - 色調對 `-tx`（文字／小 mark）：OKLCH L 0.46–0.58、C 0.045–0.13（莫蘭迪，不純不灰），
