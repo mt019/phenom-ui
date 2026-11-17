@@ -29,6 +29,8 @@ const hidden = ref(false),
   searchBox = ref<HTMLElement>(),
   homeEl = ref<any>(),
   route = useRoute();
+// 浮出的篇名可點，捲回頁首（2026-11-17：首頁不傳 home，捲下去後頂列沒有任何可回上的入口）。
+const toTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 const shown = () => past.value && !!(props.currentTitle || h1Text.value);
 // home 的 href 為絕對網址時用 a，否則交給 RouterLink，站在子路徑（base）下時才會帶上 base。
 const isAbsolute = (href: string) => /^[a-z][a-z\d+.-]*:/i.test(href) || href.startsWith('//');
@@ -139,15 +141,19 @@ onBeforeUnmount(() => cleanup());
         v-bind="isAbsolute(home.href) ? { href: home.href } : { to: home.href }"
         class="phenom-site-header__home ml-3 block min-w-0 max-w-[45%] shrink truncate font-display text-token-sm font-medium leading-tight text-ink underline-offset-4 decoration-1 hover:underline focus-visible:underline sm:max-w-[16rem]"
         >{{ home.label }}</component
-      ><span
-        aria-hidden="true"
+      ><button
+        type="button"
+        title="回到頁首"
+        :tabindex="shown() ? 0 : -1"
+        :aria-hidden="shown() ? undefined : 'true'"
+        @click="toTop"
         :style="titleStyle"
         :class="[
-          'pointer-events-none absolute top-1/2 max-lg:hidden -translate-y-1/2 truncate whitespace-nowrap text-token-sm text-ink-muted transition-opacity duration-fast',
-          shown() ? 'opacity-100' : 'opacity-0',
+          'phenom-site-header__title absolute top-1/2 max-lg:hidden -translate-y-1/2 truncate whitespace-nowrap text-left text-token-sm text-ink-muted transition-opacity duration-fast hover:text-ink',
+          shown() ? 'opacity-100' : 'pointer-events-none opacity-0',
         ]"
         ><template v-if="home"><span class="mr-1.5 text-ink-faint">›</span></template
-        >{{ currentTitle || h1Text }}</span
+        >{{ currentTitle || h1Text }}</button
       ><div
         v-if="search"
         :class="['flex-1 px-4 sm:px-8', home ? 'min-w-fit' : 'min-w-0']"

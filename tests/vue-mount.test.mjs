@@ -189,7 +189,7 @@ test('SiteHeader home：未傳不畫站名，傳了畫在返回鍵之後；捲�
   const SiteHeader = await load('SiteHeader.vue');
   const none = await mount(SiteHeader, { back: { href: '/', label: '' } });
   assert.equal(none.el.querySelector('.phenom-site-header__home'), null, '未傳 home 不畫站名');
-  assert.doesNotMatch(none.el.querySelector('span[aria-hidden="true"]').textContent, /›/, '未傳 home 篇名不帶分隔號');
+  assert.doesNotMatch(none.el.querySelector('.phenom-site-header__title').textContent, /›/, '未傳 home 篇名不帶分隔號');
   none.unmount();
 
   const main = document.createElement('main');
@@ -212,7 +212,7 @@ test('SiteHeader home：未傳不畫站名，傳了畫在返回鍵之後；捲�
   window.dispatchEvent(new win.Event('scroll'));
   await new Promise((r) => setTimeout(r, 50));
   await nextTick();
-  const tspan = view.el.querySelector('span[aria-hidden="true"]');
+  const tspan = view.el.querySelector('.phenom-site-header__title');
   assert.match(tspan.className, /opacity-100/);
   assert.equal(tspan.textContent, '›第八集　某某');
   assert.ok(home.isConnected && !home.closest('[inert]'), '捲過後站名仍可點');
@@ -259,8 +259,8 @@ test('SiteHeader：預設吸頂、字級在外觀選單內、sticky=false 維持
   let bottom = 300;
   main.firstChild.getBoundingClientRect = () => ({ left: 120, right: 720, width: 600, top: bottom - 40, bottom, height: 40 });
   const titled = await mount(SiteHeader, {});
-  const tspan = () => titled.el.querySelector('span[aria-hidden="true"]');
-  const appear = () => [...titled.el.querySelectorAll('button')].find((b) => /外觀/.test(b.textContent)).closest('[class*="transition-opacity"]');
+  const tspan = () => titled.el.querySelector('.phenom-site-header__title');
+  const appear = () => [...titled.el.querySelectorAll('button')].find((b) => /外觀/.test(b.textContent));
   assert.match(tspan().className, /opacity-0/, '標題在視窗內時篇名隱藏');
   assert.doesNotMatch(appear().className, /opacity-0/);
   bottom = 10;
@@ -270,14 +270,19 @@ test('SiteHeader：預設吸頂、字級在外觀選單內、sticky=false 維持
   assert.match(tspan().className, /opacity-100/, 'h1 捲出後篇名出現');
   assert.equal(tspan().textContent, '第三篇　某某');
   assert.match(tspan().className, /(^|\s)max-lg:hidden(\s|$)/, '手機寬度不顯示篇名');
-  assert.match(appear().className, /opacity-0/);
-  assert.equal(appear().getAttribute('aria-hidden'), 'true');
+  assert.ok(appear() && !appear().closest('[inert],[aria-hidden="true"],.opacity-0'), '篇名出現時外觀鈕仍在（2026-11-17）');
+  let scrolledTo = null;
+  const origScrollTo = window.scrollTo;
+  window.scrollTo = (o) => { scrolledTo = o; };
+  tspan().click();
+  window.scrollTo = origScrollTo;
+  assert.equal(scrolledTo?.top, 0, '點篇名捲回頁首');
   titled.unmount();
   const over = await mount(SiteHeader, { currentTitle: '覆寫篇名' });
   window.dispatchEvent(new win.Event('scroll'));
   await new Promise((r) => setTimeout(r, 50));
   await nextTick();
-  assert.equal(over.el.querySelector('span[aria-hidden="true"]').textContent, '覆寫篇名');
+  assert.equal(over.el.querySelector('.phenom-site-header__title').textContent, '覆寫篇名');
   over.unmount();
   main.remove();
   await settle();
