@@ -185,6 +185,27 @@ test('PageIdentity：眉標連結掛載在路徑相同的分頁上不帶 aria-cu
   host.remove();
 });
 
+test('PageIdentity eyebrowLinkCount：只有前幾個詞是連結，其餘是 data-eyebrow-tail 裡的純文字', async () => {
+  const PageIdentity = (await import(new URL('../packages/vue/src/components/reading/PageIdentity.vue', import.meta.url).href)).default;
+  const router = createRouter({ history: createMemoryHistory(), routes: [{ path: '/:p(.*)*', component: { render: () => null } }] });
+  const app = createApp({ render: () => h(PageIdentity, { eyebrow: '人文來風 · EP108', eyebrowBack: { href: '/r/', label: '人文來風' }, eyebrowLinkCount: 1 }) });
+  app.use(router);
+  await router.push('/r/ep108/');
+  await router.isReady();
+  const host = document.createElement('div');
+  document.body.append(host);
+  app.mount(host);
+  await nextTick();
+  const links = host.querySelectorAll('a');
+  assert.equal(links.length, 1);
+  assert.equal(links[0].textContent, '人文來風');
+  const tail = host.querySelector('[data-eyebrow-tail]');
+  assert.ok(tail && !tail.closest('a'));
+  assert.equal(tail.textContent, 'EP108');
+  app.unmount();
+  host.remove();
+});
+
 test('SiteHeader home：未傳不畫站名，傳了畫在返回鍵之後；捲過 h1 顯示「站名 › 篇名」且站名可點', async () => {
   const SiteHeader = await load('SiteHeader.vue');
   const none = await mount(SiteHeader, { back: { href: '/', label: '' } });

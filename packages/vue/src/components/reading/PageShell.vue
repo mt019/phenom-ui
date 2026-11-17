@@ -8,6 +8,7 @@ const props = withDefaults(
     title?: string;
     eyebrow?: string;
     eyebrowBack?: any;
+    eyebrowLinkCount?: number;
     width?: string;
     controls?: any;
     fontScale?: number;
@@ -43,7 +44,8 @@ watch(() => [props.title, props.manageDocumentTitle], updateTitle);
       </div>
       <div :class="['reader-scale', width === 'prose' ? 'prose-scaled' : '']">
         <header class="mb-8"
-          ><PageIdentity :eyebrow="eyebrow" :eyebrow-back="eyebrowBack" :title="title"
+          ><PageIdentity :eyebrow="eyebrow" :eyebrow-back="eyebrowBack"
+          :eyebrow-link-count="eyebrowLinkCount" :title="title"
         /></header>
         <VNodeOutlet :content="children"><slot /></VNodeOutlet>
       </div>

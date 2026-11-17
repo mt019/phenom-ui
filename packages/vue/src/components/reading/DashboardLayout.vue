@@ -16,6 +16,7 @@ const props = withDefaults(
     headerRight?: any;
     eyebrow?: string;
     eyebrowBack?: any;
+    eyebrowLinkCount?: number;
     title?: string;
     titleClassName?: string;
     summary?: string;
@@ -62,6 +63,7 @@ const panels = computed(() =>
           ><PageIdentity
             :eyebrow="eyebrow"
             :eyebrow-back="eyebrowBack"
+          :eyebrow-link-count="eyebrowLinkCount"
             :title="title"
             :title-class-name="titleClassName"
             :summary="summary" /></div></div></header
