@@ -25,6 +25,8 @@ const hidden = ref(false),
   h1Text = ref(''),
   titleStyle = ref<Record<string, string>>({}),
   row = ref<HTMLElement>(),
+  tools = ref<HTMLElement>(),
+  searchBox = ref<HTMLElement>(),
   homeEl = ref<any>(),
   route = useRoute();
 const shown = () => past.value && !!(props.currentTitle || h1Text.value);
@@ -51,19 +53,29 @@ function measure() {
   const r = h1.getBoundingClientRect();
   past.value = r.bottom < 48;
   const host = row.value?.getBoundingClientRect();
+  // 篇名右緣止於右側第一個看得見的控制項（search 欄內容或外觀鈕）左緣前 16px；控制項不再為篇名讓位
+  // （2026-11-17：窄螢幕篇名不顯示，外觀鈕卻跟著淡出，頂列只剩空條）。
+  const lefts: number[] = [];
+  if (tools.value) lefts.push(tools.value.getBoundingClientRect().left);
+  const slotRoot = searchBox.value?.firstElementChild;
+  if (slotRoot) {
+    const kids = [...slotRoot.children].filter((e) => e.getBoundingClientRect().width > 0);
+    for (const e of kids.length ? kids : [slotRoot]) lefts.push(e.getBoundingClientRect().left);
+  }
+  const limit = lefts.length ? Math.min(...lefts) - 16 : host ? host.right - 16 : 0;
   // 傳了 home 時，篇名接在站名後面成「站名 › 篇名」，起點是站名的右緣，不對齊正文欄。
   const homeNode: Element | undefined = homeEl.value?.$el ?? homeEl.value;
   if (host && homeNode?.getBoundingClientRect) {
     const left = Math.max(0, homeNode.getBoundingClientRect().right - host.left + 6);
     titleStyle.value = {
       left: `${left}px`,
-      maxWidth: `${Math.max(0, host.right - host.left - left - 16)}px`,
+      maxWidth: `${Math.max(0, limit - host.left - left)}px`,
     };
   } else if (host && r.width > 0) {
     const left = Math.max(0, r.left - host.left);
     titleStyle.value = {
       left: `${left}px`,
-      maxWidth: `${Math.max(0, Math.min(r.width, host.right - host.left - left - 16))}px`,
+      maxWidth: `${Math.max(0, Math.min(r.width, limit - host.left - left))}px`,
     };
   }
 }
@@ -139,21 +151,17 @@ onBeforeUnmount(() => cleanup());
       ><div
         v-if="search"
         :class="['flex-1 px-4 sm:px-8', home ? 'min-w-fit' : 'min-w-0']"
-        ><div class="max-w-xl"><VNodeOutlet :content="search" /></div></div
-      ><span v-else class="flex-1" /><div class="flex items-center gap-2"
+        ><div ref="searchBox" class="max-w-xl"><VNodeOutlet :content="search" /></div></div
+      ><span v-else class="flex-1" /><div ref="tools" class="relative z-10 flex items-center gap-2 bg-paper"
         ><button
           v-if="onLangChange"
           type="button"
           @click="onLangChange(lang === 'en' ? 'zh' : 'en')"
           class="text-token-xs text-ink-muted"
           >{{ lang === 'en' ? '中文' : 'EN' }}</button
-        ><div
-          :class="['transition-opacity duration-fast', shown() ? 'pointer-events-none opacity-0' : '']"
-          :aria-hidden="shown() ? 'true' : undefined"
-          :inert="shown() ? true : undefined"
-          ><AppearanceMenu
+        ><AppearanceMenu
           :lang="lang"
           :scale="scale"
-          :on-scale-change="onScaleChange" /></div></div></div
+          :on-scale-change="onScaleChange" /></div></div
   ></div>
 </template>

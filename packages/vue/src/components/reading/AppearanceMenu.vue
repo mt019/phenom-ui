@@ -110,12 +110,12 @@ function paper(id: string) {
             :title="p.name"
             :aria-label="p.name"
             :aria-pressed="palette === p.id"
-            class="h-6 w-6 rounded-full border transition-transform duration-fast hover:scale-110"
+            class="flex h-6 w-6 items-center justify-center rounded-full transition-transform duration-fast hover:scale-110"
             :style="{
-              backgroundColor: p.vars.accent,
-              borderColor: palette === p.id ? 'var(--c-ink)' : 'var(--c-line-soft)',
-              borderWidth: palette === p.id ? '2px' : '1px',
-            }" /></div
+              backgroundColor: p.vars.surface,
+              boxShadow: palette === p.id ? 'inset 0 0 0 1.5px var(--c-ink)' : 'none',
+            }"
+            ><span class="block h-[9px] w-[9px] rounded-full" :style="{ backgroundColor: p.vars.accent }" /></button></div
         ><p class="mb-2 font-accent text-token-xs uppercase tracking-[0.12em] text-ink-faint">{{
           lang === 'en' ? 'Paper' : '紙紋'
         }}</p

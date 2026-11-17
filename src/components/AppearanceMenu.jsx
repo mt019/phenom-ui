@@ -21,9 +21,10 @@ import {
  * reading page can afford exactly one row of chrome. A palette strip and a
  * texture strip permanently visible above an essay is more interface than text.
  *
- * The palette swatches show the accent, not the paper: every paper in the set is
- * near-white by rule (a tinted reading surface is banned), so a row of paper
- * swatches would be a row of identical white squares.
+ * Each palette swatch is the palette's surface tint with a small accent dot: every
+ * paper in the set is near-white by rule, so paper alone would be identical white
+ * discs, and a disc filled with the accent shows it at an area it never has on the
+ * page (2026-11-17: the solid accent discs read far uglier than the palettes).
  */
 export default function AppearanceMenu({ lang = 'zh' }) {
   const en = lang === 'en';
@@ -77,13 +78,14 @@ export default function AppearanceMenu({ lang = 'zh' }) {
                 title={p.name}
                 aria-label={p.name}
                 aria-pressed={palette === p.id}
-                className="h-6 w-6 rounded-full border transition-transform duration-fast hover:scale-110"
+                className="flex h-6 w-6 items-center justify-center rounded-full transition-transform duration-fast hover:scale-110"
                 style={{
-                  backgroundColor: p.vars.accent,
-                  borderColor: palette === p.id ? 'var(--c-ink)' : 'var(--c-line-soft)',
-                  borderWidth: palette === p.id ? '2px' : '1px',
+                  backgroundColor: p.vars.surface,
+                  boxShadow: palette === p.id ? 'inset 0 0 0 1.5px var(--c-ink)' : 'none',
                 }}
-              />
+              >
+                <span className="block h-[9px] w-[9px] rounded-full" style={{ backgroundColor: p.vars.accent }} />
+              </button>
             ))}
           </div>
 
