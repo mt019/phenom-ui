@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { resolve, join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { resolveLegacyFontUrl } from './legacy-font-url.mjs';
 const here = fileURLToPath(new URL('..', import.meta.url)),
   root = resolve(here, '../..'),
   out = join(here, 'core');
@@ -97,7 +98,9 @@ const legacyRef = 'v0.1.31',
   }).trim();
 // 字型不打包：相容主題六個 woff2 共 12.7 MB，與 src/fonts-external.css 指向的 assets.phenomcanvas.com
 // 內容定址檔逐位元組相同（以 sha256 核），所以 styles.css 的 url('../fonts/<名>') 改指該網址。
-// 每個名字都要在 fonts-external.css 找到同名、且 v0.1.31 的 blob sha256 與網址裡的 sha256 相等，否則中止。
+// 每個名字都要在 fonts-external.css 找到同名；v0.1.31 的 blob sha256 與網址裡的 sha256 相等就用該網址，
+// 不等（字型後來補過字）就改指 v1/<v0.1.31 的 sha256>/fonts/<名>，HEAD 回讀 200 且長度相符才寫入，判定在
+// legacy-font-url.mjs。
 const legacyPaths = [
   'src/styles.css',
   'src/styles/tokens.css',
@@ -136,10 +139,14 @@ for (const source of legacyPaths) {
         maxBuffer: 16 * 1024 * 1024,
       });
       const sha = createHash('sha256').update(blob).digest('hex');
-      if (sha !== external.sha256)
-        throw new Error(`相容主題字型 ${name} 的 sha256 ${sha} 與外部檔 ${external.sha256} 不同，不能改指外部網址`);
-      text = text.replaceAll(m[0], `url('${external.url}')`);
-      legacyFontRewrites.push({ font: name, sha256: sha, url: external.url });
+      const { url, source } = await resolveLegacyFontUrl({
+        name,
+        legacySha: sha,
+        legacyBytes: blob.length,
+        external,
+      });
+      text = text.replaceAll(m[0], `url('${url}')`);
+      legacyFontRewrites.push({ font: name, sha256: sha, url, source });
     }
     if (!legacyFontRewrites.length) throw new Error('相容主題 styles.css 找不到任何 ../fonts/ 的 url()，原檔改了就改這段');
     bytes = Buffer.from(text, 'utf8');
