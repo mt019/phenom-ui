@@ -38,6 +38,7 @@ export { default as Math } from './components/reading/Math.vue';
 export { default as MathText } from './components/reading/MathText.vue';
 
 export { default as SeoHead } from './components/SeoHead';
+export { needsAccentDisplayFace, displayTitleClass } from './composables/displayFont';
 export { applySeoHead } from './composables/seoHead';
 export type { SeoPage, SeoSite, SeoItem } from './composables/seoHead';
 export { useStickyTop, useStuckToTop } from './composables/sticky';
