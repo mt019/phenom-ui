@@ -9,6 +9,7 @@
 | `build_full.py` | 全量產生腳本。從 Translation 倉 `_Assets/fonts/categories/typewriter-latin/` 讀三支原檔，輸出 `build/` 完整檔與 `../../fonts/` 三個 woff2 子集、`added-codepoints.tsv`；參數在檔首 `RN` 字典 | 是 |
 | `added-codepoints.tsv` | 每個補入碼位：字型、碼位、字、組法（248 列） | 是 |
 | `tails_variants.py`、`tails-variants.png`、`tails-variants.html` | 下加符號各版本對照（見「下加符號重做」） | 是 |
+| `tails_d_sizes.py`、`tails-d-sizes.png`、`tails-d-sizes.html` | D 版三種尺寸對照，只渲染 | 是 |
 | `render_full.py` | 以 headless Chrome 渲染 `specimen-full.png`、`zoom-full.png` | 是 |
 | `specimen-full.png` | Radio Newsman 補入的 239 個字形，每組上排原字型、下排補字版；實際集名五組；Erikas 兩個字重補入的 ē Ŋ ŋ | 是 |
 | `zoom-full.png` | ß ø æ œ ł、Œ Æ Ø Ł Ŋ ŋ ð þ ſ 放大，第三列是字型原有的 u B o l f e 與補入的 ü ö | 是 |
@@ -48,8 +49,8 @@
 | 短音 | o 縮 0.50、0.45 後取下半 | o |
 | 波浪 | s 轉 90 度，壓成寬 400、高 115 | s |
 | 雙尖音 | 兩個尖音，中心距 ±95 | quotesingle |
-| 下加符、反尾符 | comma 左右翻轉，縮 0.75、0.80 | comma |
-| 拉脫維亞語下逗號（Ģ Ķ Ļ Ņ Ŗ ķ ļ ņ ŗ） | comma 縮 0.62 置下；ģ 為 comma 轉 180 度置上 | comma |
+| 下加符、反尾符（D 版，站主 11-23 選定） | j 的下鉤（裁 y<0）橫 0.42、縱 0.55，與基字底留白 20；反尾符左右鏡像、右緣距基字右緣 60 | j |
+| 拉脫維亞語下逗號（Ģ Ķ Ļ Ņ Ŗ ķ ļ ņ ŗ） | comma 縮 0.60 置基字底下、留白 50；ģ 為 comma 縮 0.60 轉 180 度置上 | comma |
 | ď ľ Ľ ť | ’ 縮 0.80 置於升部右上，advance 加寬 | comma |
 | 橫槓、斜槓（Đ đ Ð Ħ ħ Ŧ ŧ Ł ł） | 伸出字幹兩側各 130；Ł ł 轉 30 度 | hyphen |
 | Ø ø | slash 依 O、o 高放大 1.12、1.15 倍 | slash |
@@ -71,11 +72,13 @@
 
 間距量自基字外框底（yMin）；反尾符右緣距基字右緣 60。ģ 的上置倒逗號跟著下逗號的縮放。反尾符一律取來源字形左右鏡像。命令：`.venv/bin/python tails_variants.py`。
 
-站主挑定之前，`TAILS["variant"]` 暫設 B，`fonts/` 底下出貨的仍是第一版（799254c）；挑定後改 `variant`，重跑 `build_full.py`、`render_full.py` 與 `node scripts/build-external-fonts.mjs`，再跑檢查。
+站主 11-23 選 D，參數照原樣（橫 0.42、縱 0.55、間距 20，下逗號 0.60、留白 50）。`TAILS["variant"]` 已設 D，`build_full.py`、`render_full.py`、`build-external-fonts.mjs` 已重跑，`fonts/` 出貨的子集與 `specimen-full.png` 為 D 版。
+
+選定之後站主要看 D 的鉤子放大的樣子：`tails_d_sizes.py` 只渲染、不動出貨檔，出 `tails-d-sizes.png`，並排 D 原樣（0.42、0.55）、D 縱 0.70、D 橫 0.52 縱 0.70 三種，每種一行 Çç Ąą Ęę Įį Ųų Şş Ţţ 與一行 Jean-François · Garçon · Şişli，末列放大 ç ą ş。出貨仍是 D 原樣。
 
 ## 行距
 
-hhea（ascent 910、descent -200）與 OS/2 typo 不動。補入的大寫附加符號頂到 1142、下加符到 -288，OS/2 usWinAscent 由 995 改為 1162、usWinDescent 由 276 改為 308（字形頂底再加 20），免得 Windows GDI 裁掉 Ü 的點。
+hhea（ascent 910、descent -200）與 OS/2 typo 不動。補入的大寫附加符號頂到 1142、下逗號（D 版）到 -335，OS/2 usWinAscent 由 995 改為 1162、usWinDescent 由 276 改為 355（字形頂底再加 20），免得 Windows GDI 裁掉 Ü 的點。
 
 | 行高 | 原字型行框 | 補字版行框 |
 |---|---|---|
@@ -83,7 +86,7 @@ hhea（ascent 910、descent -200）與 OS/2 typo 不動。補入的大寫附加�
 | normal | 42.00 px | 42.00 px |
 | 1.375（`leading-snug`） | 41.25 px | 41.25 px |
 
-`measure_line_box.py`，30 px 標題「我的博士導師、歐洲道家─Günter Wohlfart」，macOS Chrome。Windows 上 `line-height: normal` 的瀏覽器會讀 win 值，行框可能變高；人文來風的標題都設了數值行高，不受影響。Windows 實機尚未驗。
+D 版重產後重量一次，數值相同。`measure_line_box.py`，30 px 標題「我的博士導師、歐洲道家─Günter Wohlfart」，macOS Chrome。Windows 上 `line-height: normal` 的瀏覽器會讀 win 值，行框可能變高；人文來風的標題都設了數值行高，不受影響。Windows 實機尚未驗。
 
 ## 檢查與驗收（2026-11-23）
 

@@ -57,7 +57,7 @@ RN = dict(
 #   ogonek_inset：反尾符右緣距基字右緣
 #   cb_scale、cb_gap：下逗號的等比縮放與留白
 TAILS = dict(
-    variant="B",
+    variant="D",  # 站主 11-23 選 D
     variants={
         # shape：comma＝整個逗號縮細；commatail＝只取逗號頭以下的尾巴（裁 y<tail_cut）；jhook＝取 j 的下鉤（裁 y<0）
         "A": dict(shape="comma", sx=0.50, sy=0.62, gap=25, ogonek_inset=60, cb_scale=0.60, cb_gap=40),
