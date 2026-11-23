@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import * as fontkit from 'fontkit';
 
 /*
@@ -12,39 +12,39 @@ import * as fontkit from 'fontkit';
  * 一個詞兩種字面。消費端的缺字檢查抓不到——那種檢查看的是「整個字型堆疊畫得出來」，而
  * ō 在內文字型有字，聯集永遠是通過的。所以判準要放在這裡，而且是「同一個面畫得完」。
  *
- * 兩個面各自的門檻不同：
- *  - 拉丁點綴面：常用拉丁字元（ASCII＋西歐重音＋擴充 A 的長音字母）全部要有，來源字型
- *    本身就沒有的碼位逐一列在 SOURCE_GAPS 並寫明理由。
+ * 各面的門檻：
+ *  - 拉丁點綴面（Erikas Farbband Phenom）與標題面（Radio Newsman Phenom）：ASCII、Latin-1 補充、
+ *    擴充 A 與常用標點（‘’“”–—…）全部要有，沒有例外表。兩支來源字型缺的碼位（Erikas 缺 ē Ŋ ŋ，
+ *    Radio Newsman 只有 ASCII）已由 engineering/glyph-extension-20261123/build_full.py 以字型自己的
+ *    字形補齊；以後重建子集若退回未補字的來源檔，這裡會逐碼位報出來。
  *  - 內文面：CJK 是固定全覆蓋子集，這裡只放一組煙霧測試（常用漢字、假名、全形標點、
  *    數學與箭頭），真正的逐字驗證在各消費站的 validate:fonts。
+ * 「有沒有字」一律以 fontkit 讀字型檔的 cmap 判斷，不寫死覆蓋表。
  */
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const font = (file) => fontkit.openSync(path.join(root, 'fonts', file));
 
 const range = (lo, hi) => Array.from({ length: hi - lo + 1 }, (_, i) => String.fromCodePoint(lo + i));
 
-// 來源字型 erikas-farbband.ttf 本身沒有的碼位，重建也生不出來。
-// U+0113 ē：日文羅馬字的長音 e 寫作 ei，用不到；拉脫維亞語等才需要。
-// U+014A/U+014B Ŋŋ：非洲語言與國際音標。
-const SOURCE_GAPS = new Set([0x0113, 0x014a, 0x014b]);
-
 const LATIN_REQUIRED = [
   ...range(0x0020, 0x007e), // ASCII 可見字元
-  ...range(0x00c0, 0x00ff), // 西歐重音字母
-  ...range(0x0100, 0x017f), // 擴充 A：ā ē ī ō ū 長音、č š ž
-].filter((c) => !SOURCE_GAPS.has(c.codePointAt(0)));
+  ...range(0x00a0, 0x00ff), // Latin-1 補充：西歐帶符字母與符號
+  ...range(0x0100, 0x017f), // 擴充 A：ā ē ī ō ū 長音、č š ž、ł ő ŋ
+  ...'\u2013\u2014\u2018\u2019\u201a\u201c\u201d\u201e\u2026', // – — ‘ ’ ‚ “ ” „ …
+];
 
 const CJK_SMOKE = [...'德川日本一二三四五六七八九十的是在了不和有大這中人上為個國我以要他時來用們生到作地於出就分對成會可主發年動'
   + 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん'
   + 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン'
   + '（）「」『』〈〉《》、。，：；？！…—－·×÷≤≥≈→←↑↓∈∑'];
 
-/* 拉丁點綴的兩個字重各自成一個面：缺字就是同一個詞裡換字型，所以逐檔驗。
+/* 拉丁點綴的兩個字重與標題面各自成一個面：缺字就是同一個詞裡換字型，所以逐檔驗。
    內文則是一個家族兩個檔（Huiwen 帶字，Chiron 依 unicode-range 補 Huiwen 畫不出的碼位），
    同一個家族名之下對讀者是一種字，所以驗聯集。 */
 const FACES = [
   { files: ['ErikasFarbband-subset.woff2'], label: '拉丁點綴面 regular', required: LATIN_REQUIRED },
   { files: ['ErikasFarbband-Bold-subset.woff2'], label: '拉丁點綴面 bold', required: LATIN_REQUIRED },
+  { files: ['RadioNewsman-subset.woff2'], label: '標題面 Radio Newsman', required: LATIN_REQUIRED },
   {
     files: ['HuiwenMincho-core-subset.woff2', 'HuiwenMincho-ext-subset.woff2', 'ChironSungHK-fallback-subset.woff2'],
     label: '內文家族（Huiwen 常用面＋其餘面＋Chiron 補字）',
@@ -59,7 +59,7 @@ for (const face of FACES) {
     (c) => !loaded.some((f) => f.hasGlyphForCodePoint(c.codePointAt(0))),
   );
   if (missing.length > 0) {
-    const codes = missing.slice(0, 12)
+    const codes = missing.slice(0, 40)
       .map((c) => `${c} (U+${c.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')})`)
       .join(' ');
     problems.push(`${face.label}（${face.files.join('、')}）缺 ${missing.length} 個字元：${codes}`);
@@ -130,54 +130,6 @@ for (const character of FULLWIDTH_REQUIRED) {
   }
 }
 
-/*
- * 標題字型（Radio Newsman）與它的整標題備援（Erikas）。
- *
- * 2026-11-23 補上。人文來風講者「Günter Wohlfart」的標題用 font-display，ü 掉到堆疊下一個
- * 面（汇文明體，細、無打字機質感）。來源字型 radio-newsman.ttf 只有 95 個碼位（ASCII），
- * 重建子集生不出 ü，所以辦法在使用端：標題含 Radio Newsman 畫不出的拉丁字元時整個標題
- * 改走 Erikas（packages/vue 的 displayFont.js），詞內不換字型。這裡驗三件事：
- *  1. Radio Newsman 子集畫得完 ASCII（來源字型本身沒有的碼位列在 DISPLAY_SOURCE_GAPS）。
- *  2. 判準函式涵蓋所有「Radio Newsman 沒有的拉丁字母與引號破折號」，漏一個就有一個字母掉字型。
- *  3. 判準判成走 Erikas 的字元，Erikas 兩個字重都畫得出來。
- */
-const DISPLAY_SOURCE_GAPS = new Set([0x003c, 0x003e, 0x0060, 0x007e]); // < > ` ~
-const display = font('RadioNewsman-subset.woff2');
-const displayMissing = range(0x0020, 0x007e).filter(
-  (c) => !DISPLAY_SOURCE_GAPS.has(c.codePointAt(0)) && !display.hasGlyphForCodePoint(c.codePointAt(0)),
-);
-if (displayMissing.length > 0) {
-  problems.push(`標題面 Radio Newsman 缺 ASCII ${displayMissing.length} 字：${displayMissing.join('')}`);
-}
-const { needsAccentDisplayFace } = await import(
-  pathToFileURL(path.join(root, 'packages/vue/src/composables/displayFont.js')).href
-);
-const accentFaces = ['ErikasFarbband-subset.woff2', 'ErikasFarbband-Bold-subset.woff2'].map(font);
-let accentChecked = 0;
-for (const [lo, hi] of [[0x00c0, 0x024f], [0x1e00, 0x1eff], [0x2013, 0x2014], [0x2018, 0x201d]]) {
-  for (let cp = lo; cp <= hi; cp++) {
-    if (display.hasGlyphForCodePoint(cp)) continue;
-    if (!accentFaces[0].hasGlyphForCodePoint(cp)) continue; // 兩個面都沒有：來源字型缺，不屬於這道檢查
-    accentChecked += 1;
-    const sample = `A${String.fromCodePoint(cp)}`;
-    if (!needsAccentDisplayFace(sample)) {
-      problems.push(`標題字型判準漏了 U+${cp.toString(16).toUpperCase().padStart(4, '0')}：Radio Newsman 沒有而 Erikas 有，該字會落到明體`);
-    }
-    for (const face of accentFaces) {
-      if (!face.hasGlyphForCodePoint(cp)) {
-        problems.push(`Erikas 一個字重缺 U+${cp.toString(16).toUpperCase().padStart(4, '0')}，整標題改走 Erikas 時該字掉字型`);
-      }
-    }
-  }
-}
-if (accentChecked < 200) {
-  problems.push(`標題字型備援只掃到 ${accentChecked} 個碼位（預期 200 以上），檢查沒有看到該看的字`);
-}
-for (const [text, expected] of [['Günter Wohlfart', true], ['我的博士導師─Günter Wohlfart', true], ['Kant', false], ['康德', false], ['凱薩琳·赫本', false], ['Hegel’s', true]]) {
-  if (needsAccentDisplayFace(text) !== expected) problems.push(`needsAccentDisplayFace(${JSON.stringify(text)}) 應為 ${expected}`);
-}
-console.log(`標題字型備援：Radio Newsman 缺而 Erikas 有的 ${accentChecked} 個碼位，判準全數涵蓋。`);
-
 /* 負向測試：未改過的常用面單獨拿來量，U+3008 要報半形。報不出來就表示上面那段的量法
    壞了（或是換了一支來源字型），而它壞掉的樣子與「一切正常」一模一樣。 */
 {
@@ -226,9 +178,10 @@ if (problems.length > 0) {
   for (const p of problems) console.error(`  ${p}`);
   console.error('\n這些字元在別的字型有，所以消費端的缺字檢查不會報——壞的是字面一致性：');
   console.error('缺的那個字母會掉到堆疊下一個字型，半個詞不是這個面的字。');
-  console.error('→ 缺字：在有來源字型的機器上重建子集（my-canvas-lab 的 npm run fonts:rebuild），把產物複製過來。');
+  console.error('→ 拉丁面缺字：跑 engineering/glyph-extension-20261123/build_full.py 重產補字版子集（重跑環境見同目錄 index.md），再跑 node scripts/build-external-fonts.mjs。');
+  console.error('  my-canvas-lab 的 npm run fonts:rebuild 從未補字的來源檔重建，產物會缺字，不要複製過來。');
   console.error('→ 全形標點的 advance 不對：跑 node scripts/build-angle-bracket-face.mjs，再跑 node scripts/build-external-fonts.mjs。');
   process.exit(1);
 }
 
-console.log(`字型子集覆蓋通過：${FACES.length} 個面，拉丁面各 ${LATIN_REQUIRED.length} 字、內文面煙霧測試 ${CJK_SMOKE.length} 字、全形標點 ${FULLWIDTH_REQUIRED.length} 字。`);
+console.log(`字型子集覆蓋通過：${FACES.length} 個面，拉丁面與標題面各 ${LATIN_REQUIRED.length} 字、內文面煙霧測試 ${CJK_SMOKE.length} 字、全形標點 ${FULLWIDTH_REQUIRED.length} 字。`);

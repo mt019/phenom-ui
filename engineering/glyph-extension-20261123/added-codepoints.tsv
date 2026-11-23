@@ -1,0 +1,248 @@
+字型	碼位	字	組法
+Radio Newsman Phenom	U+003C	<	v 轉 -90 度
+Radio Newsman Phenom	U+003E	>	v 轉 90 度
+Radio Newsman Phenom	U+0060	`	抑音符單獨
+Radio Newsman Phenom	U+007E	~	s 轉 90 度壓扁
+Radio Newsman Phenom	U+00A1	¡	! 轉 180 度
+Radio Newsman Phenom	U+00A2	¢	c + bar 截段
+Radio Newsman Phenom	U+00A3	£	f + L 的底筆
+Radio Newsman Phenom	U+00A4	¤	o 縮 0.55 + 四段 hyphen 斜筆
+Radio Newsman Phenom	U+00A5	¥	Y + 兩道 hyphen
+Radio Newsman Phenom	U+00A6	¦	bar 中段截去
+Radio Newsman Phenom	U+00A7	§	兩個 s 縮 0.72 上下疊
+Radio Newsman Phenom	U+00A8	¨	分音符單獨
+Radio Newsman Phenom	U+00A9	©	O + C 縮 0.42 置中
+Radio Newsman Phenom	U+00AA	ª	a 縮 0.55 上標 + hyphen 底線
+Radio Newsman Phenom	U+00AB	«	v 轉 -90 度縮小，兩個併排
+Radio Newsman Phenom	U+00AC	¬	hyphen 拉長 + hyphen 轉 90 度
+Radio Newsman Phenom	U+00AD	­	同 hyphen
+Radio Newsman Phenom	U+00AE	®	O + R 縮 0.42 置中
+Radio Newsman Phenom	U+00AF	¯	長音符單獨
+Radio Newsman Phenom	U+00B0	°	o 縮 0.36
+Radio Newsman Phenom	U+00B1	±	plus 上移 + hyphen
+Radio Newsman Phenom	U+00B2	²	two 縮 0.55 上標
+Radio Newsman Phenom	U+00B3	³	three 縮 0.55 上標
+Radio Newsman Phenom	U+00B4	´	尖音符單獨
+Radio Newsman Phenom	U+00B5	µ	u + p 的降部
+Radio Newsman Phenom	U+00B6	¶	period 放大 + bar 截段兩支 + hyphen
+Radio Newsman Phenom	U+00B7	·	period 縮 0.80 置中高
+Radio Newsman Phenom	U+00B8	¸	下加符單獨
+Radio Newsman Phenom	U+00B9	¹	one 縮 0.55 上標
+Radio Newsman Phenom	U+00BA	º	o 縮 0.55 上標 + hyphen 底線
+Radio Newsman Phenom	U+00BB	»	v 轉 90 度縮小，兩個併排
+Radio Newsman Phenom	U+00BC	¼	one、four 縮 0.45 + slash
+Radio Newsman Phenom	U+00BD	½	one、two 縮 0.45 + slash
+Radio Newsman Phenom	U+00BE	¾	three、four 縮 0.45 + slash
+Radio Newsman Phenom	U+00BF	¿	? 轉 180 度
+Radio Newsman Phenom	U+00C0	À	A + grave
+Radio Newsman Phenom	U+00C1	Á	A + acute
+Radio Newsman Phenom	U+00C2	Â	A + circumflex
+Radio Newsman Phenom	U+00C3	Ã	A + tilde
+Radio Newsman Phenom	U+00C4	Ä	A + dieresis
+Radio Newsman Phenom	U+00C5	Å	A + ring
+Radio Newsman Phenom	U+00C6	Æ	A 裁右 38% + E
+Radio Newsman Phenom	U+00C7	Ç	C + comma 翻轉縮 0.75 置下（下加符）
+Radio Newsman Phenom	U+00C8	È	E + grave
+Radio Newsman Phenom	U+00C9	É	E + acute
+Radio Newsman Phenom	U+00CA	Ê	E + circumflex
+Radio Newsman Phenom	U+00CB	Ë	E + dieresis
+Radio Newsman Phenom	U+00CC	Ì	I + grave
+Radio Newsman Phenom	U+00CD	Í	I + acute
+Radio Newsman Phenom	U+00CE	Î	I + circumflex
+Radio Newsman Phenom	U+00CF	Ï	I + dieresis
+Radio Newsman Phenom	U+00D0	Ð	D + hyphen 橫槓（同 Đ）
+Radio Newsman Phenom	U+00D1	Ñ	N + tilde
+Radio Newsman Phenom	U+00D2	Ò	O + grave
+Radio Newsman Phenom	U+00D3	Ó	O + acute
+Radio Newsman Phenom	U+00D4	Ô	O + circumflex
+Radio Newsman Phenom	U+00D5	Õ	O + tilde
+Radio Newsman Phenom	U+00D6	Ö	O + dieresis
+Radio Newsman Phenom	U+00D7	×	plus 轉 45 度縮 0.85
+Radio Newsman Phenom	U+00D8	Ø	O + slash 依 O 高放大
+Radio Newsman Phenom	U+00D9	Ù	U + grave
+Radio Newsman Phenom	U+00DA	Ú	U + acute
+Radio Newsman Phenom	U+00DB	Û	U + circumflex
+Radio Newsman Phenom	U+00DC	Ü	U + dieresis
+Radio Newsman Phenom	U+00DD	Ý	Y + acute
+Radio Newsman Phenom	U+00DE	Þ	P 字幹全高 + P 的碗縮 0.85 置中段
+Radio Newsman Phenom	U+00DF	ß	長 s（f 去橫筆）+ B 右半裁到 y 640 以下（橫 0.85、縱 0.95），上方由長 s 的鉤接
+Radio Newsman Phenom	U+00E0	à	a + grave
+Radio Newsman Phenom	U+00E1	á	a + acute
+Radio Newsman Phenom	U+00E2	â	a + circumflex
+Radio Newsman Phenom	U+00E3	ã	a + tilde
+Radio Newsman Phenom	U+00E4	ä	a + dieresis
+Radio Newsman Phenom	U+00E5	å	a + ring
+Radio Newsman Phenom	U+00E6	æ	a 裁右 22% + e
+Radio Newsman Phenom	U+00E7	ç	c + comma 翻轉縮 0.75 置下（下加符）
+Radio Newsman Phenom	U+00E8	è	e + grave
+Radio Newsman Phenom	U+00E9	é	e + acute
+Radio Newsman Phenom	U+00EA	ê	e + circumflex
+Radio Newsman Phenom	U+00EB	ë	e + dieresis
+Radio Newsman Phenom	U+00EC	ì	ı + grave
+Radio Newsman Phenom	U+00ED	í	ı + acute
+Radio Newsman Phenom	U+00EE	î	ı + circumflex
+Radio Newsman Phenom	U+00EF	ï	ı + dieresis
+Radio Newsman Phenom	U+00F0	ð	six 左右翻轉縮 0.92 + hyphen 斜槓
+Radio Newsman Phenom	U+00F1	ñ	n + tilde
+Radio Newsman Phenom	U+00F2	ò	o + grave
+Radio Newsman Phenom	U+00F3	ó	o + acute
+Radio Newsman Phenom	U+00F4	ô	o + circumflex
+Radio Newsman Phenom	U+00F5	õ	o + tilde
+Radio Newsman Phenom	U+00F6	ö	o + dieresis
+Radio Newsman Phenom	U+00F7	÷	hyphen + 兩個 period 縮 0.6
+Radio Newsman Phenom	U+00F8	ø	o + slash 依 o 高放大
+Radio Newsman Phenom	U+00F9	ù	u + grave
+Radio Newsman Phenom	U+00FA	ú	u + acute
+Radio Newsman Phenom	U+00FB	û	u + circumflex
+Radio Newsman Phenom	U+00FC	ü	u + dieresis
+Radio Newsman Phenom	U+00FD	ý	y + acute
+Radio Newsman Phenom	U+00FE	þ	p + l 的升部（含上襯線）
+Radio Newsman Phenom	U+00FF	ÿ	y + dieresis
+Radio Newsman Phenom	U+0100	Ā	A + macron
+Radio Newsman Phenom	U+0101	ā	a + macron
+Radio Newsman Phenom	U+0102	Ă	A + breve
+Radio Newsman Phenom	U+0103	ă	a + breve
+Radio Newsman Phenom	U+0104	Ą	A + comma 翻轉縮 0.80 置右下（反尾符）
+Radio Newsman Phenom	U+0105	ą	a + comma 翻轉縮 0.80 置右下（反尾符）
+Radio Newsman Phenom	U+0106	Ć	C + acute
+Radio Newsman Phenom	U+0107	ć	c + acute
+Radio Newsman Phenom	U+0108	Ĉ	C + circumflex
+Radio Newsman Phenom	U+0109	ĉ	c + circumflex
+Radio Newsman Phenom	U+010A	Ċ	C + dotaccent
+Radio Newsman Phenom	U+010B	ċ	c + dotaccent
+Radio Newsman Phenom	U+010C	Č	C + caron
+Radio Newsman Phenom	U+010D	č	c + caron
+Radio Newsman Phenom	U+010E	Ď	D + caron
+Radio Newsman Phenom	U+010F	ď	d + ’ 縮 0.80 置右上（捷克、斯洛伐克字形慣例）
+Radio Newsman Phenom	U+0110	Đ	D + hyphen 橫槓
+Radio Newsman Phenom	U+0111	đ	d + hyphen 橫槓置升部
+Radio Newsman Phenom	U+0112	Ē	E + macron
+Radio Newsman Phenom	U+0113	ē	e + macron
+Radio Newsman Phenom	U+0114	Ĕ	E + breve
+Radio Newsman Phenom	U+0115	ĕ	e + breve
+Radio Newsman Phenom	U+0116	Ė	E + dotaccent
+Radio Newsman Phenom	U+0117	ė	e + dotaccent
+Radio Newsman Phenom	U+0118	Ę	E + comma 翻轉縮 0.80 置右下（反尾符）
+Radio Newsman Phenom	U+0119	ę	e + comma 翻轉縮 0.80 置右下（反尾符）
+Radio Newsman Phenom	U+011A	Ě	E + caron
+Radio Newsman Phenom	U+011B	ě	e + caron
+Radio Newsman Phenom	U+011C	Ĝ	G + circumflex
+Radio Newsman Phenom	U+011D	ĝ	g + circumflex
+Radio Newsman Phenom	U+011E	Ğ	G + breve
+Radio Newsman Phenom	U+011F	ğ	g + breve
+Radio Newsman Phenom	U+0120	Ġ	G + dotaccent
+Radio Newsman Phenom	U+0121	ġ	g + dotaccent
+Radio Newsman Phenom	U+0122	Ģ	G + comma 縮 0.62 置下
+Radio Newsman Phenom	U+0123	ģ	g + comma 轉 180 度置上
+Radio Newsman Phenom	U+0124	Ĥ	H + circumflex
+Radio Newsman Phenom	U+0125	ĥ	h + circumflex
+Radio Newsman Phenom	U+0126	Ħ	H + hyphen 橫槓
+Radio Newsman Phenom	U+0127	ħ	h + hyphen 橫槓置升部
+Radio Newsman Phenom	U+0128	Ĩ	I + tilde
+Radio Newsman Phenom	U+0129	ĩ	ı + tilde
+Radio Newsman Phenom	U+012A	Ī	I + macron
+Radio Newsman Phenom	U+012B	ī	ı + macron
+Radio Newsman Phenom	U+012C	Ĭ	I + breve
+Radio Newsman Phenom	U+012D	ĭ	ı + breve
+Radio Newsman Phenom	U+012E	Į	I + comma 翻轉縮 0.80 置右下（反尾符）
+Radio Newsman Phenom	U+012F	į	i + comma 翻轉縮 0.80 置右下（反尾符）
+Radio Newsman Phenom	U+0130	İ	I + dotaccent
+Radio Newsman Phenom	U+0131	ı	i 去點（裁去 y 690 以上）
+Radio Newsman Phenom	U+0132	Ĳ	I + J 併排
+Radio Newsman Phenom	U+0133	ĳ	i + j 併排
+Radio Newsman Phenom	U+0134	Ĵ	J + circumflex
+Radio Newsman Phenom	U+0135	ĵ	ȷ + circumflex
+Radio Newsman Phenom	U+0136	Ķ	K + comma 縮 0.62 置下
+Radio Newsman Phenom	U+0137	ķ	k + comma 縮 0.62 置下
+Radio Newsman Phenom	U+0138	ĸ	K 橫 0.88、壓到 x 高
+Radio Newsman Phenom	U+0139	Ĺ	L + acute
+Radio Newsman Phenom	U+013A	ĺ	l + acute
+Radio Newsman Phenom	U+013B	Ļ	L + comma 縮 0.62 置下
+Radio Newsman Phenom	U+013C	ļ	l + comma 縮 0.62 置下
+Radio Newsman Phenom	U+013D	Ľ	L + ’ 縮 0.80 置右上（捷克、斯洛伐克字形慣例）
+Radio Newsman Phenom	U+013E	ľ	l + ’ 縮 0.80 置右上（捷克、斯洛伐克字形慣例）
+Radio Newsman Phenom	U+013F	Ŀ	L + period 置中高
+Radio Newsman Phenom	U+0140	ŀ	l + period 置中高
+Radio Newsman Phenom	U+0141	Ł	L + hyphen 轉 30 度斜槓
+Radio Newsman Phenom	U+0142	ł	l + hyphen 轉 30 度斜槓
+Radio Newsman Phenom	U+0143	Ń	N + acute
+Radio Newsman Phenom	U+0144	ń	n + acute
+Radio Newsman Phenom	U+0145	Ņ	N + comma 縮 0.62 置下
+Radio Newsman Phenom	U+0146	ņ	n + comma 縮 0.62 置下
+Radio Newsman Phenom	U+0147	Ň	N + caron
+Radio Newsman Phenom	U+0148	ň	n + caron
+Radio Newsman Phenom	U+0149	ŉ	’ + n
+Radio Newsman Phenom	U+014A	Ŋ	N 去右腳底襯線 + j 的下鉤（j 裁 y<200，對齊右腳中線）
+Radio Newsman Phenom	U+014B	ŋ	n 去右腳底襯線 + j 的下鉤（j 裁 y<200，對齊右腳中線）
+Radio Newsman Phenom	U+014C	Ō	O + macron
+Radio Newsman Phenom	U+014D	ō	o + macron
+Radio Newsman Phenom	U+014E	Ŏ	O + breve
+Radio Newsman Phenom	U+014F	ŏ	o + breve
+Radio Newsman Phenom	U+0150	Ő	O + hungarumlaut
+Radio Newsman Phenom	U+0151	ő	o + hungarumlaut
+Radio Newsman Phenom	U+0152	Œ	O 裁右 30% + E
+Radio Newsman Phenom	U+0153	œ	o 裁右 20% + e
+Radio Newsman Phenom	U+0154	Ŕ	R + acute
+Radio Newsman Phenom	U+0155	ŕ	r + acute
+Radio Newsman Phenom	U+0156	Ŗ	R + comma 縮 0.62 置下
+Radio Newsman Phenom	U+0157	ŗ	r + comma 縮 0.62 置下
+Radio Newsman Phenom	U+0158	Ř	R + caron
+Radio Newsman Phenom	U+0159	ř	r + caron
+Radio Newsman Phenom	U+015A	Ś	S + acute
+Radio Newsman Phenom	U+015B	ś	s + acute
+Radio Newsman Phenom	U+015C	Ŝ	S + circumflex
+Radio Newsman Phenom	U+015D	ŝ	s + circumflex
+Radio Newsman Phenom	U+015E	Ş	S + comma 翻轉縮 0.75 置下（下加符）
+Radio Newsman Phenom	U+015F	ş	s + comma 翻轉縮 0.75 置下（下加符）
+Radio Newsman Phenom	U+0160	Š	S + caron
+Radio Newsman Phenom	U+0161	š	s + caron
+Radio Newsman Phenom	U+0162	Ţ	T + comma 翻轉縮 0.75 置下（下加符）
+Radio Newsman Phenom	U+0163	ţ	t + comma 翻轉縮 0.75 置下（下加符）
+Radio Newsman Phenom	U+0164	Ť	T + caron
+Radio Newsman Phenom	U+0165	ť	t + ’ 縮 0.80 置右上（捷克、斯洛伐克字形慣例）
+Radio Newsman Phenom	U+0166	Ŧ	T + hyphen 橫槓
+Radio Newsman Phenom	U+0167	ŧ	t + hyphen 橫槓
+Radio Newsman Phenom	U+0168	Ũ	U + tilde
+Radio Newsman Phenom	U+0169	ũ	u + tilde
+Radio Newsman Phenom	U+016A	Ū	U + macron
+Radio Newsman Phenom	U+016B	ū	u + macron
+Radio Newsman Phenom	U+016C	Ŭ	U + breve
+Radio Newsman Phenom	U+016D	ŭ	u + breve
+Radio Newsman Phenom	U+016E	Ů	U + ring
+Radio Newsman Phenom	U+016F	ů	u + ring
+Radio Newsman Phenom	U+0170	Ű	U + hungarumlaut
+Radio Newsman Phenom	U+0171	ű	u + hungarumlaut
+Radio Newsman Phenom	U+0172	Ų	U + comma 翻轉縮 0.80 置右下（反尾符）
+Radio Newsman Phenom	U+0173	ų	u + comma 翻轉縮 0.80 置右下（反尾符）
+Radio Newsman Phenom	U+0174	Ŵ	W + circumflex
+Radio Newsman Phenom	U+0175	ŵ	w + circumflex
+Radio Newsman Phenom	U+0176	Ŷ	Y + circumflex
+Radio Newsman Phenom	U+0177	ŷ	y + circumflex
+Radio Newsman Phenom	U+0178	Ÿ	Y + dieresis
+Radio Newsman Phenom	U+0179	Ź	Z + acute
+Radio Newsman Phenom	U+017A	ź	z + acute
+Radio Newsman Phenom	U+017B	Ż	Z + dotaccent
+Radio Newsman Phenom	U+017C	ż	z + dotaccent
+Radio Newsman Phenom	U+017D	Ž	Z + caron
+Radio Newsman Phenom	U+017E	ž	z + caron
+Radio Newsman Phenom	U+017F	ſ	f 去橫筆：留上鉤、字幹、底襯線
+Radio Newsman Phenom	U+2013	–	hyphen 兩端各 90 不動、中段拉長到總寬 560
+Radio Newsman Phenom	U+2014	—	hyphen 兩端各 90 不動、中段拉長到總寬 1100
+Radio Newsman Phenom	U+2018	‘	comma 轉 180 度上移
+Radio Newsman Phenom	U+2019	’	comma 上移 680
+Radio Newsman Phenom	U+201A	‚	同 comma
+Radio Newsman Phenom	U+201C	“	兩個 comma 轉 180 度上移
+Radio Newsman Phenom	U+201D	”	兩個 comma 上移
+Radio Newsman Phenom	U+201E	„	兩個 comma
+Radio Newsman Phenom	U+2022	•	period 放大 1.2 置中高
+Radio Newsman Phenom	U+2026	…	三個 period 縮 0.85
+Radio Newsman Phenom	U+2039	‹	v 轉 -90 度縮小
+Radio Newsman Phenom	U+203A	›	v 轉 90 度縮小
+Erikas Farbband Phenom Regular	U+00A0	(NBSP)	對應 space 字形
+Erikas Farbband Phenom Regular	U+0113	ē	e + ō 的長音輪廓（1 條），網點用 e 的
+Erikas Farbband Phenom Regular	U+014A	Ŋ	N 去右腳底襯線 + j 下鉤（j 主輪廓裁 y<40）
+Erikas Farbband Phenom Regular	U+014B	ŋ	n 去右腳底襯線 + j 下鉤（j 主輪廓裁 y<40）
+Erikas Farbband Phenom Bold	U+00A0	(NBSP)	對應 space 字形
+Erikas Farbband Phenom Bold	U+0113	ē	e + ō 的長音輪廓（2 條），網點用 e 的
+Erikas Farbband Phenom Bold	U+014A	Ŋ	N 去右腳底襯線 + j 下鉤（j 主輪廓裁 y<40）
+Erikas Farbband Phenom Bold	U+014B	ŋ	n 去右腳底襯線 + j 下鉤（j 主輪廓裁 y<40）

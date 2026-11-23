@@ -76,21 +76,21 @@
 
 @font-face {
   font-family: 'Erikas Farbband';
-  src: url('https://assets.phenomcanvas.com/v1/519f4c7011247422db110e3fd88fc76527b672822e7c6a0295a24471a65c13ff/fonts/ErikasFarbband-subset.woff2') format('woff2');
+  src: url('https://assets.phenomcanvas.com/v1/2f7ae9be33e65072ea95429e7d729c6972f977aec6b853d182061edb3953c323/fonts/ErikasFarbband-subset.woff2') format('woff2');
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'Erikas Farbband';
-  src: url('https://assets.phenomcanvas.com/v1/1e5cf606783b370a9a3aac0b01394bc76756db11b096089921c4eee8cd0f9513/fonts/ErikasFarbband-Bold-subset.woff2') format('woff2');
+  src: url('https://assets.phenomcanvas.com/v1/0a15e1d0ad1480fb79cefb6cada33ee06a1f559d8dc50617f0d2ba64c9d661d3/fonts/ErikasFarbband-Bold-subset.woff2') format('woff2');
   font-weight: 700;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'Radio Newsman';
-  src: url('https://assets.phenomcanvas.com/v1/f41fed76c78fcd24eaa5f06dd76aeaf1fe45ca30ed473e4a76642451b3846cf9/fonts/RadioNewsman-subset.woff2') format('woff2');
+  src: url('https://assets.phenomcanvas.com/v1/4950b53a803d955ec208223d408c843893e26d0ea79ebe1b9cb9c41f57419519/fonts/RadioNewsman-subset.woff2') format('woff2');
   font-weight: 400 700;
   font-display: swap;
 }
