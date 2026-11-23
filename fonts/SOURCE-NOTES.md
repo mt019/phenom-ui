@@ -46,8 +46,9 @@ Erikas 兩個字重原本帶的是 130 字的子集，照當時某一個站的�
   附加符號，hhea 與 typo 未動，標題行框不變。
 - Erikas Farbband Phenom regular 與 bold：補 ē Ŋ ŋ 與 U+00A0。
 
-同日撤回先前的做法（`--font-display` 堆疊在 Radio Newsman 之後插入 Erikas，ui-vue
-`PageIdentity` 標題含 Radio Newsman 畫不出的字元時整行改走 font-accent 的 `displayFont.js`）。
+標題一律以補字後的 Radio Newsman Phenom 排，`--font-display` 堆疊為 Radio Newsman 接匯文明體，
+不經 Erikas；ui-vue `PageIdentity` 不再依標題字元切換字面，`displayFont.js` 已刪除。同日 df70000
+的堆疊插入 Erikas 與 font-accent 切換兩處一併撤回。
 `scripts/validate-font-subsets.mjs` 改為三個拉丁面一律驗 ASCII、Latin-1 補充、擴充 A 與常用標點，
 以 cmap 判斷，不留例外表；`scripts/check-display-coverage.mjs` 掃人文來風建置資料裡會以
 font-display 畫的文字（集名、段落標題、講者名、條目名），逐字讀標題字型的 cmap，缺字報出。
