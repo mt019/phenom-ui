@@ -61,6 +61,14 @@
 - 被否決過、不得回頭再試的：badge 深墨值直接當點（灰暗）、框架色（accent／accent2／
   pop）當 mark、驗證器生成的鮮豔組、外部名牌色票、mark 上標單字。
 
+## 句中元素與避頭（2026-11-23 站主「全局底層逗號標點符號禁止在開頭」）
+
+- 嵌在句子裡的元素（註號、HoverCard 觸發字、行內徽章）不用 `inline-block`／`inline-flex`。原子行內元素前後都是
+  斷行點，其後的「，」「。」會落到行首（cc 站釋字第 748 號意見書的註號即是）。上標的上移用 `relative` 加負 `top`，
+  左右留白用 `mx`，兩者在一般行內元素上都生效。
+- 資料裡全形標點旁的空白由資料層去掉，判準與跨倉檢查見 phenom-ops `packages/prose-rules/lib/cjk-punct.mjs`、
+  `npm run check:cjk-punct`。
+
 ## 消費端紀律
 
 - 各站一律 import 本包，禁止本地複製 `tokens.css`／`palettes.js`／validator 副本
