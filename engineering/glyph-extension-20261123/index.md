@@ -8,6 +8,7 @@
 |---|---|---|
 | `build_full.py` | 全量產生腳本。從 Translation 倉 `_Assets/fonts/categories/typewriter-latin/` 讀三支原檔，輸出 `build/` 完整檔與 `../../fonts/` 三個 woff2 子集、`added-codepoints.tsv`；參數在檔首 `RN` 字典 | 是 |
 | `added-codepoints.tsv` | 每個補入碼位：字型、碼位、字、組法（248 列） | 是 |
+| `tails_variants.py`、`tails-variants.png`、`tails-variants.html` | 下加符號各版本對照（見「下加符號重做」） | 是 |
 | `render_full.py` | 以 headless Chrome 渲染 `specimen-full.png`、`zoom-full.png` | 是 |
 | `specimen-full.png` | Radio Newsman 補入的 239 個字形，每組上排原字型、下排補字版；實際集名五組；Erikas 兩個字重補入的 ē Ŋ ŋ | 是 |
 | `zoom-full.png` | ß ø æ œ ł、Œ Æ Ø Ł Ŋ ŋ ð þ ſ 放大，第三列是字型原有的 u B o l f e 與補入的 ü ö | 是 |
@@ -56,6 +57,21 @@
 | ’ | comma 上移 680 | comma |
 
 另畫的字形（Unicode 分解組不出來）：ß 取長 s（f 去橫筆）接 B 右半在 y 640 以下的兩碗；ø Ø 見上；æ œ Æ Œ 取前字裁去右側後與 e、E 疊接；ł 見上；ŋ Ŋ 取 n、N 去右腳底襯線接 j 的下鉤；ð 取 six 左右翻轉縮 0.92 加斜槓；þ 取 p 加 l 的升部；Þ 取 P 字幹全高、碗縮到中段；ĸ 取 K 壓到 x 高；ſ 取 f 去橫筆；Ĳ ĳ ŉ Ŀ ŀ 為兩字併排；µ 取 u 接 p 的降部。符號（¡ ¿ ¢ £ ¤ ¥ ¦ § © ® ª º « » ¬ ° ± ² ³ ¹ ¶ · ¼ ½ ¾ × ÷）各自的組法見 `added-codepoints.tsv`。
+
+## 下加符號重做（11-23 站主退回）
+
+第一版的下加符（Ç ç Ş ş Ţ ţ ¸）、反尾符（Ą ą Ę ę Į į Ų ų）、下逗號（Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ）取整個 comma 等比 0.75、0.80，與基字同粗並黏在基字上，站主退回。參數改集中在 `build_full.py` 檔首 `TAILS` 字典，`tails_variants.py` 依各版本各產一份字型（`build/tails-*.ttf`，不進版控），與原字型（ç 落到明體）、第一版並排出 `tails-variants.png`。
+
+| 版本 | 下加符、反尾符的來源 | 橫、縱縮放 | 與基字間距 | 下逗號縮放、留白 |
+|---|---|---|---|---|
+| A | 整個 comma | 0.50、0.62 | 25 | 0.60、40 |
+| B | comma 裁去頭，只留 y<-20 的尾巴 | 1.00、1.00 | 15 | 0.60、60 |
+| C | 同 B | 0.80、0.85 | -10（疊入 10，細點相連） | 0.55、40 |
+| D | j 的下鉤（裁 y<0） | 0.42、0.55 | 20 | 0.60、50 |
+
+間距量自基字外框底（yMin）；反尾符右緣距基字右緣 60。ģ 的上置倒逗號跟著下逗號的縮放。反尾符一律取來源字形左右鏡像。命令：`.venv/bin/python tails_variants.py`。
+
+站主挑定之前，`TAILS["variant"]` 暫設 B，`fonts/` 底下出貨的仍是第一版（799254c）；挑定後改 `variant`，重跑 `build_full.py`、`render_full.py` 與 `node scripts/build-external-fonts.mjs`，再跑檢查。
 
 ## 行距
 

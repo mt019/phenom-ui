@@ -49,6 +49,24 @@ RN = dict(
     apos_dy=680,        # ’：comma 上移
     win_ascent_pad=20,  # winAscent 取所有字形頂再加這個量
 )
+# 下加符號（下加符 ¸、反尾符 ˛、拉脫維亞語下逗號）。站主 11-23 退回第一版：尾巴與基字同粗、整塊黏上去。
+# 改為逗號縮細（橫向縮得比縱向多），與基字之間留白或只以細點相連。版本由 tails_variants.py 並排出圖給站主挑，
+# 挑定後把 variant 改成那一版再全量重產。單位 1/1000 em。
+#   shape、sx、sy：尾巴的來源字形與橫、縱縮放（第一版為整個 comma 等比 0.75、0.80）
+#   gap：尾巴頂與基字底（外框 yMin）之間的距離；負值表示疊入基字這麼多，只在一個細點相連
+#   ogonek_inset：反尾符右緣距基字右緣
+#   cb_scale、cb_gap：下逗號的等比縮放與留白
+TAILS = dict(
+    variant="B",
+    variants={
+        # shape：comma＝整個逗號縮細；commatail＝只取逗號頭以下的尾巴（裁 y<tail_cut）；jhook＝取 j 的下鉤（裁 y<0）
+        "A": dict(shape="comma", sx=0.50, sy=0.62, gap=25, ogonek_inset=60, cb_scale=0.60, cb_gap=40),
+        "B": dict(shape="commatail", tail_cut=-20, sx=1.00, sy=1.00, gap=15, ogonek_inset=60, cb_scale=0.60, cb_gap=60),
+        "C": dict(shape="commatail", tail_cut=-20, sx=0.80, sy=0.85, gap=-10, ogonek_inset=60, cb_scale=0.55, cb_gap=40),
+        "D": dict(shape="jhook", sx=0.42, sy=0.55, gap=20, ogonek_inset=60, cb_scale=0.60, cb_gap=50),
+    },
+)
+
 # 補字範圍：Latin-1 補充、擴充 A、常用標點，加上 ASCII 原缺的 < > ` ~。
 TARGET = (list(range(0x00A0, 0x0100)) + list(range(0x0100, 0x0180))
           + [0x2013, 0x2014, 0x2018, 0x2019, 0x201A, 0x201C, 0x201D, 0x201E, 0x2026,
@@ -234,10 +252,17 @@ def build_radio(log):
     # 下加符號：外框頂在 y=0
     def normtop(q):
         return S.at(q, cx=0, top=0)
-    marks["cedilla"] = normtop(S.tf(comma, affine(-0.75, 0.75)))       # comma 左右翻轉縮小
-    marks["ogonek"] = normtop(S.tf(comma, affine(-0.80, 0.80)))
-    marks["commabelow"] = normtop(S.tf(comma, affine(0.62, 0.62)))
-    marks["commaturned"] = norm(S.tf(comma, affine(0.80, 0.80, 180)))
+    tv = TAILS["variants"][TAILS["variant"]]
+    if tv["shape"] == "comma":
+        tail_src = comma
+    elif tv["shape"] == "commatail":
+        tail_src = S.crop(comma, y1=tv["tail_cut"])
+    else:
+        tail_src = S.crop(S.path("j"), y1=0)
+    marks["cedilla"] = normtop(S.tf(tail_src, affine(tv["sx"], tv["sy"])))       # 尾向左下彎
+    marks["ogonek"] = normtop(S.tf(tail_src, affine(-tv["sx"], tv["sy"])))       # 鏡像，尾向右下
+    marks["commabelow"] = normtop(S.tf(comma, affine(tv["cb_scale"], tv["cb_scale"])))
+    marks["commaturned"] = norm(S.tf(comma, affine(tv["cb_scale"], tv["cb_scale"], 180)))
     quoteright = S.tf(comma, move(20, p["apos_dy"]))
 
     # ---- 基字 ----
@@ -281,10 +306,10 @@ def build_radio(log):
         cx = (x0 + x1) / 2
         if ch == "ģ":
             m = S.at(marks["commaturned"], cx=cx, bottom=p["lc_base"])
-            how = f"{bch} + comma 轉 180 度置上"
+            how = f"{bch} + comma 縮 {tv['cb_scale']} 轉 180 度置上（版本 {TAILS['variant']}）"
         elif ch in COMMA_BELOW:
-            m = S.at(marks["commabelow"], cx=cx, top=-30)
-            how = f"{bch} + comma 縮 0.62 置下"
+            m = S.at(marks["commabelow"], cx=cx, top=y0 - tv["cb_gap"])
+            how = f"{bch} + comma 縮 {tv['cb_scale']} 置基線下、留白 {tv['cb_gap']}（版本 {TAILS['variant']}）"
         elif ch in APOS_CARON:
             m = S.tf(quoteright, affine(0.8, 0.8))
             m = S.at(m, left=x1 + 10, top=y1 + 10)
@@ -293,11 +318,11 @@ def build_radio(log):
             put(cp, S.union(bp, m), adv, how)
             return True
         elif mk == "cedilla":
-            m = S.at(marks["cedilla"], cx=cx, top=40)
-            how = f"{bch} + comma 翻轉縮 0.75 置下（下加符）"
+            m = S.at(marks["cedilla"], cx=cx, top=y0 - tv["gap"])
+            how = f"{bch} + {tv['shape']} 橫 {tv['sx']}、縱 {tv['sy']} 置下、間距 {tv['gap']}（下加符，版本 {TAILS['variant']}）"
         elif mk == "ogonek":
-            m = S.at(marks["ogonek"], right=x1 - 40, top=40)
-            how = f"{bch} + comma 翻轉縮 0.80 置右下（反尾符）"
+            m = S.at(marks["ogonek"], right=x1 - tv["ogonek_inset"], top=y0 - tv["gap"])
+            how = f"{bch} + {tv['shape']} 鏡像、橫 {tv['sx']}、縱 {tv['sy']} 置右下、間距 {tv['gap']}（反尾符，版本 {TAILS['variant']}）"
         else:
             yb = p["uc_base"] if y1 > p["tall"] else p["lc_base"]
             m = S.at(marks[mk], cx=cx, bottom=yb)
@@ -590,7 +615,7 @@ def build_radio(log):
         return g, g.bounds[2] + 50
     sp(0x00B6, lambda: (*pilcrow(), "period 放大 + bar 截段兩支 + hyphen"))
     sp(0x00B7, lambda: (S.at(S.tf(period, affine(0.8, 0.8)), left=30, cy=380), 250, "period 縮 0.80 置中高"))
-    sp(0x00B8, lambda: (S.at(marks["cedilla"], left=40, top=40), 260, "下加符單獨"))
+    sp(0x00B8, lambda: (S.at(marks["cedilla"], left=40, top=-tv["gap"] if tv["gap"] > 0 else 0), 260, "下加符單獨"))
     def frac(a, b_):
         n1 = S.path(a, affine(0.45, 0.45))
         n1 = S.at(n1, left=20, bottom=400)
