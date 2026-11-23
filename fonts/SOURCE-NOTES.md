@@ -26,3 +26,17 @@ Erikas 兩個字重原本帶的是 130 字的子集，照當時某一個站的�
 U+014B ŋ。
 
 上游的姓名標示與各字型的授權摘要仍在 `LICENSES.md`。套件程式碼用 MIT，字型各自依上游條款。
+
+## 標題面 Radio Newsman 的覆蓋（2026-11-23）
+
+來源字型 radio-newsman.ttf 只有 95 個碼位，全在 ASCII；Latin-1 補充、擴充 A、一般標點
+（’ – —）都沒有，連 ASCII 的 `<`、`>`、反引號、`~` 也沒有，所以重建子集生不出 ü。人文來風
+講者「Günter Wohlfart」的標題用 `font-display`，ü 落到堆疊下一個面（汇文明體），詞內兩種字面。
+Erikas 兩個字重已是固定拉丁覆蓋（見上節），因此：
+
+- `--font-display` 堆疊在 Radio Newsman 之後補 Erikas Farbband，再接明體，兼顧單獨出現的字元。
+- ui-vue `PageIdentity` 的標題在含 Radio Newsman 畫不出的拉丁字元時整個改走 `font-accent`
+  （`packages/vue/src/composables/displayFont.js`），詞內不換字型。呼叫端明給 `titleClassName`
+  時以呼叫端為準。
+- `scripts/validate-font-subsets.mjs` 驗 Radio Newsman 子集畫得完 ASCII、判準涵蓋所有
+  「Radio Newsman 沒有而 Erikas 有」的 204 個碼位，並帶負向樣本。

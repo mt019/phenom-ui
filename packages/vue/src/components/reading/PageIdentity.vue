@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
+import { displayTitleClass } from '../../composables/displayFont.js';
 // 眉標連結是回站首頁的連結，照 React 版 Eyebrow 用 react-router 的 Link：畫成 <a>，不帶
 // aria-current。直接用 RouterLink 會在路徑相同的每個分頁（/guzhun?tab=…）都標 aria-current="page"。
 defineProps<{
@@ -78,7 +79,7 @@ const shared =
     ></div
   ><h1
     v-if="title"
-    :class="[titleClassName ?? 'font-display', 'text-token-2xl leading-tight sm:text-token-3xl']"
+    :class="[displayTitleClass(title, titleClassName), 'text-token-2xl leading-tight sm:text-token-3xl']"
     >{{ title }}</h1
   ><p v-if="summary" class="mt-3 max-w-3xl text-token-sm leading-relaxed text-ink-muted">{{
     summary

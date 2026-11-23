@@ -153,7 +153,7 @@ input[type='search']::-webkit-search-results-decoration {
 
 :root {
   --font-body: 'Huiwen Mincho', 'Songti TC', 'Noto Serif CJK TC', serif;
-  --font-display: 'Radio Newsman', 'Huiwen Mincho', 'Songti TC', 'Noto Serif CJK TC', serif;
+  --font-display: 'Radio Newsman', 'Erikas Farbband', 'Huiwen Mincho', 'Songti TC', 'Noto Serif CJK TC', serif;
   --font-accent: 'Erikas Farbband', 'Huiwen Mincho', 'Songti TC', 'Noto Serif CJK TC', serif;
   /* 圍籬程式碼專用。行內 `code` 走 font-accent（Erikas 的油墨網點正好），但整段程式碼靠的是
      縮排與對齊，比例字面對不齊；而且 Erikas 是子集字型，空白字元不在裡面。系統等寬字堆疊

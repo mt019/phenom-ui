@@ -36,3 +36,4 @@ export { default as Eyebrow } from './components/reading/Eyebrow.vue';
 export { default as HoverCard } from './components/reading/HoverCard.vue';
 export { default as Math } from './components/reading/Math.vue';
 export { default as MathText } from './components/reading/MathText.vue';
+export { needsAccentDisplayFace, displayTitleClass } from './composables/displayFont';

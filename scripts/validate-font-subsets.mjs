@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import * as fontkit from 'fontkit';
 
 /*
@@ -129,6 +129,54 @@ for (const character of FULLWIDTH_REQUIRED) {
     );
   }
 }
+
+/*
+ * 標題字型（Radio Newsman）與它的整標題備援（Erikas）。
+ *
+ * 2026-11-23 補上。人文來風講者「Günter Wohlfart」的標題用 font-display，ü 掉到堆疊下一個
+ * 面（汇文明體，細、無打字機質感）。來源字型 radio-newsman.ttf 只有 95 個碼位（ASCII），
+ * 重建子集生不出 ü，所以辦法在使用端：標題含 Radio Newsman 畫不出的拉丁字元時整個標題
+ * 改走 Erikas（packages/vue 的 displayFont.js），詞內不換字型。這裡驗三件事：
+ *  1. Radio Newsman 子集畫得完 ASCII（來源字型本身沒有的碼位列在 DISPLAY_SOURCE_GAPS）。
+ *  2. 判準函式涵蓋所有「Radio Newsman 沒有的拉丁字母與引號破折號」，漏一個就有一個字母掉字型。
+ *  3. 判準判成走 Erikas 的字元，Erikas 兩個字重都畫得出來。
+ */
+const DISPLAY_SOURCE_GAPS = new Set([0x003c, 0x003e, 0x0060, 0x007e]); // < > ` ~
+const display = font('RadioNewsman-subset.woff2');
+const displayMissing = range(0x0020, 0x007e).filter(
+  (c) => !DISPLAY_SOURCE_GAPS.has(c.codePointAt(0)) && !display.hasGlyphForCodePoint(c.codePointAt(0)),
+);
+if (displayMissing.length > 0) {
+  problems.push(`標題面 Radio Newsman 缺 ASCII ${displayMissing.length} 字：${displayMissing.join('')}`);
+}
+const { needsAccentDisplayFace } = await import(
+  pathToFileURL(path.join(root, 'packages/vue/src/composables/displayFont.js')).href
+);
+const accentFaces = ['ErikasFarbband-subset.woff2', 'ErikasFarbband-Bold-subset.woff2'].map(font);
+let accentChecked = 0;
+for (const [lo, hi] of [[0x00c0, 0x024f], [0x1e00, 0x1eff], [0x2013, 0x2014], [0x2018, 0x201d]]) {
+  for (let cp = lo; cp <= hi; cp++) {
+    if (display.hasGlyphForCodePoint(cp)) continue;
+    if (!accentFaces[0].hasGlyphForCodePoint(cp)) continue; // 兩個面都沒有：來源字型缺，不屬於這道檢查
+    accentChecked += 1;
+    const sample = `A${String.fromCodePoint(cp)}`;
+    if (!needsAccentDisplayFace(sample)) {
+      problems.push(`標題字型判準漏了 U+${cp.toString(16).toUpperCase().padStart(4, '0')}：Radio Newsman 沒有而 Erikas 有，該字會落到明體`);
+    }
+    for (const face of accentFaces) {
+      if (!face.hasGlyphForCodePoint(cp)) {
+        problems.push(`Erikas 一個字重缺 U+${cp.toString(16).toUpperCase().padStart(4, '0')}，整標題改走 Erikas 時該字掉字型`);
+      }
+    }
+  }
+}
+if (accentChecked < 200) {
+  problems.push(`標題字型備援只掃到 ${accentChecked} 個碼位（預期 200 以上），檢查沒有看到該看的字`);
+}
+for (const [text, expected] of [['Günter Wohlfart', true], ['我的博士導師─Günter Wohlfart', true], ['Kant', false], ['康德', false], ['凱薩琳·赫本', false], ['Hegel’s', true]]) {
+  if (needsAccentDisplayFace(text) !== expected) problems.push(`needsAccentDisplayFace(${JSON.stringify(text)}) 應為 ${expected}`);
+}
+console.log(`標題字型備援：Radio Newsman 缺而 Erikas 有的 ${accentChecked} 個碼位，判準全數涵蓋。`);
 
 /* 負向測試：未改過的常用面單獨拿來量，U+3008 要報半形。報不出來就表示上面那段的量法
    壞了（或是換了一支來源字型），而它壞掉的樣子與「一切正常」一模一樣。 */
